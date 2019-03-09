@@ -1,12 +1,21 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.json.JSONException;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -17,13 +26,38 @@ public class UserController {
         this.service = service;
     }
 
-    @GetMapping("/users")
-    Iterable<User> all() {
-        return service.getUsers();
+    // Create user
+    @PostMapping("/users")
+    //upon success return the url to the login page
+    User newUser (@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
+        return this.service.createUser(newUser);
     }
 
-    @PostMapping("/users")
-    User createUser(@RequestBody User newUser) {
-        return this.service.createUser(newUser);
+    // Login user
+    @PostMapping("/login")
+    public Map<String, String> token (@RequestBody User userToAuthenticate) throws NotRegisteredException, FailedAuthenticationException, JSONException {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("token", this.service.login(userToAuthenticate));
+
+        return map;
+    }
+
+    // Fetch all users
+    @GetMapping("/users") //users
+    Iterable<User> allUsers (@RequestHeader("authorization") String token) throws FailedAuthenticationException {
+        return service.getAllUsers(token);
+    }
+
+    // Fetch one particular user
+    @GetMapping("/users/{userId}") //users
+    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId) throws NotRegisteredException, FailedAuthenticationException {
+        return service.getUser(token, userId);
+    }
+
+    // Update one particular user
+    @PutMapping("/users/{userId}") //users
+    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate) throws NotRegisteredException,
+            FailedAuthenticationException, ResourceActionNotAllowedException {
+        return service.updateUser(token, userId, userToUpdate);
     }
 }

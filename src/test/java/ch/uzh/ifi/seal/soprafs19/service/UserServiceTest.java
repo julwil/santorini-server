@@ -3,8 +3,10 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,15 +35,15 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
-    public void createUser() {
+    public void createUser() throws JSONException, UsernameAlreadyExistsException {
         Assert.assertNull(userRepository.findByUsername("testUsername"));
 
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
+        testUser.setPassword("hello");
 
         User createdUser = userService.createUser(testUser);
-
         Assert.assertNotNull(createdUser.getToken());
         Assert.assertEquals(createdUser.getStatus(),UserStatus.ONLINE);
         Assert.assertEquals(createdUser, userRepository.findByToken(createdUser.getToken()));

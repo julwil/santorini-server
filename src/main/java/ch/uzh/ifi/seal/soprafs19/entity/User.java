@@ -1,35 +1,59 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
+@DynamicUpdate
 public class User implements Serializable {
-	
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(nullable = false, updatable = false)
 	@GeneratedValue
 	private Long id;
 	
-	@Column(nullable = false) 
+	@Column(nullable = false)
+	@NotEmpty
 	private String name;
 	
-	@Column(nullable = false, unique = true) 
+	@Column(nullable = false, unique = true)
+	@NotEmpty
 	private String username;
-	
-	@Column(nullable = false, unique = true) 
+
+	@Column(nullable = false)
+	@NotEmpty
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	private String password;
+
+	@Column
+	private Date birthday;
+
+	@Column(nullable = false, unique = true)
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String token;
 
 	@Column(nullable = false)
 	private UserStatus status;
+
+	@Column(nullable = false, updatable = false)
+	@CreationTimestamp
+	private LocalDateTime createdOn;
+
+	@Transient
+	private String createdOnTimeStamp;
 
 	public Long getId() {
 		return id;
@@ -55,6 +79,26 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	@JsonIgnore
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public LocalDateTime getCreatedOn() {return createdOn;}
+
+	@JsonIgnore
 	public String getToken() {
 		return token;
 	}
