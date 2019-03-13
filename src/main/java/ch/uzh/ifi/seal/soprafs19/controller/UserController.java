@@ -6,9 +6,6 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +23,17 @@ public class UserController {
         this.service = service;
     }
 
-    // Create user
+    // Create new user
     @PostMapping("/users")
-    //upon success return the url to the login page
-    User newUser (@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
-        return this.service.createUser(newUser);
+    public Map<String, String> pathToUser (@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
+        HashMap<String, String> pathToUser = new HashMap<>();
+        pathToUser.put("path", this.service.createUser(newUser));
+
+        // Upon success return the path to the created usr
+        return pathToUser;
     }
 
-    // Login user
+    // Login an existing user
     @PostMapping("/login")
     public Map<String, String> token (@RequestBody User userToAuthenticate) throws NotRegisteredException, FailedAuthenticationException, JSONException {
         HashMap<String, String> map = new HashMap<>();
@@ -57,7 +57,7 @@ public class UserController {
     // Update one particular user
     @PutMapping("/users/{userId}") //users
     User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate) throws NotRegisteredException,
-            FailedAuthenticationException, ResourceActionNotAllowedException {
+            FailedAuthenticationException, ResourceActionNotAllowedException, UsernameAlreadyExistsException {
         return service.updateUser(token, userId, userToUpdate);
     }
 }
