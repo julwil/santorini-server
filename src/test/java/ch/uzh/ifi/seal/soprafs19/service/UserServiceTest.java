@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
@@ -42,7 +43,7 @@ public class UserServiceTest{
 
 
     @Test
-    public void createUser() throws JSONException, UsernameAlreadyExistsException {
+    public void createUserTest() throws JSONException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -60,7 +61,7 @@ public class UserServiceTest{
 
 
     @Test
-    public void loginSuccessful() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginSuccessfulTest() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -76,7 +77,7 @@ public class UserServiceTest{
 
 
     @Test
-    public void loginFailedWrongPassword() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginFailedWrongPasswordTest() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -95,19 +96,39 @@ public class UserServiceTest{
             userRepository.delete(testUser);
         }
     }
-//
-//    @Test
-//    public void loginFailedNonExistentUserName() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
-//
-//        String token = null;
-//        try {
-//            testUser.setUsername("hello");
-//            token = userService.login(testUser);
-//        }
-//        catch (NotRegisteredException e) {
-//            Assert.assertEquals("User does not exist", e.getMessage());
-//        } finally {
-//            Assert.assertNull(token);
-//        }
-//    }
+
+    @Test
+    public void loginFailedNonExistentUserNameTest() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("testPassword");
+        String path = userService.createUser(testUser);
+
+        String token = null;
+        try {
+            testUser.setUsername("hello");
+            token = userService.login(testUser);
+        }
+        catch (NotRegisteredException e) {
+            Assert.assertEquals("User does not exist", e.getMessage());
+        } finally {
+            Assert.assertNull(token);
+            userRepository.delete(testUser);
+        }
+    }
+
+    @Test
+    public void updateUserTest() throws UsernameAlreadyExistsException, ResourceActionNotAllowedException, FailedAuthenticationException {
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("testPassword");
+        String path = userService.createUser(testUser);
+
+        testUser.setUsername("myNewUsername");
+        userService.updateUser(testUser.getToken(), testUser.getId(), testUser);
+
+        Assert.assertEquals(testUser, userRepository.findByUsername("myNewUsername"));
+    }
 }
