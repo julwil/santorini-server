@@ -54,33 +54,47 @@ public class UserServiceTest{
         Assert.assertEquals(testUser.getStatus(),UserStatus.ONLINE);
         Assert.assertEquals(testUser, userRepository.findByToken(testUser.getToken()));
         Assert.assertNotNull(userRepository.findByUsername(testUser.getUsername()).getPassword());
+
+        userRepository.delete(testUser);
     }
 
-///*
-//    @Test
-//    public void loginSuccessful() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
-//
-//        // Check if the token returned matches the to authenticated user
-//        String token = userService.login(testUser);
-//        Assert.assertEquals(token, testUser.getToken(), userRepository.findByUsername(testUser.getUsername()).getToken());
-//    }
-//*/
 
-//    @Test
-//    public void loginFailedWrongPassword() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
-//
-//        String path = userService.createUser(testUser);
-//        String token = null;
-//        try {
-//            testUser.setPassword("hello");
-//            token = userService.login(testUser);
-//        }
-//        catch (FailedAuthenticationException e) {
-//            Assert.assertEquals("Failed Authentication. Check your username and password", e.getMessage());
-//        } finally {
-//            Assert.assertNull(token);
-//        }
-//    }
+    @Test
+    public void loginSuccessful() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("testPassword");
+        String path = userService.createUser(testUser);
+
+        // Check if the token returned matches the to authenticated user
+        String token = userService.login(testUser);
+        Assert.assertEquals(token, testUser.getToken(), userRepository.findByUsername(testUser.getUsername()).getToken());
+
+        userRepository.delete(testUser);
+    }
+
+
+    @Test
+    public void loginFailedWrongPassword() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("testPassword");
+        String path = userService.createUser(testUser);
+
+        String token = null;
+        try {
+            testUser.setPassword("hello");
+            token = userService.login(testUser);
+        }
+        catch (FailedAuthenticationException e) {
+            Assert.assertEquals("Failed Authentication. Check your username and password", e.getMessage());
+        } finally {
+            Assert.assertNull(token);
+            userRepository.delete(testUser);
+        }
+    }
 //
 //    @Test
 //    public void loginFailedNonExistentUserName() throws NotRegisteredException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
