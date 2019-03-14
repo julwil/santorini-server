@@ -7,6 +7,8 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.json.JSONException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +32,7 @@ public class UserController {
         pathToUser.put("path", this.service.createUser(newUser));
 
         // Upon success return the path to the created usr
+        response.setStatus(201);
         return pathToUser;
     }
 
