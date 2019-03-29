@@ -59,7 +59,7 @@ public class UserControllerTest {
         this.mvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Test User\",\"username\": \"testUser\", \"password\": \"testPassword\"}"))
-                .andExpect(status().is(201)) //andDo(print()).
+                .andExpect(status().is(201))
                 .andExpect(jsonPath("$.path", notNullValue()));
 
         userRepository.delete(userRepository.findByUsername("testUser"));
@@ -91,8 +91,9 @@ public class UserControllerTest {
         testUser.setName("Test User");
         testUser.setPassword("testPassword");
         String path = userService.createUser(testUser);
+        long id = userRepository.findByUsername(testUser.getUsername()).getId();
 
-        this.mvc.perform(put("/users/1")
+        this.mvc.perform(put("/users/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("authorization", testUser.getToken())
                 .content("{\"name\": \"Test User Updated\",\"username\": \"testUserUpdated\", \"password\": \"testPasswordUpdated\"}"))
