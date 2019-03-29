@@ -48,14 +48,6 @@ sonarqube {
                 "sopra-fs19-group02-service" }
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectName", 
-                "sopra-fs19-group02-service" property "sonar.projectKey",
-                "sopra-fs19-group02-service" }
-}
-
-
 test {
     testLogging.showStandardStreams = true
     maxParallelForks = 1
