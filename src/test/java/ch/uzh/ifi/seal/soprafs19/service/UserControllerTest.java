@@ -45,12 +45,12 @@ public class UserControllerTest {
 
     @Test
     public void fetchAllUsersWithInvalidToken() throws Exception {
-        this.mvc.perform(get("/users").header("authorization", "fake_token")).andDo(print()).andExpect(status().is(403));
+        this.mvc.perform(get("/users").header("authorization", "fake_token")).andDo(print()).andExpect(status().is(401));
     }
 
     @Test
     public void fetchUserWithInvalidToken() throws Exception {
-        this.mvc.perform(get("/users/1").header("authorization", "fake_token")).andDo(print()).andExpect(status().is(403));
+        this.mvc.perform(get("/users/1").header("authorization", "fake_token")).andDo(print()).andExpect(status().is(401));
     }
 
     @Test
