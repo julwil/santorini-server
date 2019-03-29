@@ -26,7 +26,7 @@ import javax.security.auth.login.FailedLoginException;
 
 /**
  * Test class for the UserResource REST resource.
- *
+ * test commit
  * @see UserService
  */
 @WebAppConfiguration
