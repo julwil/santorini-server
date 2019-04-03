@@ -35,7 +35,8 @@ public class GameController {
                 "'board':['boardItem1','boardItem2']," +
                 "'status':'running',"+
                 "'currentTurn':{'id':1,'name':'testPlayer','figures':['figure1','figure2']}," +
-                "'isGodPower':false,"+
+                "'isGodPower':false,"
+                +"'createTime':'2019-04-03 12:22:02',"+
                 "'isRunning':true}";
     }
 
