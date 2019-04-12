@@ -45,6 +45,12 @@ public class UserController {
         return map;
     }
 
+    // Logout user
+    @GetMapping("/logout")
+    public void logout (@RequestHeader("authorization") String token) throws NotRegisteredException {
+        this.service.logout(token);
+    }
+
     // Fetch all users
     @GetMapping("/users") //users
     Iterable<User> allUsers (@RequestHeader("authorization") String token) throws FailedAuthenticationException {

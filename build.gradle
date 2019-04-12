@@ -39,13 +39,13 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     runtime('com.h2database:h2')
     compile 'org.json:json:20180813'
-} 
+}
 
 sonarqube {
     properties {
-        property "sonar.projectName", 
-                "sopra-fs19-group02-service" property "sonar.projectKey",
-                "sopra-fs19-group02-service" }
+        property "sonar.projectName", "sopra-fs19-group02-service"
+        property "sonar.projectKey", "sopra-fs19-group02-service"
+    }
 }
 
 test {
