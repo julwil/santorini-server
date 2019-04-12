@@ -157,6 +157,7 @@ public class UserService {
 
     public void logout(String userToLogoutToken) throws NotRegisteredException {
         try {
+
             User userToLogout = userRepository.findByToken(userToLogoutToken);
             userToLogout.setToken("logged_out");
             userToLogout.setStatus(UserStatus.OFFLINE);

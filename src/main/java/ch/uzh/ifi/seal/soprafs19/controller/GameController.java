@@ -1,44 +1,42 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
-
-import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
-import org.json.JSONException;
+import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class GameController {
 
+    private final GameService service;
 
-    GameController() {
-
+    GameController(GameService service) {
+        this.service = service;
     }
 
-    // Create new Game
+
+    // Create new Game. Recives informaciones del front. -> les das
     @PostMapping(value = "/games",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
-    public String pathToGame () {
-        return "{'path':'/games/1'}";
+    public Map<String, String> createGame (@Valid @RequestBody Game newGame, HttpServletResponse response) {
+        HashMap<String, String> pathToGame = new HashMap<>();
+        pathToGame.put("path", this.service.createGame(newGame));
+
+        // Upon success return the path to the created usr
+        response.setStatus(201);
+        return pathToGame;
     }
 
-    // Get Game by Id
-    @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
+
+    @GetMapping(value = "/games/{gameId}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    public String getGameById (@PathVariable long id) {
-        return "{'id':"+id+"," +
-                "'name':'testGame'," +
-                "'board':['boardItem1','boardItem2']," +
-                "'status':'running',"+
-                "'currentTurn':{'id':1,'name':'testPlayer','figures':['figure1','figure2']}," +
-                "'isGodPower':false,"
-                +"'createTime':'2019-04-03 12:22:02',"+
-                "'isRunning':true}";
+    Game game (@RequestHeader("authorization") String token, @PathVariable(value="gameId") long gameId) {
+        return service.getGameById(gameId);
     }
+
+
 
     // Get turns of Game
     @GetMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
@@ -57,6 +55,8 @@ public class GameController {
     public String pathToTurn (@PathVariable long id) {
         return "{'path':'/games/"+id+"/turns/1'}";
     }
+
+
 
     // Get players of Game
     @GetMapping(value = "/games/{id}/players",produces = "application/json;charset=UTF-8")

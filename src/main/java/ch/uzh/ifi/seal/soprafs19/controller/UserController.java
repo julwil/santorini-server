@@ -7,14 +7,12 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.json.JSONException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+
 
 @RestController
 public class UserController {
@@ -27,7 +25,7 @@ public class UserController {
 
     // Create new user
     @PostMapping("/users")
-    public Map<String, String> pathToUser (@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
+    public Map<String, String> createUser(@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
         HashMap<String, String> pathToUser = new HashMap<>();
         pathToUser.put("path", this.service.createUser(newUser));
 
