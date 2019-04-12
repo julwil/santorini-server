@@ -9,7 +9,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -48,12 +50,12 @@ public class User implements Serializable {
 	@Column(nullable = false)
 	private UserStatus status;
 
+	@OneToMany(mappedBy = "owner")
+	private List<Player> players;
+
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
-
-	@Transient
-	private String createdOnTimeStamp;
 
 	public Long getId() {
 		return id;
