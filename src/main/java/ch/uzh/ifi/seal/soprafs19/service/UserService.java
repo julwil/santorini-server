@@ -33,14 +33,16 @@ public class UserService {
     // Creates a new user if username not already taken and saves it to DB. Returns a path to the created user (e.g. users/5)
     public String createUser(User newUser) throws UsernameAlreadyExistsException {
         if (!userRepository.existsByUsername(newUser.getUsername())) {
-            newUser.setStatus(UserStatus.ONLINE);
+            newUser.setStatus(UserStatus.OFFLINE);
 
-            // use pseudo token to create user in order to generate a valid id
+            // Use pseudo token to create user in order to get a valid id
             newUser.setToken("no_token");
             userRepository.save(newUser);
 
-            // generate a token with the valid id
-            generateTokenAndSaveEntity(newUser);
+            // Generate a token for the new user
+            newUser.setToken(createUserToken(newUser));
+            userRepository.save(newUser);
+
             return "/users/"+newUser.getId().toString();
         } else {
             throw new UsernameAlreadyExistsException();
@@ -81,14 +83,15 @@ public class UserService {
 
         //Check if userToAuthenticate with that username exists in DB
         if(userRepository.existsByUsername(userToAuthenticate.getUsername())) {
-            User user = userRepository.findByUsername(userToAuthenticate.getUsername());
+            User dbUser = userRepository.findByUsername(username);
 
-            //Validate password against DB. Upon success, return the new user-token
-            if (password.equals(user.getPassword())){
-                generateTokenAndSaveEntity(userToAuthenticate);
-                userRepository.save(user);
+            //Validate password against DB. Upon success, return the new user-token and
+            if (password.equals(dbUser.getPassword())){
+                dbUser.setToken(createUserToken(dbUser));
+                dbUser.setStatus(UserStatus.ONLINE);
+                userRepository.save(dbUser);
 
-                return user.getToken();
+                return dbUser.getToken();
             } else {
                 throw new FailedAuthenticationException();
             }
@@ -119,30 +122,24 @@ public class UserService {
     }
 
     // Create a token for the user
-    private void generateTokenAndSaveEntity(User newUser) {
+    private String createUserToken(User user) {
 
-        // Fetch the created user from db and extract userId and creation date
-        newUser = userRepository.findByUsername(newUser.getUsername());
-        long userId = newUser.getId();
+        // Fetch the user from db and extract userId and creation date
+        user = userRepository.findByUsername(user.getUsername());
+        long userId = user.getId();
         Date timeStamp = new Date();
 
         // Create JSON with userId and creation date
-        Map<String, Object> map = new HashMap<>();
-        map.put("user_id", userId);
-        map.put("token_created", "Wtf");
-
-
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("user_id", userId);
+//        map.put("token_created", "Wtf");
 
        JSONObject json = new JSONObject();
        json.put("user_id", userId);
        json.put("token_created", timeStamp);
 
        // Convert json to String and encode it with b64
-       String token = Base64.getEncoder().encodeToString(json.toString().getBytes());
-
-       // Set token to user and update entity
-        newUser.setToken(token);
-        userRepository.save(newUser);
+       return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
     public void copyAttributes (User toUser, User fromUser) {
@@ -156,5 +153,18 @@ public class UserService {
         );
         toUser.setName(fromUser.getName());
         toUser.setBirthday(fromUser.getBirthday());
+    }
+
+    public void logout(String userToLogoutToken) throws NotRegisteredException {
+        try {
+            User userToLogout = userRepository.findByToken(userToLogoutToken);
+            userToLogout.setToken("logged_out");
+            userToLogout.setStatus(UserStatus.OFFLINE);
+
+            userRepository.save(userToLogout);
+        }
+        catch (NullPointerException e) {
+            throw new NotRegisteredException();
+        }
     }
 }

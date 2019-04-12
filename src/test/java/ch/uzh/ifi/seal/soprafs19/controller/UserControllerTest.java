@@ -86,6 +86,21 @@ public class UserControllerTest {
     }
 
     @Test
+    public void logoutUser() throws Exception{
+        User testUser = new User();
+        testUser.setUsername("testUser");
+        testUser.setName("Test User");
+        testUser.setPassword("testPassword");
+        String path = userService.createUser(testUser);
+
+        this.mvc.perform(get("/logout")
+                .header("authorization", testUser.getToken()))
+                .andExpect(status().is(200));
+
+        userRepository.delete(userRepository.findByUsername("testUser"));
+    }
+
+    @Test
     public void updateUser() throws Exception {
         User testUser = new User();
         testUser.setUsername("testUser");
