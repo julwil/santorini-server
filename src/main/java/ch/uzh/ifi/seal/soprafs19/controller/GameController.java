@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
-
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 @RestController
 public class GameController {
 
@@ -18,7 +19,7 @@ public class GameController {
     }
 
 
-    // Create new Game. Recives informaciones del front. -> les das
+    // Create new Game
     @PostMapping(value = "/games",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, String> createGame (@Valid @RequestBody Game newGame, HttpServletResponse response) {
@@ -34,6 +35,7 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     Game game (@RequestHeader("authorization") String token, @PathVariable(value="gameId") long gameId) {
+
         return service.getGameById(gameId);
     }
 
@@ -57,6 +59,13 @@ public class GameController {
         return "{'path':'/games/"+id+"/turns/1'}";
     }
 
+
+    // Fetch all games s
+    @GetMapping("/games")
+    Iterable<Game> allGames (
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException {
+        return service.getAllGames(token);
+    }
 
 
     // Get players of Game
