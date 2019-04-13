@@ -50,20 +50,18 @@ public class User implements Serializable {
 	@Column(nullable = false)
 	private UserStatus status;
 
-	@OneToMany(mappedBy = "owner")
-	private List<Player> players;
-
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
+
+	@OneToOne
+	private Game game;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public void setId(Long id) { this.id = id;	}
 
 	public String getName() {
 		return name;
@@ -116,6 +114,11 @@ public class User implements Serializable {
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
+
+	@JsonIgnore
+	public Game getGame() { return game;}
+
+	public void setGame(Game game) { this.game = game;	}
 
 	@Override
 	public boolean equals(Object o) {
