@@ -17,7 +17,7 @@ public class GameController {
     }
 
 
-    // Create new Game. Recives informaciones del front. -> les das
+    // Create new Game
     @PostMapping(value = "/games",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, String> createGame (@Valid @RequestBody Game newGame, HttpServletResponse response) {
