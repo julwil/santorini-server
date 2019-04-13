@@ -43,7 +43,7 @@ public class UserService {
             newUser.setToken(createUserToken(newUser));
             userRepository.save(newUser);
 
-            return "/users/"+newUser.getId().toString();
+            return "/users/" + newUser.getId().toString();
         } else {
             throw new UsernameAlreadyExistsException();
         }
@@ -124,16 +124,10 @@ public class UserService {
     // Create a token for the user
     private String createUserToken(User user) {
 
-        // Fetch the user from db and extract userId and creation date
-        user = userRepository.findByUsername(user.getUsername());
-        long userId = user.getId();
-        Date timeStamp = new Date();
-
-        // Create JSON with userId and creation date
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("user_id", userId);
-//        map.put("token_created", "Wtf");
-
+       // Fetch the user from db and extract userId and creation date
+       user = userRepository.findByUsername(user.getUsername());
+       long userId = user.getId();
+       Date timeStamp = new Date();
        JSONObject json = new JSONObject();
        json.put("user_id", userId);
        json.put("token_created", timeStamp);
@@ -154,6 +148,12 @@ public class UserService {
         toUser.setName(fromUser.getName());
         toUser.setBirthday(fromUser.getBirthday());
     }
+
+    public boolean isOnline(User user) { return user.getStatus() == UserStatus.ONLINE; }
+    public boolean isPlaying(User user) {
+        return user.getStatus() == UserStatus.PLAYING;
+    }
+    public boolean isChallenged(User user) { return user.getStatus() == UserStatus.CHALLENGED; }
 
     public void logout(String userToLogoutToken) throws NotRegisteredException {
         try {

@@ -1,4 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;

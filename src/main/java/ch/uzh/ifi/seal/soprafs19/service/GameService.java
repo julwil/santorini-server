@@ -1,4 +1,10 @@
 package ch.uzh.ifi.seal.soprafs19.service;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +22,14 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(GameService.class);
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
 
 
     @Autowired
-
-    public GameService(GameRepository gameRepository, UserRepository userRepository) {
+    public GameService(GameRepository gameRepository, UserService userService, UserRepository userRepository) {
         this.gameRepository = gameRepository;
+        this.userService = userService;
         this.userRepository = userRepository;
     }
 
