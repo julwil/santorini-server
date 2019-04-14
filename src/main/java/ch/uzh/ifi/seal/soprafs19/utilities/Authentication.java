@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs19.Utilities;
+package ch.uzh.ifi.seal.soprafs19.utilities;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;

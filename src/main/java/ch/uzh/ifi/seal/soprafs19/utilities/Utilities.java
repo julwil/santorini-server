@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs19.Utilities;
+package ch.uzh.ifi.seal.soprafs19.utilities;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
