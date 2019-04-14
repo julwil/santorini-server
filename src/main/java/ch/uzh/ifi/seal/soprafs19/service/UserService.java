@@ -119,18 +119,6 @@ public class UserService {
        return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
-    public void copyAttributes (User toUser, User fromUser) {
-        toUser.setUsername(
-                fromUser.getUsername() != null ?
-                fromUser.getUsername() : toUser.getUsername()
-        );
-        toUser.setPassword(
-            fromUser.getPassword() != null ?
-            fromUser.getPassword() :  toUser.getPassword()
-        );
-        toUser.setName(fromUser.getName());
-        toUser.setBirthday(fromUser.getBirthday());
-    }
 
     public boolean isOnline(User user) { return user.getStatus() == UserStatus.ONLINE; }
     public boolean isPlaying(User user) {
