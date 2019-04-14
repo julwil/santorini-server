@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
 @RestController
 public class GameController {
 
