@@ -31,13 +31,13 @@ public class GameService {
     }
 
     public Game getGameById(long id){
-        return null;
+        return gameRepository.findById(id);
     }
 
     public String createGame(Game newGame) {
         // Get the users by extracting the user id's from the game
-        User user1 = userRepository.findById(newGame.getUser1Id());
-        User user2 = userRepository.findById(newGame.getUser2Id());
+        User user1 = newGame.getUser1();
+        User user2 = newGame.getUser2();
 
         // Check if a users are offline
         if (!(userService.isOnline(user1) && userService.isOnline(user2))) {
@@ -49,10 +49,7 @@ public class GameService {
             return "You can't play against yourself";
         }
 
-        newGame.setUser1(user1);
-        newGame.setUser2(user2);
         newGame.setStatus(GameStatus.INITIALIZED);
-        newGame.setGodPower(false);
         newGame.setCurrentTurn(user2);
         gameRepository.save(newGame);
 
@@ -65,5 +62,9 @@ public class GameService {
         userRepository.save(user2);
 
         return "games/" + newGame.getId().toString();
+    }
+
+    public Iterable<Game> getAllGames(String token) {
+        return gameRepository.findAll();
     }
 }
