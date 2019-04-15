@@ -35,7 +35,7 @@ public class UserController {
     }
 
     // Login an existing user
-    @PostMapping("/login")
+    @PostMapping("users/login")
     public Map<String, String> token (@RequestBody User userToAuthenticate) throws NotRegisteredException, FailedAuthenticationException, JSONException {
         HashMap<String, String> map = new HashMap<>();
         map.put("token", this.service.login(userToAuthenticate));
@@ -45,8 +45,9 @@ public class UserController {
 
 
     // Logout user
-    @GetMapping("/logout")
-    public void logout (@RequestHeader("authorization") String token) throws NotRegisteredException {
+    @GetMapping("users/logout")
+    public void logout (@RequestHeader("authorization") String token, HttpServletResponse response) throws NotRegisteredException {
+        response.setStatus(204);
         this.service.logout(token);
     }
 
