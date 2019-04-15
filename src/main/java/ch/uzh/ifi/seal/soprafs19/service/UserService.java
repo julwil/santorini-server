@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.utilities.Authentication;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
@@ -23,6 +24,7 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+
 
 
     @Autowired
@@ -52,28 +54,9 @@ public class UserService {
     // Update a user
     public User updateUser(String originatorToken, long userToUpdateId, User userToUpdate) throws ResourceActionNotAllowedException, FailedAuthenticationException, UsernameAlreadyExistsException {
         // Check if token is valid
-        if (userRepository.existsByToken(originatorToken)) {
+        Authentication authentication = new Authentication(userRepository);
+        return authentication.updateUser(originatorToken,userToUpdateId,userToUpdate);
 
-            // Check if token from request-originator is related to the user-id from the user to be updated
-            if (userRepository.findByToken(originatorToken).getId().equals(userToUpdateId)) {
-                User dbUser = userRepository.findById(userToUpdateId);
-
-                if (dbUser.getUsername().equals(userToUpdate.getUsername()) ||
-                    !userRepository.existsByUsername(userToUpdate.getUsername())) {
-                    copyAttributes(dbUser, userToUpdate);
-                    userRepository.save(dbUser);
-                } else {
-                    throw new UsernameAlreadyExistsException();
-                }
-
-            } else {
-                throw new ResourceActionNotAllowedException();
-            }
-        } else {
-            throw new FailedAuthenticationException();
-        }
-
-        return null;
     }
 
     //Logs in a user if the user exists and password is correct. Returns the users's token
@@ -136,18 +119,6 @@ public class UserService {
        return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
-    public void copyAttributes (User toUser, User fromUser) {
-        toUser.setUsername(
-                fromUser.getUsername() != null ?
-                fromUser.getUsername() : toUser.getUsername()
-        );
-        toUser.setPassword(
-            fromUser.getPassword() != null ?
-            fromUser.getPassword() :  toUser.getPassword()
-        );
-        toUser.setName(fromUser.getName());
-        toUser.setBirthday(fromUser.getBirthday());
-    }
 
     public boolean isOnline(User user) { return user.getStatus() == UserStatus.ONLINE; }
     public boolean isPlaying(User user) {

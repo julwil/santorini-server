@@ -75,7 +75,7 @@ public class UserControllerTest {
         testUser.setPassword("testPassword");
         String path = userService.createUser(testUser);
 
-        this.mvc.perform(post("/login")
+        this.mvc.perform(post("/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\": \"testUser\", \"password\": \"testPassword\"}"))
                 .andExpect(status().is(200))
@@ -93,9 +93,9 @@ public class UserControllerTest {
         testUser.setPassword("testPassword");
         String path = userService.createUser(testUser);
 
-        this.mvc.perform(get("/logout")
+        this.mvc.perform(get("/users/logout")
                 .header("authorization", testUser.getToken()))
-                .andExpect(status().is(200));
+                .andExpect(status().is(204));
 
         userRepository.delete(userRepository.findByUsername("testUser"));
     }
@@ -113,7 +113,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("authorization", testUser.getToken())
                 .content("{\"name\": \"Test User Updated\",\"username\": \"testUserUpdated\", \"password\": \"testPasswordUpdated\"}"))
-                .andExpect(status().is(200)); //andDo(print()).
+                .andExpect(status().is(204)); //andDo(print()).
         userRepository.delete(userRepository.findByUsername("testUserUpdated"));
 
     }
