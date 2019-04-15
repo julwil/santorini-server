@@ -67,5 +67,5 @@ public class GameService {
     public Game getGameById(long id){
         return gameRepository.findById(id);
     }
-    public Iterable<Game> getGamesForUser2(User user2) { return gameRepository.findByUser2(user2); }
+    public Iterable<Game> getGamesForUser2(User user2) { return gameRepository.findByUser2AndStatus(user2, GameStatus.INITIALIZED); }
 }
