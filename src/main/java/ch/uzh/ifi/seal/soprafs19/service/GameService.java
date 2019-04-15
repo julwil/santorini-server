@@ -31,10 +31,6 @@ public class GameService {
         this.userRepository = userRepository;
     }
 
-    public Game getGameById(long id){
-        return gameRepository.findById(id);
-    }
-
     public String createGame(Game newGame) {
         // Get the users by extracting the user id's from the game
         User user1 = newGame.getUser1();
@@ -68,4 +64,8 @@ public class GameService {
     public Iterable<Game> getAllGames(String token) {
         return gameRepository.findAll();
     }
+    public Game getGameById(long id){
+        return gameRepository.findById(id);
+    }
+    public Iterable<Game> getGamesForUser2(User user2) { return gameRepository.findByUser2(user2); }
 }

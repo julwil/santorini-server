@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +14,11 @@ import java.util.Map;
 public class GameController {
 
     private final GameService service;
+    private final UserRepository userRepository;
 
-    GameController(GameService service) {
+    GameController(GameService service, UserRepository userRepository) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
 
@@ -59,11 +63,18 @@ public class GameController {
     }
 
 
-    // Fetch all games s
+    // Fetch all games
     @GetMapping("/games")
     Iterable<Game> allGames (
         @RequestHeader("authorization") String token) throws FailedAuthenticationException {
         return service.getAllGames(token);
+    }
+
+    // Fetch all games of the logged in user
+    @GetMapping("/games/invitations")
+    Iterable<Game> getGamesForUser2 (@RequestHeader("authorization") String token) {
+        User user2 = this.userRepository.findByToken(token);
+        return service.getGamesForUser2(user2);
     }
 
 
