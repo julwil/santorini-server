@@ -2,7 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
@@ -36,7 +36,7 @@ public class UserController {
 
     // Login an existing user
     @PostMapping("users/login")
-    public Map<String, String> token (@RequestBody User userToAuthenticate) throws NotFoundException, FailedAuthenticationException, JSONException {
+    public Map<String, String> token (@RequestBody User userToAuthenticate) throws ResourceNotFoundException, FailedAuthenticationException, JSONException {
         HashMap<String, String> map = new HashMap<>();
         map.put("token", this.service.login(userToAuthenticate));
 
@@ -46,7 +46,7 @@ public class UserController {
 
     // Logout user
     @GetMapping("users/logout")
-    public void logout (@RequestHeader("authorization") String token, HttpServletResponse response) throws NotFoundException {
+    public void logout (@RequestHeader("authorization") String token, HttpServletResponse response) throws ResourceNotFoundException {
         response.setStatus(204);
         this.service.logout(token);
     }
@@ -59,13 +59,13 @@ public class UserController {
 
     // Fetch one particular user
     @GetMapping("/users/{userId}") //users
-    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId) throws NotFoundException, FailedAuthenticationException {
+    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId) throws ResourceNotFoundException, FailedAuthenticationException {
         return service.getUser(token, userId);
     }
 
     // Update one particular user
     @PutMapping("/users/{userId}") //users
-    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate, HttpServletResponse response) throws NotFoundException,
+    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate, HttpServletResponse response) throws ResourceNotFoundException,
             FailedAuthenticationException, ResourceActionNotAllowedException, UsernameAlreadyExistsException {
         response.setStatus(204);
         return service.updateUser(token, userId, userToUpdate);

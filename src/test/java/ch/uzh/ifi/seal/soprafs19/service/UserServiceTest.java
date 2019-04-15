@@ -4,7 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -56,7 +56,7 @@ public class UserServiceTest{
 
 
     @Test
-    public void loginSuccessfulTest() throws NotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginSuccessfulTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -74,7 +74,7 @@ public class UserServiceTest{
     }
 
     @Test
-    public void logoutTest() throws NotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException {
+    public void logoutTest() throws ResourceNotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -97,7 +97,7 @@ public class UserServiceTest{
 
 
     @Test
-    public void loginFailedWrongPasswordTest() throws NotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginFailedWrongPasswordTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -118,7 +118,7 @@ public class UserServiceTest{
     }
 
     @Test
-    public void loginFailedNonExistentUserNameTest() throws NotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginFailedNonExistentUserNameTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
@@ -130,7 +130,7 @@ public class UserServiceTest{
             testUser.setUsername("hello");
             token = userService.login(testUser);
         }
-        catch (NotFoundException e) {
+        catch (ResourceNotFoundException e) {
             Assert.assertEquals("User does not exist", e.getMessage());
         } finally {
             Assert.assertNull(token);

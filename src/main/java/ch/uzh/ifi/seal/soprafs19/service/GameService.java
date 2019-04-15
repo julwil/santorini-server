@@ -3,7 +3,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 
 @Service
@@ -63,7 +61,7 @@ public class GameService {
         return "games/" + newGame.getId().toString();
     }
 
-    public Game acceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, NotFoundException {
+    public Game acceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException {
         try {
             Game game = gameRepository.findById(id);
 
@@ -85,11 +83,11 @@ public class GameService {
             return game;
         }
         catch (NullPointerException e) {
-            throw new NotFoundException("No game with matching id found");
+            throw new ResourceNotFoundException("No game with matching id found");
         }
     }
 
-    public void cancelGameRequestByUser(long id, User cancelingUser) throws NotFoundException, ResourceActionNotAllowedException {
+    public void cancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException {
         try {
             Game game = gameRepository.findById(id);
 
@@ -109,7 +107,7 @@ public class GameService {
             userRepository.save(user2);
         }
         catch (NullPointerException e) {
-            throw new NotFoundException("No game with matching id found");
+            throw new ResourceNotFoundException("No game with matching id found");
         }
     }
 
