@@ -8,4 +8,8 @@ public class ResourceActionNotAllowedException extends Exception{
     public ResourceActionNotAllowedException() {
         super("Resource action not allowed");
     }
+
+    public ResourceActionNotAllowedException(String message) {
+        super(message);
+    }
 }

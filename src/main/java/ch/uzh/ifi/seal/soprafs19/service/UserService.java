@@ -4,7 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.Authentication;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     //Logs in a user if the user exists and password is correct. Returns the users's token
-    public String login(User userToAuthenticate) throws FailedAuthenticationException, NotRegisteredException{
+    public String login(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException {
         String username = userToAuthenticate.getUsername();
         String password = userToAuthenticate.getPassword();
 
@@ -79,7 +79,7 @@ public class UserService {
                 throw new FailedAuthenticationException();
             }
         } else {
-            throw new NotRegisteredException();
+            throw new ResourceNotFoundException("User does not exist");
         }
     }
 
@@ -93,7 +93,7 @@ public class UserService {
     }
 
     // Get one particular user. A valid token and a user id must be provided
-    public User getUser(String token, long userId) throws FailedAuthenticationException, NotRegisteredException, NullPointerException {
+    public User getUser(String token, long userId) throws FailedAuthenticationException, NullPointerException {
 
         //Check if token exists
         if (userRepository.findByToken(token) != null) {
@@ -126,17 +126,17 @@ public class UserService {
     }
     public boolean isChallenged(User user) { return user.getStatus() == UserStatus.CHALLENGED; }
 
-    public void logout(String userToLogoutToken) throws NotRegisteredException {
+    public void logout(String userToLogoutToken) throws ResourceNotFoundException {
         try {
 
             User userToLogout = userRepository.findByToken(userToLogoutToken);
-            userToLogout.setToken("logged_out");
+            userToLogout.setToken("logged_out " + new Date().toString());
             userToLogout.setStatus(UserStatus.OFFLINE);
 
             userRepository.save(userToLogout);
         }
         catch (NullPointerException e) {
-            throw new NotRegisteredException();
+            throw new ResourceNotFoundException("User does not exist");
         }
     }
 }

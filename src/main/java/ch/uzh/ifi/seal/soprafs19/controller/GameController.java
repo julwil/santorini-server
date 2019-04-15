@@ -1,7 +1,10 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -72,11 +75,23 @@ public class GameController {
 
     // Fetch all games of the logged in user
     @GetMapping("/games/invitations")
-    Iterable<Game> getGamesForUser2 (@RequestHeader("authorization") String token) {
+    Game getGamesForUser2 (@RequestHeader("authorization") String token) {
         User user2 = this.userRepository.findByToken(token);
-        return service.getGamesForUser2(user2);
+        return service.getGamesForUser2AndStatus(user2, GameStatus.INITIALIZED);
     }
 
+    @PostMapping("/games/{id}/accept")
+    Game acceptGameRequestByUser (@RequestHeader("authorization") String token, @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+        User user = this.userRepository.findByToken(token);
+        return service.acceptGameRequestByUser(gameId, user);
+    }
+
+    @PostMapping("/games/{id}/reject")
+    void cancelGameRequest (@RequestHeader("authorization") String token, @PathVariable("id") long gameId, HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+        User user = this.userRepository.findByToken(token);
+        service.cancelGameRequestByUser(gameId, user);
+        response.setStatus(204);
+    }
 
     // Get players of Game
     @GetMapping(value = "/games/{id}/players",produces = "application/json;charset=UTF-8")
