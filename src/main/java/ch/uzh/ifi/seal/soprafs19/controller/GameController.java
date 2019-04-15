@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
+
 @RestController
 public class GameController {
 
@@ -63,7 +63,7 @@ public class GameController {
     // Fetch all games s
     @GetMapping("/games")
     Iterable<Game> allGames (
-            @RequestHeader("authorization") String token) throws FailedAuthenticationException {
+        @RequestHeader("authorization") String token) throws FailedAuthenticationException {
         return service.getAllGames(token);
     }
 
