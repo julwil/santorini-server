@@ -43,6 +43,7 @@ public class UserController {
         return map;
     }
 
+
     // Logout user
     @GetMapping("/logout")
     public void logout (@RequestHeader("authorization") String token) throws NotRegisteredException {
