@@ -10,19 +10,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class Utilities {
 
 
-    public void copyAttributes(User toUser, User fromUser) {
+    public void copyAttributes(User fromUser, User toUser) {
+        String username = fromUser.getUsername();
+        String password = fromUser.getPassword();
 
+        if (!(username == null || username.isEmpty())) {
+            toUser.setUsername(username);
+        }
 
-        toUser.setUsername(
-                fromUser.getUsername() != null ?
-                        fromUser.getUsername() : toUser.getUsername()
-        );
-        toUser.setPassword(
-                fromUser.getPassword() != null ?
-                        fromUser.getPassword() :  toUser.getPassword()
-        );
+        if (!(password == null || password.isEmpty())) {
+            toUser.setPassword(password);
+        }
+
         toUser.setName(fromUser.getName());
         toUser.setBirthday(fromUser.getBirthday());
-
     }
 }

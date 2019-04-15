@@ -9,7 +9,4 @@ import org.springframework.stereotype.Repository;
 public interface GameRepository extends CrudRepository<Game, Long> {
 	Game findById(long id);
 	boolean existsById(long id);
-	Iterable<Game> findByUser1AndStatusIn(User user1, GameStatus status);
-
-	Iterable<Game> findByUser2AndStatusIn(User user2, GameStatus status);
 }
