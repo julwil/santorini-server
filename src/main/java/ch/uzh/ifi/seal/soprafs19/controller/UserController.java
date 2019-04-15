@@ -64,8 +64,9 @@ public class UserController {
 
     // Update one particular user
     @PutMapping("/users/{userId}") //users
-    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate) throws NotRegisteredException,
+    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate, HttpServletResponse response) throws NotRegisteredException,
             FailedAuthenticationException, ResourceActionNotAllowedException, UsernameAlreadyExistsException {
+        response.setStatus(204);
         return service.updateUser(token, userId, userToUpdate);
     }
 }

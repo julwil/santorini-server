@@ -33,7 +33,7 @@ public class Authentication  {
                     userRepository.save(dbUser);
 
                     Utilities utilities = new Utilities();
-                    utilities.copyAttributes(dbUser, userToUpdate);
+                    utilities.copyAttributes(userToUpdate, dbUser);
 
 
                     return dbUser;
