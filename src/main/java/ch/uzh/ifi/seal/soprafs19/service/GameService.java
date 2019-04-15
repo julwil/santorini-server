@@ -3,6 +3,8 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exceptions.NotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ public class GameService {
     private final UserService userService;
 
     @Autowired
-    public GameService(GameRepository gameRepository, UserService userService, UserRepository userRepository) {
+    public GameService(GameRepository gameRepository, UserRepository userRepository, UserService userService) {
         this.gameRepository = gameRepository;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -61,11 +63,61 @@ public class GameService {
         return "games/" + newGame.getId().toString();
     }
 
+    public Game acceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, NotFoundException {
+        try {
+            Game game = gameRepository.findById(id);
+
+            if (!game.getUser2().equals(acceptingUser)) {
+                throw new ResourceActionNotAllowedException("Missing permission to accept the game");
+            }
+            game.setStatus(GameStatus.STARTED);
+            gameRepository.save(game);
+
+            User user1 = game.getUser1();
+            User user2 = game.getUser2();
+
+            user1.setStatus(UserStatus.PLAYING);
+            user2.setStatus(UserStatus.PLAYING);
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+
+            return game;
+        }
+        catch (NullPointerException e) {
+            throw new NotFoundException("No game with matching id found");
+        }
+    }
+
+    public void cancelGameRequestByUser(long id, User cancelingUser) throws NotFoundException, ResourceActionNotAllowedException {
+        try {
+            Game game = gameRepository.findById(id);
+
+            if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
+                throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
+            }
+            game.setStatus(GameStatus.CANCLED);
+            gameRepository.save(game);
+
+            User user1 = game.getUser1();
+            User user2 = game.getUser2();
+
+            user1.setStatus(UserStatus.ONLINE);
+            user2.setStatus(UserStatus.ONLINE);
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+        }
+        catch (NullPointerException e) {
+            throw new NotFoundException("No game with matching id found");
+        }
+    }
+
     public Iterable<Game> getAllGames(String token) {
         return gameRepository.findAll();
     }
     public Game getGameById(long id){
         return gameRepository.findById(id);
     }
-    public Iterable<Game> getGamesForUser2(User user2) { return gameRepository.findByUser2AndStatus(user2, GameStatus.INITIALIZED); }
+    public Game getGamesForUser2AndStatus(User user2, GameStatus status) { return gameRepository.findByUser2AndStatus(user2, status); }
 }
