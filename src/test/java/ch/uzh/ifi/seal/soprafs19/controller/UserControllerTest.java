@@ -75,7 +75,7 @@ public class UserControllerTest {
         testUser.setPassword("testPassword");
         String path = userService.createUser(testUser);
 
-        this.mvc.perform(post("/login")
+        this.mvc.perform(post("users/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\": \"testUser\", \"password\": \"testPassword\"}"))
                 .andExpect(status().is(200))
@@ -93,7 +93,7 @@ public class UserControllerTest {
         testUser.setPassword("testPassword");
         String path = userService.createUser(testUser);
 
-        this.mvc.perform(get("/logout")
+        this.mvc.perform(get("users/logout")
                 .header("authorization", testUser.getToken()))
                 .andExpect(status().is(200));
 
