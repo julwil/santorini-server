@@ -43,12 +43,12 @@ public class UserServiceTest{
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
 
-        Assert.assertNotNull(testUser.getToken());
+        Assert.assertNull(testUser.getToken());
         Assert.assertEquals(UserStatus.OFFLINE, testUser.getStatus());
-        Assert.assertEquals(testUser, userRepository.findByToken(testUser.getToken()));
+        Assert.assertEquals(testUser, userRepository.findByUsername(testUser.getUsername()));
         Assert.assertNotNull(userRepository.findByUsername(testUser.getUsername()).getPassword());
 
         userRepository.delete(testUser);
@@ -61,12 +61,11 @@ public class UserServiceTest{
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
-        String token = userService.login(testUser);
+        String token = userService.postLogin(testUser);
 
-        // Check if the token returned matches the to authenticated user
-        Assert.assertEquals(token, testUser.getToken(), userRepository.findByUsername(testUser.getUsername()).getToken());
+        Assert.assertNotNull(token);
 
         // Check if user is online
         Assert.assertEquals(UserStatus.ONLINE, userRepository.findByToken(token).getStatus());
@@ -74,17 +73,17 @@ public class UserServiceTest{
     }
 
     @Test
-    public void logoutTest() throws ResourceNotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException {
+    public void logoutTest() throws ResourceNotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException, ResourceActionNotAllowedException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
         // Check if the token returned matches the to authenticated user
-        String token = userService.login(testUser);
+        String token = userService.postLogin(testUser);
         User userToLogout = userRepository.findByToken(token);
-        userService.logout(testUser.getToken());
+        userService.getLogout(token);
         User loggedOutUser = userRepository.findByUsername(userToLogout.getUsername());
         // Check if user status is offline
         Assert.assertEquals(UserStatus.OFFLINE, loggedOutUser.getStatus());
@@ -102,15 +101,15 @@ public class UserServiceTest{
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
         String token = null;
         try {
             testUser.setPassword("hello");
-            token = userService.login(testUser);
+            token = userService.postLogin(testUser);
         }
         catch (FailedAuthenticationException e) {
-            Assert.assertEquals("Failed Authentication. Check your username and password", e.getMessage());
+            Assert.assertEquals("Failed AuthenticationService. Check your username and password", e.getMessage());
         } finally {
             Assert.assertNull(token);
             userRepository.delete(testUser);
@@ -123,12 +122,12 @@ public class UserServiceTest{
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
         String token = null;
         try {
             testUser.setUsername("hello");
-            token = userService.login(testUser);
+            token = userService.postLogin(testUser);
         }
         catch (ResourceNotFoundException e) {
             Assert.assertEquals("User does not exist", e.getMessage());
@@ -139,15 +138,16 @@ public class UserServiceTest{
     }
 
     @Test
-    public void updateUserTest() throws UsernameAlreadyExistsException, ResourceActionNotAllowedException, FailedAuthenticationException {
+    public void updateUserTest() throws UsernameAlreadyExistsException, ResourceActionNotAllowedException, FailedAuthenticationException, ResourceNotFoundException {
         User testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
+        String token = userService.postLogin(testUser);
 
         testUser.setUsername("myNewUsername");
-        userService.updateUser(testUser.getToken(), testUser.getId(), testUser);
+        userService.putUpdateUser(token, testUser.getId(), testUser);
 
         Assert.assertEquals(testUser, userRepository.findByUsername("myNewUsername"));
     }

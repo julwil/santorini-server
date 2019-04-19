@@ -38,7 +38,7 @@ public class User implements Serializable {
 	@Column
 	private Date birthday;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = true, unique = true)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String token;
 

@@ -25,13 +25,18 @@ public class GameService {
     private final UserService userService;
 
     @Autowired
-    public GameService(GameRepository gameRepository, UserRepository userRepository, UserService userService) {
+    public GameService(
+            GameRepository gameRepository,
+            UserRepository userRepository,
+            UserService userService)
+    {
         this.gameRepository = gameRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
 
-    public String createGame(Game newGame) {
+    public String postCreateGame(Game newGame)
+    {
         // Get the users by extracting the user id's from the game
         User user1 = newGame.getUser1();
         User user2 = newGame.getUser2();
@@ -61,7 +66,8 @@ public class GameService {
         return "games/" + newGame.getId().toString();
     }
 
-    public Game acceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException {
+    public Game postAcceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException
+    {
         try {
             Game game = gameRepository.findById(id);
 
@@ -87,7 +93,8 @@ public class GameService {
         }
     }
 
-    public void cancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+    public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    {
         try {
             Game game = gameRepository.findById(id);
 
@@ -111,11 +118,18 @@ public class GameService {
         }
     }
 
-    public Iterable<Game> getAllGames(String token) {
+    public Iterable<Game> getAllGames(String token)
+    {
         return gameRepository.findAll();
     }
-    public Game getGameById(long id){
+
+    public Game getGameById(long id)
+    {
         return gameRepository.findById(id);
     }
-    public Game getGamesForUser2AndStatus(User user2, GameStatus status) { return gameRepository.findByUser2AndStatus(user2, status); }
+
+    public Iterable<Game> getGamesForUser2AndStatus(User user2, GameStatus status)
+    {
+        return gameRepository.findByUser2AndStatus(user2, status);
+    }
 }

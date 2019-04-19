@@ -24,33 +24,38 @@ public class GameController {
         this.userRepository = userRepository;
     }
 
-
     // Create new Game
     @PostMapping(value = "/games",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> createGame (@Valid @RequestBody Game newGame, HttpServletResponse response) {
+    public Map<String, String> postCreateGame (
+            @Valid @RequestBody Game newGame,
+            HttpServletResponse response)
+    {
         HashMap<String, String> pathToGame = new HashMap<>();
-        pathToGame.put("path", this.service.createGame(newGame));
+        pathToGame.put("path", this.service.postCreateGame(newGame));
 
         // Upon success return the path to the created usr
         response.setStatus(201);
         return pathToGame;
     }
 
-
     @GetMapping(value = "/games/{gameId}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    Game game (@RequestHeader("authorization") String token, @PathVariable(value="gameId") long gameId) {
-
+    public Game getGameById (
+            @RequestHeader("authorization") String token,
+            @PathVariable(value="gameId") long gameId)
+    {
         return service.getGameById(gameId);
     }
 
 
 
     // Get turns of Game
-    @GetMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/games/{gameId}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    public String getTurnsOfGame (@PathVariable long id) {
+    public String getTurnsByGame (
+            @PathVariable long gameId)
+    {
         return "{'turns':[" +
                 "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
                 "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
@@ -61,46 +66,58 @@ public class GameController {
     // Create new Turn in Game
     @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
-    public String pathToTurn (@PathVariable long id) {
+    public String postCreateTurn (
+            @PathVariable long id)
+    {
         return "{'path':'/games/"+id+"/turns/1'}";
     }
 
-
     // Fetch all games
     @GetMapping("/games")
-    Iterable<Game> allGames (
-        @RequestHeader("authorization") String token) throws FailedAuthenticationException {
+    public Iterable<Game> getAllGames (
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException
+    {
         return service.getAllGames(token);
     }
 
     // Fetch all games of the logged in user
     @GetMapping("/games/invitations")
-    Game getGamesForUser2 (@RequestHeader("authorization") String token) {
+    public Iterable<Game> getGamesForUser2 (
+            @RequestHeader("authorization") String token)
+    {
         User user2 = this.userRepository.findByToken(token);
         return service.getGamesForUser2AndStatus(user2, GameStatus.INITIALIZED);
     }
 
     @PostMapping("/games/{id}/accept")
-    Game acceptGameRequestByUser (@RequestHeader("authorization") String token, @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+    public Game postAcceptGameRequestByUser (
+            @RequestHeader("authorization") String token,
+            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    {
         User user = this.userRepository.findByToken(token);
-        return service.acceptGameRequestByUser(gameId, user);
+        return service.postAcceptGameRequestByUser(gameId, user);
     }
 
     @PostMapping("/games/{id}/reject")
-    void cancelGameRequest (@RequestHeader("authorization") String token, @PathVariable("id") long gameId, HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+    void postCancelGameRequest (
+            @RequestHeader("authorization") String token,
+            @PathVariable("id") long gameId,
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    {
         User user = this.userRepository.findByToken(token);
-        service.cancelGameRequestByUser(gameId, user);
+        service.postCancelGameRequestByUser(gameId, user);
         response.setStatus(204);
     }
 
     // Get players of Game
     @GetMapping(value = "/games/{id}/players",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    public String getPlayersOfGame (@PathVariable long id) {
+    public String getPlayersByGame (
+            @PathVariable long id)
+    {
         return "{'players':[" +
                 "{'id':1,'name':'testPlayer','figures':['figure1','figure2']}," +
                 "{'id':2,'name':'testPlayer2','figures':['figure3','figure4']}" +
                 "]}";
     }
-
 }

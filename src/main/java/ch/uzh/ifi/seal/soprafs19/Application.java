@@ -8,12 +8,12 @@ import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
+import ch.uzh.ifi.seal.soprafs19.utilities.Utilities;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -38,9 +38,9 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository) {
+    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, AuthenticationService authentication, Utilities utils) {
         return (args) -> {
-            UserService userService = new UserService(userRepository);
+            UserService userService = new UserService(userRepository, authentication, utils);
             // save a couple of Users
             String[] testUsers = {"julius", "areg", "max", "tobi", "stewie", "peter", "brian", "louise", "wilson", "doris"};
             for (String username : testUsers) {
@@ -49,7 +49,7 @@ public class Application {
                 user.setName(username.toUpperCase());
                 user.setPassword("admin");
                 user.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-                userService.createUser(user);
+                userService.postCreateUser(user);
             }
 
             GameService gameService = new GameService(gameRepository, userRepository,userService);
@@ -65,7 +65,7 @@ public class Application {
                 game.setUser2(user2);
                 game.setCurrentTurn(user2);
                 game.setGodPower(i%2 == 0);
-                gameService.createGame(game);
+                gameService.postCreateGame(game);
             }
         };
     }
