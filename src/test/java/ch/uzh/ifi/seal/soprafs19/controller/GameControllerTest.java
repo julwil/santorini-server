@@ -42,7 +42,7 @@ public class GameControllerTest {
         testUser.setUsername("testUser");
         testUser.setName("Test User");
         testUser.setPassword("testPassword");
-        userService.createUser(testUser);
+        userService.postCreateUser(testUser);
     }
 
     @After

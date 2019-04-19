@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
-import ch.uzh.ifi.seal.soprafs19.controller.UserController;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
@@ -73,7 +72,7 @@ public class UserControllerTest {
         testUser.setUsername("testUser");
         testUser.setName("Test User");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
 
         this.mvc.perform(post("/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,10 +90,12 @@ public class UserControllerTest {
         testUser.setUsername("testUser");
         testUser.setName("Test User");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
+        String token = userService.postLogin(testUser);
+
 
         this.mvc.perform(get("/users/logout")
-                .header("authorization", testUser.getToken()))
+                .header("authorization", token))
                 .andExpect(status().is(204));
 
         userRepository.delete(userRepository.findByUsername("testUser"));
@@ -106,12 +107,13 @@ public class UserControllerTest {
         testUser.setUsername("testUser");
         testUser.setName("Test User");
         testUser.setPassword("testPassword");
-        String path = userService.createUser(testUser);
+        String path = userService.postCreateUser(testUser);
+        String token = userService.postLogin(testUser);
         long id = userRepository.findByUsername(testUser.getUsername()).getId();
 
         this.mvc.perform(put("/users/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("authorization", testUser.getToken())
+                .header("authorization", token)
                 .content("{\"name\": \"Test User Updated\",\"username\": \"testUserUpdated\", \"password\": \"testPasswordUpdated\"}"))
                 .andExpect(status().is(204)); //andDo(print()).
         userRepository.delete(userRepository.findByUsername("testUserUpdated"));

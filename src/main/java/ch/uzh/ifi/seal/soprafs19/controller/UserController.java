@@ -25,9 +25,12 @@ public class UserController {
 
     // Create new user
     @PostMapping("/users")
-    public Map<String, String> createUser(@Valid @RequestBody User newUser, HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException {
+    public Map<String, String> postCreateUser(
+            @Valid @RequestBody User newUser,
+            HttpServletResponse response) throws UsernameAlreadyExistsException, JSONException
+    {
         HashMap<String, String> pathToUser = new HashMap<>();
-        pathToUser.put("path", this.service.createUser(newUser));
+        pathToUser.put("path", this.service.postCreateUser(newUser));
 
         // Upon success return the path to the created usr
         response.setStatus(201);
@@ -36,38 +39,50 @@ public class UserController {
 
     // Login an existing user
     @PostMapping("users/login")
-    public Map<String, String> token (@RequestBody User userToAuthenticate) throws ResourceNotFoundException, FailedAuthenticationException, JSONException {
+    public Map<String, String> postLogin (
+            @RequestBody User userToAuthenticate)
+            throws ResourceNotFoundException, FailedAuthenticationException, JSONException
+    {
         HashMap<String, String> map = new HashMap<>();
-        map.put("token", this.service.login(userToAuthenticate));
+        map.put("token", this.service.postLogin(userToAuthenticate));
 
         return map;
     }
 
-
     // Logout user
     @GetMapping("users/logout")
-    public void logout (@RequestHeader("authorization") String token, HttpServletResponse response) throws ResourceNotFoundException {
+    public void getLogout (
+            @RequestHeader("authorization") String token,
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException {
         response.setStatus(204);
-        this.service.logout(token);
+        this.service.getLogout(token);
     }
 
     // Fetch all users
     @GetMapping("/users") //users
-    Iterable<User> allUsers (@RequestHeader("authorization") String token) throws FailedAuthenticationException {
+    public Iterable<User> getAllUsers (
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException
+    {
         return service.getAllUsers(token);
     }
 
     // Fetch one particular user
     @GetMapping("/users/{userId}") //users
-    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId) throws ResourceNotFoundException, FailedAuthenticationException {
-        return service.getUser(token, userId);
+    public User getUserById (
+            @RequestHeader("authorization") String token,
+            @PathVariable(value="userId") long userId) throws ResourceNotFoundException, FailedAuthenticationException
+    {
+        return service.getUserById(token, userId);
     }
 
     // Update one particular user
     @PutMapping("/users/{userId}") //users
-    User user (@RequestHeader("authorization") String token, @PathVariable(value="userId") long userId, @RequestBody User userToUpdate, HttpServletResponse response) throws ResourceNotFoundException,
+    public User putUser (
+            @RequestHeader("authorization") String token,
+            @PathVariable(value="userId") long userId,
+            @RequestBody User userToUpdate, HttpServletResponse response) throws ResourceNotFoundException,
             FailedAuthenticationException, ResourceActionNotAllowedException, UsernameAlreadyExistsException {
         response.setStatus(204);
-        return service.updateUser(token, userId, userToUpdate);
+        return service.putUpdateUser(token, userId, userToUpdate);
     }
 }
