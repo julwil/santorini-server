@@ -27,6 +27,7 @@ public class GameSerializer extends StdSerializer<Game> {
         jgen.writeNumberField("user1", game.getUser1().getId());
         jgen.writeNumberField("user2", game.getUser2().getId());
         jgen.writeNumberField("currentTurn", game.getCurrentTurn().getId());
+        jgen.writeObjectField("board", game.getBoard());
         jgen.writeStringField("createdOn", game.getCreatedOn().toString());
         jgen.writeEndObject();
     }

@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
@@ -74,6 +75,10 @@ public class GameService {
             if (!game.getUser2().equals(acceptingUser)) {
                 throw new ResourceActionNotAllowedException("Missing permission to accept the game");
             }
+            GameBoard board = new GameBoard();
+            board.setGame(game);
+            game.setBoard(board);
+
             game.setStatus(GameStatus.STARTED);
             gameRepository.save(game);
 
