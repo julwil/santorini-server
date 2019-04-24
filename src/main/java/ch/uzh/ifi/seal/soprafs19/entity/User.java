@@ -5,12 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
-
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
@@ -41,7 +38,7 @@ public class User implements Serializable {
 	@Column
 	private Date birthday;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = true, unique = true)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String token;
 
@@ -52,16 +49,14 @@ public class User implements Serializable {
 	@CreationTimestamp
 	private LocalDateTime createdOn;
 
-	@Transient
-	private String createdOnTimeStamp;
+	@OneToOne
+	private Game game;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public void setId(Long id) { this.id = id;	}
 
 	public String getName() {
 		return name;
@@ -114,6 +109,11 @@ public class User implements Serializable {
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
+
+	@JsonIgnore
+	public Game getGame() { return game;}
+
+	public void setGame(Game game) { this.game = game;	}
 
 	@Override
 	public boolean equals(Object o) {

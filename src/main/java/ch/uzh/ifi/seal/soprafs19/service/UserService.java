@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.NotRegisteredException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.utilities.Utilities;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,140 +23,165 @@ import java.util.*;
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
-
+    private final AuthenticationService authentication;
+    private final Utilities utils;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuthenticationService authentication, Utilities utils) {
         this.userRepository = userRepository;
+        this.authentication = authentication;
+        this.utils = utils;
     }
 
-    // Creates a new user if username not already taken and saves it to DB. Returns a path to the created user (e.g. users/5)
-    public String createUser(User newUser) throws UsernameAlreadyExistsException {
-        if (!userRepository.existsByUsername(newUser.getUsername())) {
-            newUser.setStatus(UserStatus.ONLINE);
+    public String postCreateUser(User newUser) throws UsernameAlreadyExistsException
+    {
+        Boolean uniqueUsername = !userRepository.existsByUsername(newUser.getUsername());
 
-            // use pseudo token to create user in order to generate a valid id
-            newUser.setToken("no_token");
-            userRepository.save(newUser);
-
-            // generate a token with the valid id
-            generateTokenAndSaveEntity(newUser);
-            return "/users/"+newUser.getId().toString();
-        } else {
+        if (!uniqueUsername) {
             throw new UsernameAlreadyExistsException();
         }
+
+        newUser.setStatus(UserStatus.OFFLINE);
+        userRepository.save(newUser);
+
+        return "/users/" + newUser.getId().toString();
     }
 
     // Update a user
-    public User updateUser(String originatorToken, long userToUpdateId, User userToUpdate) throws ResourceActionNotAllowedException, FailedAuthenticationException, UsernameAlreadyExistsException {
-        // Check if token is valid
-        if (userRepository.existsByToken(originatorToken)) {
+    public User putUpdateUser(String token, long userToUpdateId, User userToUpdate) throws
+            ResourceActionNotAllowedException,
+            FailedAuthenticationException,
+            UsernameAlreadyExistsException
+    {
+        User dbUser = userRepository.findById(userToUpdateId);
+        Boolean authenticated = authentication.isAuthenticated(token);
+        Boolean tokenBelongsToUser = authentication.tokenOwnsUser(token, userToUpdateId);
+        Boolean uniqueUsername = !userRepository.existsByUsername(userToUpdate.getUsername())
+                || userToUpdate.getUsername().equals(dbUser.getUsername());
 
-            // Check if token from request-originator is related to the user-id from the user to be updated
-            if (userRepository.findByToken(originatorToken).getId().equals(userToUpdateId)) {
-                User dbUser = userRepository.findById(userToUpdateId);
-
-                if (dbUser.getUsername().equals(userToUpdate.getUsername()) ||
-                    !userRepository.existsByUsername(userToUpdate.getUsername())) {
-                    copyAttributes(dbUser, userToUpdate);
-                    userRepository.save(dbUser);
-                } else {
-                    throw new UsernameAlreadyExistsException();
-                }
-
-            } else {
-                throw new ResourceActionNotAllowedException();
-            }
-        } else {
+        if (!authenticated) {
             throw new FailedAuthenticationException();
         }
 
-        return null;
-    }
-
-    //Logs in a user if the user exists and password is correct. Returns the users's token
-    public String login(User userToAuthenticate) throws FailedAuthenticationException, NotRegisteredException{
-        String username = userToAuthenticate.getUsername();
-        String password = userToAuthenticate.getPassword();
-
-        //Check if userToAuthenticate with that username exists in DB
-        if(userRepository.existsByUsername(userToAuthenticate.getUsername())) {
-            User user = userRepository.findByUsername(userToAuthenticate.getUsername());
-
-            //Validate password against DB. Upon success, return the new user-token
-            if (password.equals(user.getPassword())){
-                generateTokenAndSaveEntity(userToAuthenticate);
-                userRepository.save(user);
-
-                return user.getToken();
-            } else {
-                throw new FailedAuthenticationException();
-            }
-        } else {
-            throw new NotRegisteredException();
+        if (!tokenBelongsToUser) {
+            throw new ResourceActionNotAllowedException();
         }
+
+        if (!uniqueUsername) {
+            throw new UsernameAlreadyExistsException();
+        }
+
+        utils.copyAttributes(userToUpdate, dbUser);
+        userRepository.save(dbUser);
+
+        return dbUser;
     }
 
-    // Fetch all users
-    public Iterable<User> getAllUsers(String token) throws FailedAuthenticationException {
-        if (userRepository.existsByToken(token)) {
-            return this.userRepository.findAll();
-        } else {
+    public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
+    {
+        String loginUsername = userToAuthenticate.getUsername();
+        String loginPassword = userToAuthenticate.getPassword();
+        Boolean userExists = userRepository.existsByUsername(loginUsername);
+
+        if (!userExists) {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        User dbUser = userRepository.findByUsername(loginUsername);
+        String dbPassword = dbUser.getPassword();
+
+        if (!loginPassword.equals(dbPassword)) {
             throw new FailedAuthenticationException();
         }
+
+        if (isOffline(dbUser)) {
+            dbUser.setStatus(UserStatus.ONLINE);
+        }
+
+        dbUser.setToken(createUserToken(dbUser));
+        userRepository.save(dbUser);
+
+        return dbUser.getToken();
+    }
+
+    public Iterable<User> getAllUsers(String token) throws FailedAuthenticationException
+    {
+        Boolean authenticated = authentication.isAuthenticated(token);
+
+        if (!authenticated) {
+            throw new FailedAuthenticationException();
+        }
+
+        return this.userRepository.findAll();
     }
 
     // Get one particular user. A valid token and a user id must be provided
-    public User getUser(String token, long userId) throws FailedAuthenticationException, NotRegisteredException, NullPointerException {
+    public User getUserById(String token, long userId) throws FailedAuthenticationException, NullPointerException
+    {
+        Boolean authenticated = authentication.isAuthenticated(token);
 
-        //Check if token exists
-        if (userRepository.findByToken(token) != null) {
-
-            return userRepository.findById(userId);
-        }  else {
+        if (!authenticated) {
             throw new FailedAuthenticationException();
         }
+
+        return userRepository.findById(userId);
     }
 
     // Create a token for the user
-    private void generateTokenAndSaveEntity(User newUser) {
+    private String createUserToken(User user)
+    {
+       User dbUser = userRepository.findByUsername(user.getUsername());
 
-        // Fetch the created user from db and extract userId and creation date
-        newUser = userRepository.findByUsername(newUser.getUsername());
-        long userId = newUser.getId();
-        Date timeStamp = new Date();
+        // We use a timestamp and the user id to create a hash
+       long userId = dbUser.getId();
+       Date now = new Date();
 
-        // Create JSON with userId and creation date
-        Map<String, Object> map = new HashMap<>();
-        map.put("user_id", userId);
-        map.put("token_created", "Wtf");
-
-
-
+       // We create a json object containing user id and creation date of token
        JSONObject json = new JSONObject();
        json.put("user_id", userId);
-       json.put("token_created", timeStamp);
+       json.put("token_created", now);
 
        // Convert json to String and encode it with b64
-       String token = Base64.getEncoder().encodeToString(json.toString().getBytes());
-
-       // Set token to user and update entity
-        newUser.setToken(token);
-        userRepository.save(newUser);
+       return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
-    public void copyAttributes (User toUser, User fromUser) {
-        toUser.setUsername(
-                fromUser.getUsername() != null ?
-                fromUser.getUsername() : toUser.getUsername()
-        );
-        toUser.setPassword(
-            fromUser.getPassword() != null ?
-            fromUser.getPassword() :  toUser.getPassword()
-        );
-        toUser.setName(fromUser.getName());
-        toUser.setBirthday(fromUser.getBirthday());
+    public void getLogout(String userToLogoutToken) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    {
+        Boolean authenticated = authentication.isAuthenticated(userToLogoutToken);
+
+        if (!authenticated) {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        User dbUser = userRepository.findByToken(userToLogoutToken);
+
+        if (!isOnline(dbUser)) {
+            throw new ResourceActionNotAllowedException();
+        }
+
+        dbUser.setToken(null);
+        dbUser.setStatus(UserStatus.OFFLINE);
+        userRepository.save(dbUser);
+    }
+
+    public boolean isOnline(User user)
+    {
+        return user.getStatus() == UserStatus.ONLINE;
+    }
+
+    public boolean isPlaying(User user)
+    {
+        return user.getStatus() == UserStatus.PLAYING;
+    }
+
+    public boolean isChallenged(User user)
+    {
+        return user.getStatus() == UserStatus.CHALLENGED;
+    }
+
+    public boolean isOffline(User user)
+    {
+        return user.getStatus() == UserStatus.OFFLINE;
     }
 }
