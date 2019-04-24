@@ -82,7 +82,7 @@ public class GameControllerTest {
     @Test
     public void getTurns() throws Exception {
         this.mvc.perform(get("/games/1/turns")
-                .header("Authorization", testUser.getToken()))
+                .header("Authorization", "token"))
                 .andExpect(status().is(200))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.turns").isNotEmpty())
@@ -102,7 +102,7 @@ public class GameControllerTest {
         this.mvc.perform(post("/games/1/turns")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"performedBy\": 1,\"finished\": true, \"events\": [\"event1\",\"event2\"]}")
-                .header("Authorization", testUser.getToken()))
+                .header("Authorization", "token"))
                 .andExpect(status().is(201))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.path").isString());
@@ -111,7 +111,7 @@ public class GameControllerTest {
     @Test
     public void getPlayers() throws Exception {
         this.mvc.perform(get("/games/1/players")
-                .header("Authorization", testUser.getToken()))
+                .header("Authorization", "token"))
                 .andExpect(status().is(200))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.players").isNotEmpty())

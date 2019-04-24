@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
@@ -38,7 +39,7 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, AuthenticationService authentication, Utilities utils) {
+    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, FigureRepository figureRepository, AuthenticationService authentication, Utilities utils) {
         return (args) -> {
             UserService userService = new UserService(userRepository, authentication, utils);
             // save a couple of Users
@@ -52,7 +53,7 @@ public class Application {
                 userService.postCreateUser(user);
             }
 
-            GameService gameService = new GameService(gameRepository, userRepository,userService);
+            GameService gameService = new GameService(gameRepository, figureRepository, userRepository,userService);
             // save a few games
             GameStatus[] gameStatuses = {GameStatus.INITIALIZED, GameStatus.STARTED, GameStatus.CANCLED};
             for (int i = 0; i < 3; i++) {

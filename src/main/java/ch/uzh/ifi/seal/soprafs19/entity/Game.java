@@ -81,6 +81,7 @@ public class Game implements Serializable {
 
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
