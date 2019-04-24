@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
-import ch.uzh.ifi.seal.soprafs19.utilities.Position;
-import org.hibernate.annotations.Columns;
+ import ch.uzh.ifi.seal.soprafs19.utilities.Position;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -53,6 +53,11 @@ public abstract class BoardItem implements Serializable {
         this.y = position.getY();
         this.z = position.getZ();
     }
+
+    @JsonIgnore
+	public Game getGame() {return game;}
+
+	public void setGame(Game game) {this.game = game;}
 
 	@Override
 	public boolean equals(Object o) {
