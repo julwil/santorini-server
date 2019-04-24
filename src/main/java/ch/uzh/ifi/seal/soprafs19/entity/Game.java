@@ -40,9 +40,6 @@ public class Game implements Serializable {
     @OneToOne
 	private User user2;
 
-    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
-	private GameBoard board;
-
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
@@ -84,9 +81,6 @@ public class Game implements Serializable {
 
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
-	public GameBoard getBoard() {return board;}
-
-	public void setBoard(GameBoard board) {	this.board = board;}
 
 	@Override
 	public boolean equals(Object o) {

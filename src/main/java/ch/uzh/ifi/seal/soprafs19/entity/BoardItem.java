@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-abstract class BoardItem implements Serializable {
+public abstract class BoardItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,11 +19,14 @@ abstract class BoardItem implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	@Columns(columns = { @Column(name = "x"), @Column(name = "y"), @Column(name = "z") })
-	@Type(type = "ch.uzh.ifi.seal.soprafs19.types.PositionType")
-	private Position position;
+	private int x;
 
-	private GameBoard board;
+	private int y;
+
+	private int z;
+
+	@ManyToOne
+	private Game game;
 
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
@@ -39,17 +42,17 @@ abstract class BoardItem implements Serializable {
 
 	public LocalDateTime getCreatedOn() {return createdOn;}
 
-	public GameBoard getGameBoard() {return board;}
+	public Position getPosition()
+    {
+        return new Position(this.x, this.y, this.z);
+    }
 
-	public void setGameBoard(GameBoard board) {this.board = board;}
-
-	public Position getPosition() {return position;}
-
-	public void setPosition(Position position) {this.position = position;}
-
-	public GameBoard getBoard() {return board;}
-
-	public void setBoard(GameBoard board) {	this.board = board;}
+	public void setPosition(Position position)
+    {
+        this.x = position.getX();
+        this.y = position.getY();
+        this.z = position.getZ();
+    }
 
 	@Override
 	public boolean equals(Object o) {

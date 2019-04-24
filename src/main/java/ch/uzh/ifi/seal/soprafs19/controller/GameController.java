@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
@@ -108,12 +107,6 @@ public class GameController {
         User user = this.userRepository.findByToken(token);
         service.postCancelGameRequestByUser(gameId, user);
         response.setStatus(204);
-    }
-
-    @GetMapping(value = "/games/{id}/board")
-    public GameBoard getGameBoard (@PathVariable long id)
-    {
-        return service.getGameBoardByGameId(id);
     }
 
     // Get players of Game

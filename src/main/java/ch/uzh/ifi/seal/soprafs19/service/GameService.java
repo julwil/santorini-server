@@ -1,12 +1,10 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.GameBoard;
-import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
-import ch.uzh.ifi.seal.soprafs19.repository.GameBoardRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @Transactional
 public class GameService {
@@ -23,19 +20,19 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
-    private final GameBoardRepository gameBoardRepository;
+    private final FigureRepository figureRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
     @Autowired
     public GameService(
             GameRepository gameRepository,
-            GameBoardRepository gameBoardRepository,
+            FigureRepository figureRepository,
             UserRepository userRepository,
             UserService userService)
     {
         this.gameRepository = gameRepository;
-        this.gameBoardRepository = gameBoardRepository;
+        this.figureRepository = figureRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
@@ -79,9 +76,6 @@ public class GameService {
             if (!game.getUser2().equals(acceptingUser)) {
                 throw new ResourceActionNotAllowedException("Missing permission to accept the game");
             }
-            GameBoard board = new GameBoard();
-            board.setGame(game);
-            gameBoardRepository.save(board);
 
             game.setStatus(GameStatus.STARTED);
             gameRepository.save(game);
@@ -140,9 +134,5 @@ public class GameService {
     public Iterable<Game> getGamesForUser2AndStatus(User user2, GameStatus status)
     {
         return gameRepository.findByUser2AndStatus(user2, status);
-    }
-
-    public GameBoard getGameBoardByGameId(long id) {
-        return gameBoardRepository.findByGame(gameRepository.findById(id));
     }
 }

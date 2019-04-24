@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface BuildingRepository extends CrudRepository<Building, Long> {
 	Building findById(long id);
 	boolean existsById(long id);
+	Iterable<Building> findAllByGame(Game game);
 }
