@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BuildingRepository extends CrudRepository<Game, Long> {
+public interface BuildingRepository extends CrudRepository<Building, Long> {
 	Building findById(long id);
 	boolean existsById(long id);
 }

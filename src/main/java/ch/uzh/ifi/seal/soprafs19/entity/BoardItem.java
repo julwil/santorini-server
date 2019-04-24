@@ -1,7 +1,9 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
+import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,9 +19,10 @@ abstract class BoardItem implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	//private Position position;
+	@Columns(columns = { @Column(name = "x"), @Column(name = "y"), @Column(name = "z") })
+	@Type(type = "ch.uzh.ifi.seal.soprafs19.types.PositionType")
+	private Position position;
 
-	@Column(nullable = false)
 	private GameBoard board;
 
 	@Column(nullable = false, updatable = false)
@@ -40,9 +43,9 @@ abstract class BoardItem implements Serializable {
 
 	public void setGameBoard(GameBoard board) {this.board = board;}
 
-//	public Position getPosition() {return position;}
-//
-//	public void setPosition(Position position) {this.position = position;}
+	public Position getPosition() {return position;}
+
+	public void setPosition(Position position) {this.position = position;}
 
 	public GameBoard getBoard() {return board;}
 

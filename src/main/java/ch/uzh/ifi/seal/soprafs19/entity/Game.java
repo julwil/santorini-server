@@ -40,7 +40,7 @@ public class Game implements Serializable {
     @OneToOne
 	private User user2;
 
-	@OneToOne
+    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
 	private GameBoard board;
 
 	@Column(nullable = false, updatable = false)

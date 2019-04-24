@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
@@ -39,22 +40,22 @@ public class GameController {
         return pathToGame;
     }
 
-    @GetMapping(value = "/games/{gameId}",produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     public Game getGameById (
             @RequestHeader("authorization") String token,
-            @PathVariable(value="gameId") long gameId)
+            @PathVariable(value="gameId") long id)
     {
-        return service.getGameById(gameId);
+        return service.getGameById(id);
     }
 
 
 
     // Get turns of Game
-    @GetMapping(value = "/games/{gameId}/turns",produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     public String getTurnsByGame (
-            @PathVariable long gameId)
+            @PathVariable long id)
     {
         return "{'turns':[" +
                 "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
@@ -107,6 +108,12 @@ public class GameController {
         User user = this.userRepository.findByToken(token);
         service.postCancelGameRequestByUser(gameId, user);
         response.setStatus(204);
+    }
+
+    @GetMapping(value = "/games/{id}/board")
+    public GameBoard getGameBoard (@PathVariable long id)
+    {
+        return service.getGameBoardByGameId(id);
     }
 
     // Get players of Game

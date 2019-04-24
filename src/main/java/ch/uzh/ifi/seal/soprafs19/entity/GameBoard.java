@@ -1,11 +1,14 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @DynamicUpdate
@@ -18,24 +21,33 @@ public class GameBoard implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	@Column(nullable = false)
+	@OneToOne
+	@MapsId
 	private Game game;
+
+	@Transient
+	private Set<BoardItem> items = new HashSet<>();
 
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
 
-	public Long getId() {
-		return id;
-	}
+	@JsonIgnore
+	public Long getId() {return id;	}
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	@JsonIgnore
 	public LocalDateTime getCreatedOn() {return createdOn;}
 
+	@JsonIgnore
 	public Game getGame() {return game;}
+
+	public Set<BoardItem> getItems() {return items;}
+
+	public void setItems(Set<BoardItem> items) {this.items = items;}
 
 	public void setGame(Game game) {this.game = game;}
 
@@ -45,7 +57,7 @@ public class GameBoard implements Serializable {
 		if (!(o instanceof GameBoard)) {
 			return false;
 		}
-		GameBoard user = (GameBoard) o;
-		return this.getId().equals(user.getId());
+		GameBoard board = (GameBoard) o;
+		return this.getId().equals(board.getId());
 	}
 }

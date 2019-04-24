@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FigureRepository extends CrudRepository<Game, Long> {
+public interface FigureRepository extends CrudRepository<Figure, Long> {
 	Figure findById(long id);
 	boolean existsById(long id);
 }
