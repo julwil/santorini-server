@@ -19,6 +19,7 @@ public class GameBoardController {
         this.gameRepository = gameRepository;
     }
 
+    // Get the board of a game
     @GetMapping(value = "/games/{id}/board")
     public GameBoard getGameBoard (@PathVariable long id)
     {
