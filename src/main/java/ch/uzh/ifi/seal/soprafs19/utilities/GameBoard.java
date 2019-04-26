@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.utilities;
 
 import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
+import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
