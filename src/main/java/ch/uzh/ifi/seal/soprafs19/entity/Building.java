@@ -3,7 +3,6 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 import ch.uzh.ifi.seal.soprafs19.constant.BoardItemType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.DynamicUpdate;
-
 import javax.persistence.Entity;
 import java.io.Serializable;
 

@@ -43,7 +43,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public Game getGameById (
             @RequestHeader("authorization") String token,
-            @PathVariable(value="gameId") long id)
+            @PathVariable(value="id") long id)
     {
         return service.getGameById(id);
     }
