@@ -51,4 +51,16 @@ public class Position {
                 this.getY() == position.getY() &&
                 this.getZ() == position.getZ();
     }
+
+
+    @Override
+    public int hashCode() {
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZ();
+
+        String hash = Integer.toString(x) + Integer.toString(y) + Integer.toString(z);
+
+        return Integer.parseInt(hash);
+    }
 }

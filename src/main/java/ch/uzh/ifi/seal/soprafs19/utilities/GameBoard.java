@@ -4,8 +4,11 @@ import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,15 +19,30 @@ public class GameBoard {
 
 	private Game game;
 
-	private Map<Position, BoardItem> items = new HashMap<>();
+	private Map<Position, BoardItem> boardMap = new HashMap<>();
 
 	public Game getGame() {return game;}
 
 	public void setGame(Game game) {this.game = game;}
 
-	public Map<Position, BoardItem> getItems() {return items;}
+	@JsonIgnore
+	public Map<Position, BoardItem> getBoardMap()
+	{
+		return boardMap;
+	}
 
-	public void setItems(Map<Position, BoardItem> items) {this.items = items;}
+	@JsonProperty("board")
+	public ArrayList<BoardItem> getBoardValues()
+	/*
+	 	returns the boardMap as HashMap with id as key and item as value.
+	*/
+	{
+		ArrayList<BoardItem> items = new ArrayList<>();
+		items.addAll(boardMap.values());
+		return items;
+	}
+
+	public void setBoardMap(Map<Position, BoardItem> boardMap) {this.boardMap = boardMap;}
 
 	@Autowired
 	public GameBoard(Game game, FigureRepository figureRepository, BuildingRepository buildingRepository)
@@ -33,14 +51,14 @@ public class GameBoard {
 		this.figureRepository = figureRepository;
 		this.buildingRepository = buildingRepository;
 
-		// Add all figures to the items list
+		// Add all figures to the boardMap list
 		figureRepository.findAllByGame(game).forEach(figure->{
-			this.getItems().put(figure.getPosition(), figure);
+			this.getBoardMap().put(figure.getPosition(), figure);
 		});
 
-		// Add all buildings to the items list
+		// Add all buildings to the boardMap list
 		buildingRepository.findAllByGame(game).forEach(building->{
-			this.getItems().put(building.getPosition(), building);
+			this.getBoardMap().put(building.getPosition(), building);
 		});
 	}
 }
