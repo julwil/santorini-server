@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameDeserializer;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,6 +33,9 @@ public class Game implements Serializable {
     @OneToOne
 	private User currentTurn;
 
+    @Column
+	private long lastActiveFigureId;
+
 	// Player 1 is the challenger
     @OneToOne
 	private User user1;
@@ -43,6 +47,10 @@ public class Game implements Serializable {
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
+
+	/*
+	 * Getters and Setters
+	 */
 
 	public Long getId() {
 		return id;
@@ -81,6 +89,10 @@ public class Game implements Serializable {
 
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
+    @JsonIgnore
+	public long getLastActiveFigureId() {return lastActiveFigureId;}
+
+	public void setLastActiveFigureId(long lastActiveFigureId) {this.lastActiveFigureId = lastActiveFigureId; }
 
 	@Override
 	public boolean equals(Object o) {
