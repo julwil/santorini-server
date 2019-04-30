@@ -81,7 +81,7 @@ public class GameBoardController {
         return pathToFigure;
     }
 
-    @PutMapping(value = "/games/{gameId}/figures{figureId}")
+    @PutMapping(value = "/games/{gameId}/figures/{figureId}")
     public Map<String, String> putGameBoardFigure (
             @RequestHeader("authorization") String token,
             @PathVariable long gameId,

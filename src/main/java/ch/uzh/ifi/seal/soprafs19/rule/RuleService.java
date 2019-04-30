@@ -28,6 +28,9 @@ public class RuleService {
         this.gameBoard = gameBoard;
     }
 
+    /*
+     * returns whether the place action of a figure is valid
+     */
     public Boolean postFigureIsValid(Game game, Figure figure)
     {
         ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, figure.getOwnerId());
@@ -39,9 +42,12 @@ public class RuleService {
                possiblePostFigurePositions.contains(positionToPlaceFigure);
     }
 
-    public  Boolean postBuildingIsValid(Game game, Building building)
+    /*
+     * returns whether the build action is valid
+     */
+    public  Boolean postBuildingIsValid(Game game, Building buildingToBuild)
     {
-        Position positionToBuild = building.getPosition();
+        Position positionToBuild = buildingToBuild.getPosition();
         Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
         ArrayList<Position> possibleBuildPositions = getPossiblePostBuildingPositions(lastActiveFigure.getPosition());
 
@@ -49,15 +55,21 @@ public class RuleService {
         return possibleBuildPositions.contains(positionToBuild);
     }
 
-    public Boolean putFigureIsValid(Game game, Figure figure, Position targetPosition)
+    /*
+     * returns whether the move action is valid
+     */
+    public Boolean putFigureIsValid(Game game, Figure figureToMove, Position targetPosition)
     {
-        Position originPosition = figure.getPosition();
+        Position originPosition = figureToMove.getPosition();
         ArrayList<Position> possibleMoveFigurePositions = getPossiblePutFigurePositions(originPosition);
 
         return possibleMoveFigurePositions.contains(targetPosition);
     }
 
-    private ArrayList<Position> getPossiblePutFigurePositions(Position position)
+    /*
+     * returns a list of possible positions where the the figure can move to based on an origin position
+     */
+    private ArrayList<Position> getPossiblePutFigurePositions(Position origin)
     {
         // Get all adjacentPositions
         ArrayList<Position> adjacentPositions = new ArrayList<>();
@@ -70,9 +82,9 @@ public class RuleService {
                             continue;
                         }
                         Position tmp = new Position(
-                                position.getX() + dx,
-                                position.getY() + dy,
-                                position.getZ() + dz);
+                                origin.getX() + dx,
+                                origin.getY() + dy,
+                                origin.getZ() + dz);
 
                         if (validPosition(tmp)) {
                             adjacentPositions.add(tmp);
@@ -87,7 +99,12 @@ public class RuleService {
         return adjacentPositions;
     }
 
-    private ArrayList<Position> getPossiblePostBuildingPositions(Position position)
+    /*
+     * returns a list of possible positions where a building can be placed,
+     * based on the position of the last active figure.
+     */
+
+    private ArrayList<Position> getPossiblePostBuildingPositions(Position positionOfLastActiveFigure)
     {
         // Get all adjacentPositions
         ArrayList<Position> adjacentPositions = new ArrayList<>();
@@ -100,9 +117,9 @@ public class RuleService {
                             continue;
                         }
                         Position tmp = new Position(
-                                position.getX() + dx,
-                                position.getY() + dy,
-                                position.getZ() + dz);
+                                positionOfLastActiveFigure.getX() + dx,
+                                positionOfLastActiveFigure.getY() + dy,
+                                positionOfLastActiveFigure.getZ() + dz);
 
                         if (validPosition(tmp)) {
                             adjacentPositions.add(tmp);
@@ -117,10 +134,39 @@ public class RuleService {
         return adjacentPositions;
     }
 
+    /*
+     * returns a list of possible positions where a figure can be placed on the board
+     */
+
+    private ArrayList<Position> getPossiblePostFigurePositions()
+    {
+        ArrayList<Position> possiblePositions = new ArrayList<>();
+        Map<Position, BoardItem> board = gameBoard.getBoardMap();
+
+        // Calculate all possible positions on the 0th level
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                Position possiblePosition = new Position(x, y, 0);
+                possiblePositions.add(possiblePosition);
+            }
+        }
+
+        // Remove all positions which are already occupied.
+        possiblePositions.removeAll(board.keySet());
+
+        return possiblePositions;
+    }
+
+
+
+
+    // Helpers:
+
+    /*
+     * deletes all positions which don't are floor positions or don't have a building below them
+     */
     private void stripFloatingPositions(ArrayList<Position> adjacentPositions)
     {
-        //ArrayList<Position> candidates = adjacentPositions;
-
         // For all positions higher than level 0 z in {1,2,3} check if the field below has a building, else remove the original field
         for (Iterator<Position> iterator = adjacentPositions.iterator(); iterator.hasNext();) {
             Position adjacentPosition = iterator.next();
@@ -150,36 +196,22 @@ public class RuleService {
         }
     }
 
+    /*
+     * deletes all positions which are already occupied by a board item
+     */
     private void stripOccupiedPositions(ArrayList<Position> adjacentPositions)
     {
         Map<Position, BoardItem> board = gameBoard.getBoardMap();
         adjacentPositions.removeAll(board.keySet());
     }
-    
+
+    /*
+     * returns whether the position is valid according to the board dimensions
+     */
     private boolean validPosition(Position position)
     {
         return Axis.XYAXIS.contains(position.getX()) &&
                 Axis.XYAXIS.contains(position.getY()) &&
                 Axis.ZAXIS.contains(position.getZ());
-    }
-
-
-    private ArrayList<Position> getPossiblePostFigurePositions()
-    {
-        ArrayList<Position> possiblePositions = new ArrayList<>();
-        Map<Position, BoardItem> board = gameBoard.getBoardMap();
-
-        // Calculate all possible positions on the 0th level
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
-                Position possiblePosition = new Position(x, y, 0);
-                possiblePositions.add(possiblePosition);
-            }
-        }
-
-        // Remove all positions which are already occupied.
-        possiblePositions.removeAll(board.keySet());
-
-        return possiblePositions;
     }
 }

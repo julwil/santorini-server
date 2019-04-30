@@ -83,6 +83,7 @@ public class GameBoardService {
             throw new GameRuleException();
         }
 
+        figure.setPosition(target);
         figureRepository.save(figure);
         gameService.setLastActiveFigureInGame(figure, game);
 
