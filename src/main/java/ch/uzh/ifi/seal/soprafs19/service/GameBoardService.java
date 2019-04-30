@@ -2,11 +2,12 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.rules.RuleService;
+import ch.uzh.ifi.seal.soprafs19.rule.RuleService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
+import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,38 +44,48 @@ public class GameBoardService {
         return this.buildingRepository.findAllByGame(game);
     }
 
-    public String postGameBoardFigure(Game game, Figure figure)
-    {
-        figure.setGame(game);
+    public String postGameBoardFigure(Game game, Figure figure) throws GameRuleException {
+        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
+        Boolean validPostFigure = ruleService.postFigureIsValid(game, figure);
+
+        if (!validPostFigure) {
+            throw new GameRuleException();
+        }
+
         figureRepository.save(figure);
         gameService.setLastActiveFigureInGame(figure, game);
-
 
         return "figures/"  + figure.getId();
     }
 
-    public String postGameBoardBuilding(Game game, Building building)
-    {
+    public String postGameBoardBuilding(Game game, Building building) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
-        building.setGame(game);
-       // gameService.swapTurns(game);
-        Boolean success = ruleService.buildingAtValidPosition(game, building);
+        Boolean validPostBuilding = ruleService.postBuildingIsValid(game, building);
 
-        if (!success) {
-            return "invalid.build";
+        if (!validPostBuilding) {
+            throw new GameRuleException();
         }
 
         buildingRepository.save(building);
+        //gameService.swapTurns(game);
 
         return "buildings/" + building.getId().toString();
     }
 
-    public String putGameBoardFigure(Game game, Figure figure)
-    {
+    public String putGameBoardFigure(Game game, Figure figure, Position target) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
-        return "Hello";
+        Boolean validPutFigure = ruleService.putFigureIsValid(game, figure, target);
 
+        if (!validPutFigure) {
+            throw new GameRuleException();
+        }
+
+        figureRepository.save(figure);
+        gameService.setLastActiveFigureInGame(figure, game);
+
+        return "figures/"  + figure.getId();
     }
 }

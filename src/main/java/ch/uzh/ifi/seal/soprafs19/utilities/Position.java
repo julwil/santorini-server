@@ -48,47 +48,6 @@ public class Position {
     }
 
     @JsonIgnore
-    public ArrayList<Position> getAdjacentPositions()
-    {
-        ArrayList<Position> candidates = getCandidateAdjacentPositions();
-        ArrayList<Position> neighbours = new ArrayList<>();
-        for (Position candiate : candidates) {
-            if (candiate.hasValidAxis()) {
-                neighbours.add(candiate);
-            }
-        }
-
-        return neighbours;
-    }
-
-    @JsonIgnore
-    public boolean hasValidAxis()
-    {
-        return Axis.XYAXIS.contains(this.x) &&
-               Axis.XYAXIS.contains(this.y) &&
-               Axis.ZAXIS.contains(this.z);
-    }
-
-    @JsonIgnore
-    private ArrayList<Position> getCandidateAdjacentPositions()
-    {
-        ArrayList<Position> candidatePositions = new ArrayList<>();
-
-        for (int dx = -1; dx <= 1; ++dx) {
-            for (int dy = -1; dy <= 1; ++dy) {
-                for (int dz = -1; dz <=1; ++dz) {
-                    if (dx != 0 || dy != 0 || dz != 0) {
-                        Position tmp = new Position(this.x + dx, this.y + dy, this.z + dz);
-                        candidatePositions.add(tmp);
-                    }
-                }
-            }
-        }
-
-        return candidatePositions;
-    }
-
-    @JsonIgnore
     public boolean isFloor() {
         return this.getZ() == 0;
     }

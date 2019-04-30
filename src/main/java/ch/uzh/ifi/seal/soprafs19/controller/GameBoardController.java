@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -60,8 +61,7 @@ public class GameBoardController {
             @PathVariable long id,
             @RequestBody Position position,
             HttpServletResponse response)
-            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, id);
         authenticationService.userTokenIsCurrentTurn(token, id);
@@ -72,6 +72,7 @@ public class GameBoardController {
 
         figure.setPosition(position);
         figure.setOwnerId(user.getId());
+        figure.setGame(game);
         response.setStatus(201);
 
         HashMap<String, String> pathToFigure = new HashMap<>();
@@ -87,8 +88,7 @@ public class GameBoardController {
             @PathVariable long figureId,
             @RequestBody Position position,
             HttpServletResponse response)
-            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, gameId);
         authenticationService.userTokenIsCurrentTurn(token,gameId);
@@ -97,12 +97,10 @@ public class GameBoardController {
         User user = userRepository.findByToken(token);
         Figure figure = figureRepository.findById(figureId);
 
-        figure.setPosition(position);
-        figure.setOwnerId(user.getId());
-        response.setStatus(201);
+        response.setStatus(200);
 
         HashMap<String, String> pathToFigure = new HashMap<>();
-        pathToFigure.put("path", service.putGameBoardFigure(game, figure));
+        pathToFigure.put("path", service.putGameBoardFigure(game, figure, position));
 
         return pathToFigure;
     }
@@ -113,8 +111,7 @@ public class GameBoardController {
             @PathVariable long id,
             @RequestBody Position position,
             HttpServletResponse response)
-            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, id);
         authenticationService.userTokenIsCurrentTurn(token, id);
@@ -125,6 +122,7 @@ public class GameBoardController {
 
         building.setPosition(position);
         building.setOwnerId(user.getId());
+        building.setGame(game);
         response.setStatus(201);
 
         HashMap<String, String> pathToBuilding = new HashMap<>();
