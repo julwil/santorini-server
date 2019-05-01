@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.rule.RuleService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
+import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class BuildingService {
     {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, gameBoard);
-        Boolean validPostBuilding = ruleService.postBuildingIsValid(game, building);
+        Boolean validPostBuilding = ruleService.postBuildingIsValid(building);
 
         if (!validPostBuilding) {
             throw new GameRuleException();
@@ -52,5 +53,15 @@ public class BuildingService {
         //gameService.swapTurns(game);
 
         return "buildings/" + building.getId().toString();
+    }
+
+    /*
+     * returns a list of possible positions where a building can be placed
+     */
+    public Iterable<Position> getGameBoardBuildingsPossibleBuilds(Game game) {
+        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+
+        return ruleService.getPossiblePostBuildingPositions();
     }
 }

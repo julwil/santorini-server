@@ -69,4 +69,11 @@ public class BuildingController {
 
         return pathToBuilding;
     }
+
+    @GetMapping(value = "/games/{id}/buildings/possibleBuilds")
+    public Iterable<Position> getGameBoardBuildingsPossibleBuilds (@PathVariable long id)
+    {
+        Game game = gameRepository.findById(id);
+        return service.getGameBoardBuildingsPossibleBuilds(game);
+    }
 }
