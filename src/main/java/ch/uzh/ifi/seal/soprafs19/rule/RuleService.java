@@ -18,17 +18,19 @@ public class RuleService {
 
     private final FigureRepository figureRepository;
     private final GameBoard gameBoard;
+    private final Game game;
 
     public RuleService(FigureRepository figureRepository, GameBoard gameBoard)
     {
         this.figureRepository = figureRepository;
         this.gameBoard = gameBoard;
+        this.game = gameBoard.getGame();
     }
 
     /*
      * returns whether the place action of a figure is valid
      */
-    public Boolean postFigureIsValid(Game game, Figure figure)
+    public Boolean postFigureIsValid(Figure figure)
     {
         ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, figure.getOwnerId());
         Position positionToPlaceFigure = figure.getPosition();
@@ -42,11 +44,10 @@ public class RuleService {
     /*
      * returns whether the build action is valid
      */
-    public  Boolean postBuildingIsValid(Game game, Building buildingToBuild)
+    public  Boolean postBuildingIsValid(Building buildingToBuild)
     {
         Position positionToBuild = buildingToBuild.getPosition();
-        Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
-        ArrayList<Position> possiblePostBuildingPositions = getPossiblePostBuildingPositions(lastActiveFigure.getPosition());
+        ArrayList<Position> possiblePostBuildingPositions = getPossiblePostBuildingPositions();
 
         // Don't build on an invalid position
         return possiblePostBuildingPositions.contains(positionToBuild);
@@ -55,7 +56,7 @@ public class RuleService {
     /*
      * returns whether the move action is valid
      */
-    public Boolean putFigureIsValid(Game game, Figure figureToMove, Position targetPosition)
+    public Boolean putFigureIsValid(Figure figureToMove, Position targetPosition)
     {
         Position originPosition = figureToMove.getPosition();
         ArrayList<Position> possiblePutFigurePositions = getPossiblePutFigurePositions(originPosition);
@@ -100,8 +101,11 @@ public class RuleService {
      * returns a list of possible positions where a building can be placed,
      * based on the position of the last active figure.
      */
-    public ArrayList<Position> getPossiblePostBuildingPositions(Position positionOfLastActiveFigure)
+    public ArrayList<Position> getPossiblePostBuildingPositions()
     {
+        Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
+        Position positionOfLastActiveFigure = lastActiveFigure.getPosition();
+
         // Get all adjacentPositions
         ArrayList<Position> possiblePositions = new ArrayList<>();
 
