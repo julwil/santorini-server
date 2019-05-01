@@ -46,7 +46,7 @@ public class GameBoardService {
 
     public String postGameBoardFigure(Game game, Figure figure) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
         Boolean validPostFigure = ruleService.postFigureIsValid(game, figure);
 
         if (!validPostFigure) {
@@ -61,7 +61,7 @@ public class GameBoardService {
 
     public String postGameBoardBuilding(Game game, Building building) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
         Boolean validPostBuilding = ruleService.postBuildingIsValid(game, building);
 
         if (!validPostBuilding) {
@@ -76,7 +76,7 @@ public class GameBoardService {
 
     public String putGameBoardFigure(Game game, Figure figure, Position target) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
         Boolean validPutFigure = ruleService.putFigureIsValid(game, figure, target);
 
         if (!validPutFigure) {
