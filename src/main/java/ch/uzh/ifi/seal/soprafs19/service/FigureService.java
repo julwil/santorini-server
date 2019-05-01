@@ -52,7 +52,10 @@ public class FigureService {
         }
 
         figureRepository.save(figure);
-        gameService.setLastActiveFigureInGame(figure, game);
+
+        if (ruleService.getUserPostedTwoFigures()) {
+            gameService.swapTurns(game);
+        }
 
         return "figures/" + figure.getId();
     }
@@ -79,11 +82,18 @@ public class FigureService {
     /*
      * returns a list of possible positions where a given figure can move to.
      */
-    public Iterable<Position> getGameBoardFigurePossibleMoves(Game game, Figure figure)
+    public Iterable<Position> getGameBoardFigurePossiblePuts(Game game, Figure figure)
     {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, gameBoard);
 
         return ruleService.getPossiblePutFigurePositions(figure.getPosition());
+    }
+
+    public Iterable<Position> getGameBoardFigurePossiblePosts(Game game) {
+        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+
+        return ruleService.getPossiblePostFigurePositions();
     }
 }

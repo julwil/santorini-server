@@ -50,7 +50,7 @@ public class BuildingService {
         }
 
         buildingRepository.save(building);
-        //gameService.swapTurns(game);
+        gameService.swapTurns(game);
 
         return "buildings/" + building.getId().toString();
     }

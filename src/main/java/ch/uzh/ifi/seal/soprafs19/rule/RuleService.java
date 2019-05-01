@@ -1,10 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.rule;
 
 import ch.uzh.ifi.seal.soprafs19.constant.Axis;
-import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
-import ch.uzh.ifi.seal.soprafs19.entity.Building;
-import ch.uzh.ifi.seal.soprafs19.entity.Figure;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
@@ -19,12 +16,15 @@ public class RuleService {
     private final FigureRepository figureRepository;
     private final GameBoard gameBoard;
     private final Game game;
+    private final Boolean userPostedTwoFigures;
 
     public RuleService(FigureRepository figureRepository, GameBoard gameBoard)
     {
         this.figureRepository = figureRepository;
         this.gameBoard = gameBoard;
         this.game = gameBoard.getGame();
+        ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
+        this.userPostedTwoFigures = figuresByGameAndOwner.size() >= 2;
     }
 
     /*
@@ -32,13 +32,10 @@ public class RuleService {
      */
     public Boolean postFigureIsValid(Figure figure)
     {
-        ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, figure.getOwnerId());
         Position positionToPlaceFigure = figure.getPosition();
-        Boolean notYetTwoFiguresPosted = figuresByGameAndOwner.size() < 2;
         ArrayList<Position> possiblePostFigurePositions = getPossiblePostFigurePositions();
 
-        return notYetTwoFiguresPosted &&
-               possiblePostFigurePositions.contains(positionToPlaceFigure);
+        return possiblePostFigurePositions.contains(positionToPlaceFigure);
     }
 
     /*
@@ -49,7 +46,7 @@ public class RuleService {
         Position positionToBuild = buildingToBuild.getPosition();
         ArrayList<Position> possiblePostBuildingPositions = getPossiblePostBuildingPositions();
 
-        // Don't build on an invalid position
+        // Don't build on an invalid position or if not yet 2 figures were placed
         return possiblePostBuildingPositions.contains(positionToBuild);
     }
 
@@ -69,12 +66,15 @@ public class RuleService {
      */
     public ArrayList<Position> getPossiblePutFigurePositions(Position origin)
     {
-        // Get all adjacentPositions
         ArrayList<Position> possiblePositions = new ArrayList<>();
+
+        if (!userPostedTwoFigures) {
+            return possiblePositions;
+        }
 
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
-                for (int dz = -2; dz <= 1; ++dz) {  // you can move down any height and climb up max 1 level
+                for (int dz = -3; dz <= 1; ++dz) {  // you can move down any height and climb up max 1 level
                     if (dx != 0 || dy != 0 || dz != 0) {
                         if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
                             continue;
@@ -103,12 +103,16 @@ public class RuleService {
      */
     public ArrayList<Position> getPossiblePostBuildingPositions()
     {
+        ArrayList<Position> possiblePositions = new ArrayList<>();
+
+        if (!userPostedTwoFigures) {
+            return possiblePositions;
+        }
+
         Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
         Position positionOfLastActiveFigure = lastActiveFigure.getPosition();
 
         // Get all adjacentPositions
-        ArrayList<Position> possiblePositions = new ArrayList<>();
-
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 for (int dz = -2; dz <= 3; ++dz) { // you can build any height
@@ -140,7 +144,10 @@ public class RuleService {
     public ArrayList<Position> getPossiblePostFigurePositions()
     {
         ArrayList<Position> possiblePositions = new ArrayList<>();
-        Map<Position, BoardItem> board = gameBoard.getBoardMap();
+
+        if (userPostedTwoFigures) {
+            return possiblePositions;
+        }
 
         // Calculate all possible positions on the 0th level
         for (int x = 0; x < 5; x++) {
@@ -212,5 +219,11 @@ public class RuleService {
         return Axis.XYAXIS.contains(position.getX()) &&
                 Axis.XYAXIS.contains(position.getY()) &&
                 Axis.ZAXIS.contains(position.getZ());
+    }
+
+
+    public Boolean getUserPostedTwoFigures() {
+        ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
+        return figuresByGameAndOwner.size() >= 2;
     }
 }
