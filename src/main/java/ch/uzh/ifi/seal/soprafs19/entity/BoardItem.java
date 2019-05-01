@@ -14,7 +14,7 @@ public abstract class BoardItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
+    @Id
 	@Column(nullable = false, updatable = false)
 	@GeneratedValue
 	private Long id;
