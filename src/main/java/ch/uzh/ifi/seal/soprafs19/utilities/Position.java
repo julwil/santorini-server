@@ -1,11 +1,20 @@
 package ch.uzh.ifi.seal.soprafs19.utilities;
 
+import ch.uzh.ifi.seal.soprafs19.constant.Axis;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Position {
 
 
     private int x;
     private int y;
     private int z;
+
+    public Position(){}
 
     public Position (int x, int y, int z)
     {
@@ -36,6 +45,16 @@ public class Position {
 
     public void setZ(int z) {
         this.z = z;
+    }
+
+    @JsonIgnore
+    public boolean isFloor() {
+        return this.getZ() == 0;
+    }
+
+    @JsonIgnore
+    public boolean isCeil() {
+        return this.getZ() == 3;
     }
 
     @Override

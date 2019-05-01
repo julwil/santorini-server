@@ -1,6 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
- import ch.uzh.ifi.seal.soprafs19.utilities.Position;
+import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +14,7 @@ public abstract class BoardItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
+    @Id
 	@Column(nullable = false, updatable = false)
 	@GeneratedValue
 	private Long id;
@@ -28,6 +28,8 @@ public abstract class BoardItem implements Serializable {
 	@ManyToOne
 	private Game game;
 
+    private long ownerId;
+
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
@@ -40,6 +42,14 @@ public abstract class BoardItem implements Serializable {
 		this.id = id;
 	}
 
+    @JsonProperty("owner")
+    public long getOwnerId() {return ownerId;}
+
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+	@JsonIgnore
 	public LocalDateTime getCreatedOn() {return createdOn;}
 
 	public Position getPosition()
@@ -55,9 +65,9 @@ public abstract class BoardItem implements Serializable {
     }
 
     @JsonIgnore
-	public Game getGame() {return game;}
+	public Game getGame() {		return game;	}
 
-	public void setGame(Game game) {this.game = game;}
+	public void setGame(Game game) {		this.game = game;	}
 
 	@Override
 	public boolean equals(Object o) {
