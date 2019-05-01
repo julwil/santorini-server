@@ -99,14 +99,28 @@ public class FigureController {
     }
 
     @GetMapping(value = "/games/{gameId}/figures/{figureId}/possibleMoves")
-    public Iterable<Position> getGameBoardFigurePossibleMoves (
+    public Iterable<Position> getGameBoardFigurePossiblePuts(
             @PathVariable long gameId,
             @PathVariable long figureId,
             @RequestHeader("authorization") String token) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, gameId);
+        authenticationService.userTokenIsCurrentTurn(token,gameId);
+
         Game game = gameRepository.findById(gameId);
         Figure figure = figureRepository.findById(figureId);
-        return service.getGameBoardFigurePossibleMoves(game, figure);
+        return figure != null ? service.getGameBoardFigurePossiblePuts(game, figure) : null;
+    }
+
+    @GetMapping(value = "/games/{gameId}/figures/possiblePosts")
+    public Iterable<Position> getGameBoardFigurePossiblePosts (
+            @PathVariable long gameId,
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, gameId);
+        authenticationService.userTokenIsCurrentTurn(token,gameId);
+
+        Game game = gameRepository.findById(gameId);
+        return service.getGameBoardFigurePossiblePosts(game);
     }
 }

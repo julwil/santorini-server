@@ -71,8 +71,14 @@ public class BuildingController {
     }
 
     @GetMapping(value = "/games/{id}/buildings/possibleBuilds")
-    public Iterable<Position> getGameBoardBuildingsPossibleBuilds (@PathVariable long id)
-    {
+    public Iterable<Position> getGameBoardBuildingsPossibleBuilds (
+            @RequestHeader("authorization") String token,
+            @PathVariable long id
+    ) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, id);
+        authenticationService.userTokenIsCurrentTurn(token, id);
+
         Game game = gameRepository.findById(id);
         return service.getGameBoardBuildingsPossibleBuilds(game);
     }
