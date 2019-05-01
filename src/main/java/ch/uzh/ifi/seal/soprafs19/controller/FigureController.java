@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
-import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
@@ -11,7 +10,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.GameBoardService;
+import ch.uzh.ifi.seal.soprafs19.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.web.bind.annotation.*;
@@ -22,15 +21,15 @@ import java.util.Map;
 
 
 @RestController
-public class GameBoardController {
+public class FigureController {
 
-    private final GameBoardService service;
+    private final FigureService service;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final FigureRepository figureRepository;
     private final AuthenticationService authenticationService;
 
-    GameBoardController(GameBoardService service, GameRepository gameRepository, UserRepository userRepository, AuthenticationService authenticationService, FigureRepository figureRepository)
+    FigureController(FigureService service, GameRepository gameRepository, UserRepository userRepository, AuthenticationService authenticationService, FigureRepository figureRepository)
     {
         this.service = service;
         this.gameRepository = gameRepository;
@@ -42,17 +41,11 @@ public class GameBoardController {
     @GetMapping(value = "/games/{id}/figures")
     public Iterable<Figure> getGameBoardFigures (
             @PathVariable long id,
-            @RequestHeader("authorization") String token)
-    {
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, id);
         Game game = gameRepository.findById(id);
         return service.getGameBoardFigures(game);
-    }
-
-    @GetMapping(value = "/games/{id}/buildings")
-    public Iterable<Building> getGameBoardBuildings (@PathVariable long id)
-    {
-        Game game = gameRepository.findById(id);
-        return service.getGameBoardBuildings(game);
     }
 
     @PostMapping(value = "/games/{id}/figures")
@@ -105,31 +98,15 @@ public class GameBoardController {
         return pathToFigure;
     }
 
-    @PostMapping(value = "/games/{id}/buildings")
-    public Map<String, String> postGameBoardBuilding (
-            @RequestHeader("authorization") String token,
-            @PathVariable long id,
-            @RequestBody Position position,
-            HttpServletResponse response)
-            throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
+    @GetMapping(value = "/games/{gameId}/figures/{figureId}/possibleMoves")
+    public Iterable<Position> getGameBoardFigurePossibleMoves (
+            @PathVariable long gameId,
+            @PathVariable long figureId,
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
         authenticationService.authenticateUser(token);
-        authenticationService.userTokenInGameById(token, id);
-        authenticationService.userTokenIsCurrentTurn(token, id);
-
-        Game game = gameRepository.findById(id);
-        User user = userRepository.findByToken(token);
-        Building building = new Building();
-
-        building.setPosition(position);
-        building.setOwnerId(user.getId());
-        building.setGame(game);
-        response.setStatus(201);
-
-        HashMap<String, String> pathToBuilding = new HashMap<>();
-        pathToBuilding.put("path", service.postGameBoardBuilding(game, building));
-
-        return pathToBuilding;
+        authenticationService.userTokenInGameById(token, gameId);
+        Game game = gameRepository.findById(gameId);
+        Figure figure = figureRepository.findById(figureId);
+        return service.getGameBoardFigurePossibleMoves(game, figure);
     }
-
-
 }

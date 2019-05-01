@@ -1,5 +1,4 @@
 package ch.uzh.ifi.seal.soprafs19.service;
-import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
@@ -17,33 +16,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class GameBoardService {
+public class FigureService {
 
-    private final Logger log = LoggerFactory.getLogger(GameBoardService.class);
+    private final Logger log = LoggerFactory.getLogger(FigureService.class);
     private final FigureRepository figureRepository;
     private final BuildingRepository buildingRepository;
     private final GameService gameService;
-    //private final GameBoard gameBoard;
 
     @Autowired
-    public GameBoardService(FigureRepository figureRepository, BuildingRepository buildingRepository, GameService gameService)
+    public FigureService(FigureRepository figureRepository, BuildingRepository buildingRepository, GameService gameService)
     {
         this.figureRepository = figureRepository;
         this.buildingRepository = buildingRepository;
         this.gameService = gameService;
-        //this.gameBoard = gameBoard;
     }
 
+    /*
+     * returns a list of all figures on the board
+     */
     public Iterable<Figure> getGameBoardFigures(Game game)
     {
         return this.figureRepository.findAllByGame(game);
     }
 
-    public Iterable<Building> getGameBoardBuildings(Game game)
-    {
-        return this.buildingRepository.findAllByGame(game);
-    }
-
+    /*
+     * places a new figure on the game board
+     */
     public String postGameBoardFigure(Game game, Figure figure) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, gameBoard);
@@ -56,24 +54,12 @@ public class GameBoardService {
         figureRepository.save(figure);
         gameService.setLastActiveFigureInGame(figure, game);
 
-        return "figures/"  + figure.getId();
+        return "figures/" + figure.getId();
     }
 
-    public String postGameBoardBuilding(Game game, Building building) throws GameRuleException {
-        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
-        Boolean validPostBuilding = ruleService.postBuildingIsValid(game, building);
-
-        if (!validPostBuilding) {
-            throw new GameRuleException();
-        }
-
-        buildingRepository.save(building);
-        //gameService.swapTurns(game);
-
-        return "buildings/" + building.getId().toString();
-    }
-
+    /*
+     * moves a figure on the board to a target position
+     */
     public String putGameBoardFigure(Game game, Figure figure, Position target) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, gameBoard);
@@ -88,5 +74,16 @@ public class GameBoardService {
         gameService.setLastActiveFigureInGame(figure, game);
 
         return "figures/"  + figure.getId();
+    }
+
+    /*
+     * returns a list of possible positions where a given figure can move to.
+     */
+    public Iterable<Position> getGameBoardFigurePossibleMoves(Game game, Figure figure)
+    {
+        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
+        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+
+        return ruleService.getPossiblePutFigurePositions(figure.getPosition());
     }
 }

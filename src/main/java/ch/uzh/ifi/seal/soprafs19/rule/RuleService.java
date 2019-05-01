@@ -66,7 +66,7 @@ public class RuleService {
     /*
      * returns a list of possible positions where the the figure can move to based on an origin position
      */
-    private ArrayList<Position> getPossiblePutFigurePositions(Position origin)
+    public ArrayList<Position> getPossiblePutFigurePositions(Position origin)
     {
         // Get all adjacentPositions
         ArrayList<Position> possiblePositions = new ArrayList<>();
@@ -100,7 +100,7 @@ public class RuleService {
      * returns a list of possible positions where a building can be placed,
      * based on the position of the last active figure.
      */
-    private ArrayList<Position> getPossiblePostBuildingPositions(Position positionOfLastActiveFigure)
+    public ArrayList<Position> getPossiblePostBuildingPositions(Position positionOfLastActiveFigure)
     {
         // Get all adjacentPositions
         ArrayList<Position> possiblePositions = new ArrayList<>();
@@ -133,7 +133,7 @@ public class RuleService {
     /*
      * returns a list of possible positions where a figure can be placed on the board
      */
-    private ArrayList<Position> getPossiblePostFigurePositions()
+    public ArrayList<Position> getPossiblePostFigurePositions()
     {
         ArrayList<Position> possiblePositions = new ArrayList<>();
         Map<Position, BoardItem> board = gameBoard.getBoardMap();
