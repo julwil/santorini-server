@@ -34,7 +34,6 @@ public class GameController {
         HashMap<String, String> pathToGame = new HashMap<>();
         pathToGame.put("path", this.service.postCreateGame(newGame));
 
-        // Upon success return the path to the created usr
         response.setStatus(201);
         return pathToGame;
     }

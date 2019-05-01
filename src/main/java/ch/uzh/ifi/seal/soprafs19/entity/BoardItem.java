@@ -43,9 +43,7 @@ public abstract class BoardItem implements Serializable {
 	}
 
     @JsonProperty("owner")
-    public long getOwnerId() {
-        return ownerId;
-    }
+    public long getOwnerId() {return ownerId;}
 
     public void setOwnerId(long ownerId) {
         this.ownerId = ownerId;
@@ -68,9 +66,6 @@ public abstract class BoardItem implements Serializable {
 
     @JsonIgnore
 	public Game getGame() {		return game;	}
-
-	@JsonProperty("game")
-	public long getGameId() {		return game.getId();	}
 
 	public void setGame(Game game) {		this.game = game;	}
 

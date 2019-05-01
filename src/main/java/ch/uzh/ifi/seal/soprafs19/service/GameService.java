@@ -121,6 +121,17 @@ public class GameService {
         }
     }
 
+    public void swapTurns(Game game) {
+        if (game.getCurrentTurn().equals(game.getUser1())) {
+            game.setCurrentTurn(game.getUser2());
+        }
+        else {
+            game.setCurrentTurn(game.getUser1());
+        }
+
+        gameRepository.save(game);
+    }
+
     public Iterable<Game> getAllGames(String token)
     {
         return gameRepository.findAll();
@@ -134,5 +145,10 @@ public class GameService {
     public Iterable<Game> getGamesForUser2AndStatus(User user2, GameStatus status)
     {
         return gameRepository.findByUser2AndStatus(user2, status);
+    }
+
+    public void setLastActiveFigureInGame(Figure figure, Game game) {
+        game.setLastActiveFigureId(figure.getId());
+        gameRepository.save(game);
     }
 }
