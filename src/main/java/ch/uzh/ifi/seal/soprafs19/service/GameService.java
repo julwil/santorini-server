@@ -151,4 +151,10 @@ public class GameService {
         game.setLastActiveFigureId(figure.getId());
         gameRepository.save(game);
     }
+
+    public void setWinner(Game game, User currentTurn)
+    {
+        game.setStatus(GameStatus.FINISHED);
+        gameRepository.save(game);
+    }
 }
