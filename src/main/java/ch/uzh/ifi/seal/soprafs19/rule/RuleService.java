@@ -17,14 +17,11 @@ import java.util.Map;
 public class RuleService {
 
     private final FigureRepository figureRepository;
-    private final BuildingRepository buildingRepository;
     private final GameBoard gameBoard;
-    private ArrayList<String> validations = new ArrayList<>();
 
-    public RuleService(FigureRepository figureRepository, BuildingRepository buildingRepository, GameBoard gameBoard)
+    public RuleService(FigureRepository figureRepository, GameBoard gameBoard)
     {
         this.figureRepository = figureRepository;
-        this.buildingRepository = buildingRepository;
         this.gameBoard = gameBoard;
     }
 
@@ -49,10 +46,10 @@ public class RuleService {
     {
         Position positionToBuild = buildingToBuild.getPosition();
         Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
-        ArrayList<Position> possibleBuildPositions = getPossiblePostBuildingPositions(lastActiveFigure.getPosition());
+        ArrayList<Position> possiblePostBuildingPositions = getPossiblePostBuildingPositions(lastActiveFigure.getPosition());
 
         // Don't build on an invalid position
-        return possibleBuildPositions.contains(positionToBuild);
+        return possiblePostBuildingPositions.contains(positionToBuild);
     }
 
     /*
@@ -61,9 +58,9 @@ public class RuleService {
     public Boolean putFigureIsValid(Game game, Figure figureToMove, Position targetPosition)
     {
         Position originPosition = figureToMove.getPosition();
-        ArrayList<Position> possibleMoveFigurePositions = getPossiblePutFigurePositions(originPosition);
+        ArrayList<Position> possiblePutFigurePositions = getPossiblePutFigurePositions(originPosition);
 
-        return possibleMoveFigurePositions.contains(targetPosition);
+        return possiblePutFigurePositions.contains(targetPosition);
     }
 
     /*
@@ -72,13 +69,13 @@ public class RuleService {
     private ArrayList<Position> getPossiblePutFigurePositions(Position origin)
     {
         // Get all adjacentPositions
-        ArrayList<Position> adjacentPositions = new ArrayList<>();
+        ArrayList<Position> possiblePositions = new ArrayList<>();
 
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
-                for (int dz = -2; dz <= 1; ++dz) {  // !!
+                for (int dz = -2; dz <= 1; ++dz) {  // you can move down any height and climb up max 1 level
                     if (dx != 0 || dy != 0 || dz != 0) {
-                        if (dx == 0 && dy == 0) { // moving up/down without changing x /y is not allowed
+                        if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
                             continue;
                         }
                         Position tmp = new Position(
@@ -86,34 +83,33 @@ public class RuleService {
                                 origin.getY() + dy,
                                 origin.getZ() + dz);
 
-                        if (validPosition(tmp)) {
-                            adjacentPositions.add(tmp);
+                        if (hasValidAxis(tmp)) {
+                            possiblePositions.add(tmp);
                         }}}}}
 
         // Only consider unoccupied positions
-        stripOccupiedPositions(adjacentPositions);
+        stripOccupiedPositions(possiblePositions);
 
         // Strip out the positions that are floating and have no building below
-        stripFloatingPositions(adjacentPositions);
+        stripFloatingPositions(possiblePositions);
 
-        return adjacentPositions;
+        return possiblePositions;
     }
 
     /*
      * returns a list of possible positions where a building can be placed,
      * based on the position of the last active figure.
      */
-
     private ArrayList<Position> getPossiblePostBuildingPositions(Position positionOfLastActiveFigure)
     {
         // Get all adjacentPositions
-        ArrayList<Position> adjacentPositions = new ArrayList<>();
+        ArrayList<Position> possiblePositions = new ArrayList<>();
 
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
-                for (int dz = -2; dz <= 3; ++dz) { // !!
+                for (int dz = -2; dz <= 3; ++dz) { // you can build any height
                     if (dx != 0 || dy != 0 || dz != 0) {
-                        if (dx == 0 && dy == 0) { // moving up/down without changing x /y is not allowed
+                        if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
                             continue;
                         }
                         Position tmp = new Position(
@@ -121,23 +117,22 @@ public class RuleService {
                                 positionOfLastActiveFigure.getY() + dy,
                                 positionOfLastActiveFigure.getZ() + dz);
 
-                        if (validPosition(tmp)) {
-                            adjacentPositions.add(tmp);
+                        if (hasValidAxis(tmp)) {
+                            possiblePositions.add(tmp);
                         }}}}}
 
         // Only consider unoccupied positions
-        stripOccupiedPositions(adjacentPositions);
+        stripOccupiedPositions(possiblePositions);
 
         // Strip out the positions that are floating and have no building below
-        stripFloatingPositions(adjacentPositions);
+        stripFloatingPositions(possiblePositions);
 
-        return adjacentPositions;
+        return possiblePositions;
     }
 
     /*
      * returns a list of possible positions where a figure can be placed on the board
      */
-
     private ArrayList<Position> getPossiblePostFigurePositions()
     {
         ArrayList<Position> possiblePositions = new ArrayList<>();
@@ -152,7 +147,7 @@ public class RuleService {
         }
 
         // Remove all positions which are already occupied.
-        possiblePositions.removeAll(board.keySet());
+        stripOccupiedPositions(possiblePositions);
 
         return possiblePositions;
     }
@@ -165,10 +160,10 @@ public class RuleService {
     /*
      * deletes all positions which don't are floor positions or don't have a building below them
      */
-    private void stripFloatingPositions(ArrayList<Position> adjacentPositions)
+    private void stripFloatingPositions(ArrayList<Position> possiblePositions)
     {
         // For all positions higher than level 0 z in {1,2,3} check if the field below has a building, else remove the original field
-        for (Iterator<Position> iterator = adjacentPositions.iterator(); iterator.hasNext();) {
+        for (Iterator<Position> iterator = possiblePositions.iterator(); iterator.hasNext();) {
             Position adjacentPosition = iterator.next();
             if (adjacentPosition.isFloor()) {
                 continue;
@@ -199,16 +194,16 @@ public class RuleService {
     /*
      * deletes all positions which are already occupied by a board item
      */
-    private void stripOccupiedPositions(ArrayList<Position> adjacentPositions)
+    private void stripOccupiedPositions(ArrayList<Position> possiblePositions)
     {
         Map<Position, BoardItem> board = gameBoard.getBoardMap();
-        adjacentPositions.removeAll(board.keySet());
+        possiblePositions.removeAll(board.keySet());
     }
 
     /*
      * returns whether the position is valid according to the board dimensions
      */
-    private boolean validPosition(Position position)
+    private boolean hasValidAxis(Position position)
     {
         return Axis.XYAXIS.contains(position.getX()) &&
                 Axis.XYAXIS.contains(position.getY()) &&
