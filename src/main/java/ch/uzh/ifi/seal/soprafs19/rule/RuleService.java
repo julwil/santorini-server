@@ -14,13 +14,15 @@ import java.util.Map;
 public class RuleService {
 
     private final FigureRepository figureRepository;
-    private final GameBoard gameBoard;
-    private final Game game;
-    private final Boolean userPostedTwoFigures;
+    private final BuildingRepository buildingRepository;
+    private GameBoard gameBoard;
+    private Game game;
+    private Boolean userPostedTwoFigures;
 
-    public RuleService(FigureRepository figureRepository, GameBoard gameBoard)
+    public RuleService(FigureRepository figureRepository, BuildingRepository buildingRepository, GameBoard gameBoard)
     {
         this.figureRepository = figureRepository;
+        this.buildingRepository = buildingRepository;
         this.gameBoard = gameBoard;
         this.game = gameBoard.getGame();
         ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
@@ -225,5 +227,23 @@ public class RuleService {
     public Boolean getUserPostedTwoFigures() {
         ArrayList<Figure> figuresByGameAndOwner = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
         return figuresByGameAndOwner.size() >= 2;
+    }
+
+    public Boolean isLoose() {
+        refreshGameBoard();
+        User currentTurnUser = game.getCurrentTurn();
+        ArrayList<Figure> figures = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, currentTurnUser.getId());
+
+        for (Figure figure : figures) {
+            if (getPossiblePutFigurePositions(figure.getPosition()).size() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void refreshGameBoard()
+    {
+        this.gameBoard = new GameBoard(game, figureRepository, buildingRepository);
     }
 }

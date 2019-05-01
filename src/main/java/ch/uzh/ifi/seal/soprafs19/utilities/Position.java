@@ -52,6 +52,11 @@ public class Position {
         return this.getZ() == 0;
     }
 
+    @JsonIgnore
+    public boolean isCeil() {
+        return this.getZ() == 3;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;

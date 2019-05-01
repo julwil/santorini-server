@@ -44,6 +44,9 @@ public class Game implements Serializable {
     @OneToOne
 	private User user2;
 
+//	@OneToOne
+//	private User winner;
+
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdOn;
@@ -88,6 +91,10 @@ public class Game implements Serializable {
     public User getCurrentTurn() { return currentTurn; }
 
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
+
+//	public User getWinner() {return winner;	}
+//
+//	public void setWinner(User winner) {this.winner = winner;}
 
     @JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}

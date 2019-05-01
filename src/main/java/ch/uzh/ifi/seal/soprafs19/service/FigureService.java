@@ -44,7 +44,7 @@ public class FigureService {
      */
     public String postGameBoardFigure(Game game, Figure figure) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
         Boolean validPostFigure = ruleService.postFigureIsValid(figure);
 
         if (!validPostFigure) {
@@ -65,7 +65,7 @@ public class FigureService {
      */
     public String putGameBoardFigure(Game game, Figure figure, Position target) throws GameRuleException {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
         Boolean validPutFigure = ruleService.putFigureIsValid(figure, target);
 
         if (!validPutFigure) {
@@ -76,6 +76,10 @@ public class FigureService {
         figureRepository.save(figure);
         gameService.setLastActiveFigureInGame(figure, game);
 
+        if (target.isCeil()) {
+            gameService.setWinner(figure.getGame(), figure.getGame().getCurrentTurn());
+        }
+
         return "figures/"  + figure.getId();
     }
 
@@ -85,14 +89,14 @@ public class FigureService {
     public Iterable<Position> getGameBoardFigurePossiblePuts(Game game, Figure figure)
     {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
 
         return ruleService.getPossiblePutFigurePositions(figure.getPosition());
     }
 
     public Iterable<Position> getGameBoardFigurePossiblePosts(Game game) {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
 
         return ruleService.getPossiblePostFigurePositions();
     }

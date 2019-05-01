@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -42,7 +43,7 @@ public class BuildingService {
     public String postGameBoardBuilding(Game game, Building building) throws GameRuleException
     {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
         Boolean validPostBuilding = ruleService.postBuildingIsValid(building);
 
         if (!validPostBuilding) {
@@ -52,6 +53,11 @@ public class BuildingService {
         buildingRepository.save(building);
         gameService.swapTurns(game);
 
+        if(ruleService.isLoose()) {
+            User winner = game.getUser1().equals(game.getCurrentTurn()) ? game.getUser1() : game.getUser2();
+            gameService.setWinner(game, winner);
+        }
+
         return "buildings/" + building.getId().toString();
     }
 
@@ -60,7 +66,7 @@ public class BuildingService {
      */
     public Iterable<Position> getGameBoardBuildingsPossibleBuilds(Game game) {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, gameBoard);
+        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
 
         return ruleService.getPossiblePostBuildingPositions();
     }
