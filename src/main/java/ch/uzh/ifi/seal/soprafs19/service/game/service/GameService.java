@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs19.service;
+package ch.uzh.ifi.seal.soprafs19.service.game.service;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,8 +148,8 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setLastActiveFigureInGame(Figure figure, Game game) {
-        game.setLastActiveFigureId(figure.getId());
-        gameRepository.save(game);
+    public void setLastActiveFigureInGame(Figure figure) {
+        figure.getGame().setLastActiveFigureId(figure.getId());
+        gameRepository.save(figure.getGame());
     }
 }
