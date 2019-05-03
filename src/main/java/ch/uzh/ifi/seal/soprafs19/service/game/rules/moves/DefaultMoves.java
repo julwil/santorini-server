@@ -31,6 +31,6 @@ public class DefaultMoves extends Action {
     @Override
     public void perform()
     {
-
+        getFigure().setPosition(getTargetPosition());
     }
 }

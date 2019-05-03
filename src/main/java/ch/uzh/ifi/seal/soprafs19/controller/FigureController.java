@@ -45,7 +45,7 @@ public class FigureController {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, id);
         Game game = gameRepository.findById(id);
-        return service.getGameBoardFigures(game);
+        return service.getAllFigures(game);
     }
 
     @PostMapping(value = "/games/{id}/figures")
@@ -69,17 +69,17 @@ public class FigureController {
         response.setStatus(201);
 
         HashMap<String, String> pathToFigure = new HashMap<>();
-        pathToFigure.put("path", service.postGameBoardFigure(game, figure));
+        pathToFigure.put("path", service.postFigure(game, figure));
 
         return pathToFigure;
     }
 
     @PutMapping(value = "/games/{gameId}/figures/{figureId}")
-    public Map<String, String> putGameBoardFigure (
+    public Map<String, String> putFigure (
             @RequestHeader("authorization") String token,
             @PathVariable long gameId,
             @PathVariable long figureId,
-            @RequestBody Position position,
+            @RequestBody Position destination,
             HttpServletResponse response)
             throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
         authenticationService.authenticateUser(token);
@@ -93,7 +93,7 @@ public class FigureController {
         response.setStatus(200);
 
         HashMap<String, String> pathToFigure = new HashMap<>();
-        pathToFigure.put("path", service.putGameBoardFigure(game, figure, position));
+        pathToFigure.put("path", service.putFigure(figureId, destination));
 
         return pathToFigure;
     }
@@ -109,7 +109,7 @@ public class FigureController {
 
         Game game = gameRepository.findById(gameId);
         Figure figure = figureRepository.findById(figureId);
-        return figure != null ? service.getGameBoardFigurePossiblePuts(game, figure, figureId) : null;
+        return figure != null ? service.getPossibleMoves(figureId) : null;
     }
 
     @GetMapping(value = "/games/{gameId}/figures/possiblePosts")
@@ -121,6 +121,6 @@ public class FigureController {
         authenticationService.userTokenIsCurrentTurn(token,gameId);
 
         Game game = gameRepository.findById(gameId);
-        return service.getGameBoardFigurePossiblePosts(game);
+        return service.getPossibleInitialMoves(game);
     }
 }

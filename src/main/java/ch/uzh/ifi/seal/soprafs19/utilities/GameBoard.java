@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class GameBoard {
 	private Game game;
 
 	private Map<Position, BoardItem> boardMap = new HashMap<>();
+
+	private Map<Long, ArrayList<Figure>> figureMap = new HashMap<>();
 
 	public Game getGame() {return game;}
 
@@ -61,5 +64,20 @@ public class GameBoard {
 		buildingRepository.findAllByGame(game).forEach(building->{
 			this.getBoardMap().put(building.getPosition(), building);
 		});
+	}
+
+	public Map<Long, ArrayList<Figure>> getFigureMap() {
+		return figureMap;
+	}
+
+	public int figureCountPerOwner(long ownerId)
+	{
+		int count = 0;
+		for (BoardItem item : getBoardMap().values()) {
+			if (item instanceof Figure && item.getOwnerId() == ownerId) {
+				count++;
+			}
+		}
+		return count;
 	}
 }
