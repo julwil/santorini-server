@@ -110,4 +110,6 @@ public class Game implements Serializable {
 		Game user = (Game) o;
 		return this.getId().equals(user.getId());
 	}
+
+
 }
