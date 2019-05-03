@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs19.service.game.rules;
+package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions;
 
 import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;

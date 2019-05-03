@@ -85,11 +85,6 @@ public class FigureController {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, gameId);
         authenticationService.userTokenIsCurrentTurn(token,gameId);
-
-        Game game = gameRepository.findById(gameId);
-        User user = userRepository.findByToken(token);
-        Figure figure = figureRepository.findById(figureId);
-
         response.setStatus(200);
 
         HashMap<String, String> pathToFigure = new HashMap<>();
@@ -107,7 +102,6 @@ public class FigureController {
         authenticationService.userTokenInGameById(token, gameId);
         authenticationService.userTokenIsCurrentTurn(token,gameId);
 
-        Game game = gameRepository.findById(gameId);
         Figure figure = figureRepository.findById(figureId);
         return figure != null ? service.getPossibleMoves(figureId) : null;
     }

@@ -2,14 +2,8 @@ package ch.uzh.ifi.seal.soprafs19.service.game.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.rule.RuleService;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.builds.DefaultBuilds;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.moves.DefaultMoves;
-import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,22 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BuildingService {
 
-    private final FigureRepository figureRepository;
     private final BuildingRepository buildingRepository;
-    private final GameService gameService;
+    private final FigureService figureService;
 
     @Autowired
-    public BuildingService(FigureRepository figureRepository, BuildingRepository buildingRepository, GameService gameService)
+    public BuildingService(BuildingRepository buildingRepository, FigureService figureService)
     {
-        this.figureRepository = figureRepository;
         this.buildingRepository = buildingRepository;
-        this.gameService = gameService;
+        this.figureService = figureService;
     }
 
     /*
      * returns a list of all buildings on the board
      */
-    public Iterable<Building> getGameBoardBuildings(Game game)
+    public Iterable<Building> getAllBuildings(Game game)
     {
         return this.buildingRepository.findAllByGame(game);
     }
@@ -43,39 +35,26 @@ public class BuildingService {
     /*
      * puts a building on the game board
      */
-    public String postGameBoardBuilding(Game game, Building building) throws GameRuleException
+    public String postBuilding(Game game, Building newBuilding) throws GameRuleException
     {
-        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
-        Boolean validPostBuilding = ruleService.postBuildingIsValid(building);
+        Figure figure = figureService.loadFigure(game.getLastActiveFigureId());
 
-        if (!validPostBuilding) {
+        if (!figure.getPossibleBuilds().contains(newBuilding.getPosition())) {
             throw new GameRuleException();
         }
 
-        buildingRepository.save(building);
-        gameService.swapTurns(game);
+        figure.build(newBuilding);
+        buildingRepository.save(newBuilding);
 
-        if(ruleService.isLoose()) {
-            User winner = game.getUser1().equals(game.getCurrentTurn()) ? game.getUser1() : game.getUser2();
-            //gameService.setWinner(game, winner);
-        }
-
-        return "buildings/" + building.getId().toString();
+        return "buildings/" + newBuilding.getId().toString();
     }
 
     /*
      * returns a list of possible positions where a building can be placed
      */
-    public Iterable<Position> getGameBoardBuildingsPossibleBuilds(Game game) {
-        GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
-        RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
+    public Iterable<Position> getPossibleBuilds(Game game) {
+        Figure lastActiveFigure = figureService.loadFigure(game.getLastActiveFigureId());
 
-
-        Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
-
-        DefaultBuilds builds = new DefaultBuilds(lastActiveFigure, gameBoard);
-        return builds.calculatePossiblePositions();
-        //return ruleService.getPossiblePostBuildingPositions();
+        return lastActiveFigure.getPossibleBuilds();
     }
 }

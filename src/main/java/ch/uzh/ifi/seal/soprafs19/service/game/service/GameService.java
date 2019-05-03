@@ -148,8 +148,8 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setLastActiveFigureInGame(Figure figure, Game game) {
-        game.setLastActiveFigureId(figure.getId());
-        gameRepository.save(game);
+    public void setLastActiveFigureInGame(Figure figure) {
+        figure.getGame().setLastActiveFigureId(figure.getId());
+        gameRepository.save(figure.getGame());
     }
 }

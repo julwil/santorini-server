@@ -1,7 +1,7 @@
-package ch.uzh.ifi.seal.soprafs19.service.game.rules.moves;
+package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.Action;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 

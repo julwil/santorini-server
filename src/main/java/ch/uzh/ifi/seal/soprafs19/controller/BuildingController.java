@@ -40,7 +40,7 @@ public class BuildingController {
     public Iterable<Building> getGameBoardBuildings (@PathVariable long id)
     {
         Game game = gameRepository.findById(id);
-        return service.getGameBoardBuildings(game);
+        return service.getAllBuildings(game);
     }
 
     @PostMapping(value = "/games/{id}/buildings")
@@ -65,7 +65,7 @@ public class BuildingController {
         response.setStatus(201);
 
         HashMap<String, String> pathToBuilding = new HashMap<>();
-        pathToBuilding.put("path", service.postGameBoardBuilding(game, building));
+        pathToBuilding.put("path", service.postBuilding(game, building));
 
         return pathToBuilding;
     }
@@ -80,6 +80,6 @@ public class BuildingController {
         authenticationService.userTokenIsCurrentTurn(token, id);
 
         Game game = gameRepository.findById(id);
-        return service.getGameBoardBuildingsPossibleBuilds(game);
+        return service.getPossibleBuilds(game);
     }
 }

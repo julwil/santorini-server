@@ -4,10 +4,10 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.Action;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.builds.DefaultBuilds;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.moves.DefaultMoves;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.moves.InitialMoves;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.DefaultBuilds;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.DefaultMoves;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.InitialMoves;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
@@ -71,6 +71,7 @@ public class FigureService {
         }
 
         figure.moveTo(destination);
+        gameService.setLastActiveFigureInGame(figure);
         figureRepository.save(figure);
 
         return "figures/"  + figure.getId();

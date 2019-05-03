@@ -1,5 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.Action;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.DynamicUpdate;
@@ -34,9 +34,13 @@ public class Figure extends BoardItem implements Serializable {
 	}
 
 	@JsonIgnore
-	public Collection<Position> getPossibleBuilds() {
-		return builds.calculatePossiblePositions();
+	public void build(Building building) {
+		builds.setTargetPosition(building.getPosition());
+		builds.perform();
 	}
+
+	@JsonIgnore
+	public Collection<Position> getPossibleBuilds() { return builds.calculatePossiblePositions(); }
 
 	public void setMoves(Action moves) {
 		this.moves = moves;

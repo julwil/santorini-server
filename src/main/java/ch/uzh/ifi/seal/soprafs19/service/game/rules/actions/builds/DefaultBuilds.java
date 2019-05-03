@@ -1,22 +1,24 @@
-package ch.uzh.ifi.seal.soprafs19.service.game.rules.moves;
-
+package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.Action;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
+
 import java.util.ArrayList;
+import java.util.List;
 
-public class DefaultMoves extends Action {
 
-    public DefaultMoves(Figure figure, GameBoard board)
+public class DefaultBuilds extends Action {
+
+    public DefaultBuilds(Figure figure, GameBoard board)
     {
         super(figure, board);
     }
 
     @Override
-    public ArrayList<Position> calculatePossiblePositions()
+    public List<Position> calculatePossiblePositions()
     {
-        int [] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
+        int [] neighbourhood = {-1, 1, -1, 1, -3, 3}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
         // Strip out positions that are occupied by other board items
@@ -31,6 +33,6 @@ public class DefaultMoves extends Action {
     @Override
     public void perform()
     {
-        getFigure().setPosition(getTargetPosition());
+
     }
 }
