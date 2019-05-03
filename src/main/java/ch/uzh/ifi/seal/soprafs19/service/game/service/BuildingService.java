@@ -1,11 +1,14 @@
-package ch.uzh.ifi.seal.soprafs19.service;
+package ch.uzh.ifi.seal.soprafs19.service.game.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
+import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.rule.RuleService;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.builds.DefaultBuilds;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.moves.DefaultMoves;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +58,7 @@ public class BuildingService {
 
         if(ruleService.isLoose()) {
             User winner = game.getUser1().equals(game.getCurrentTurn()) ? game.getUser1() : game.getUser2();
-            gameService.setWinner(game, winner);
+            //gameService.setWinner(game, winner);
         }
 
         return "buildings/" + building.getId().toString();
@@ -68,6 +71,11 @@ public class BuildingService {
         GameBoard gameBoard = new GameBoard(game, figureRepository, buildingRepository);
         RuleService ruleService = new RuleService(figureRepository, buildingRepository, gameBoard);
 
-        return ruleService.getPossiblePostBuildingPositions();
+
+        Figure lastActiveFigure = figureRepository.findById(game.getLastActiveFigureId());
+
+        DefaultBuilds builds = new DefaultBuilds(lastActiveFigure, gameBoard);
+        return builds.calculatePossiblePositions();
+        //return ruleService.getPossiblePostBuildingPositions();
     }
 }

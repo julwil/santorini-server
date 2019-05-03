@@ -10,7 +10,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.FigureService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.web.bind.annotation.*;
@@ -109,7 +109,7 @@ public class FigureController {
 
         Game game = gameRepository.findById(gameId);
         Figure figure = figureRepository.findById(figureId);
-        return figure != null ? service.getGameBoardFigurePossiblePuts(game, figure) : null;
+        return figure != null ? service.getGameBoardFigurePossiblePuts(game, figure, figureId) : null;
     }
 
     @GetMapping(value = "/games/{gameId}/figures/possiblePosts")
