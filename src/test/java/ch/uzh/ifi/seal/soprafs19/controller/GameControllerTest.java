@@ -14,6 +14,7 @@ import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import ch.uzh.ifi.seal.soprafs19.utilities.Utilities;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,18 +71,19 @@ public class GameControllerTest {
     GameService gameService = new GameService(gameRepository, figureRepository, userRepository,userService);
     private Object NullPointerException;
 
-
-    @Before
-    public void init() throws Exception {
-
-
+//
+//    @Before
+//    public void init() throws Exception {
+//
+//
 //
 //        testUser = new User();
 //        testUser.setUsername("testUser");
 //        testUser.setName("Test User");
 //        testUser.setPassword("testPassword");
 //        userService.postCreateUser(testUser);
-//        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+//        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));}
+//
 //        testUser2 = new User();
 //        testUser2.setUsername("testUser2");
 //        testUser2.setName("Test User2");
@@ -109,16 +111,15 @@ public class GameControllerTest {
 //        game.setGodPower(true);
 //
 //        gameService.postCreateGame(game);
-//
+
 
 
 //        gameService.postAcceptGameRequestByUser(game.getId(),testUser2);
 
-    }
-
+//
 //    @After
 //    public void destruct(){ userRepository.delete(testUser);
-//         userRepository.delete(testUser2);
+//
 //    }
 
 //    @Test
@@ -248,10 +249,6 @@ public class GameControllerTest {
             gameService.postCreateGame(game);
             long gameId= game.getId();
 
-
-            gameService.postAcceptGameRequestByUser(gameId,testUser2);
-
-
             Assert.assertEquals(game.getStatus(), GameStatus.INITIALIZED);
 
 
@@ -307,4 +304,177 @@ public class GameControllerTest {
 
     }
 
-}
+
+
+
+//    package ch.uzh.ifi.seal.soprafs19.service;
+//import ch.uzh.ifi.seal.soprafs19.Application;
+//import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+//import ch.uzh.ifi.seal.soprafs19.constant.GodCard;
+//import ch.uzh.ifi.seal.soprafs19.constant.Mode;
+//import ch.uzh.ifi.seal.soprafs19.entity.Game;
+//import ch.uzh.ifi.seal.soprafs19.entity.Space;
+//import ch.uzh.ifi.seal.soprafs19.entity.User;
+//import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+//import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+//import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+//import ch.uzh.ifi.seal.soprafs19.repository.WorkerRepository;
+//import org.junit.Assert;
+//import org.junit.Before;
+//import org.junit.BeforeClass;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Qualifier;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+//import org.springframework.test.context.web.WebAppConfiguration;
+//import java.util.List;
+//    @WebAppConfiguration
+//    @RunWith(SpringJUnit4ClassRunner.class)
+//    @SpringBootTest(classes = Application.class)
+//    public class GameAdminServiceTest {
+//        @Qualifier("gameRepository")
+//        @Autowired
+//        private GameRepository gameRepository;
+//        @Qualifier("userRepository")
+//        @Autowired
+//        private UserRepository userRepository;
+//        @Qualifier("workerRepository")
+//        @Autowired
+//        private WorkerRepository workerRepository;
+//        @Autowired
+//        private UserService userService;
+//        @Autowired
+//        private GameAdminService gameAdminService;
+//        private User playerOne;
+//        private User playerTwo;
+//        private Game newGame;
+//        @Before
+//        public void initPlayers() throws Exception {
+//            System.out.println("@Before executing, init players");
+//            playerOne = new User();
+//            playerOne.setUsername("playerOneUN");
+//            playerOne.setName("playerOneN");
+//            playerOne.setPassword("playerOnePW");
+//            playerOne.setAge(20);
+//            playerTwo = new User();
+//            playerTwo.setUsername("playerTwoUN");
+//            playerTwo.setName("playerTwoN");
+//            playerTwo.setPassword("playerTwoPW");
+//            playerTwo.setAge(20);
+//            newGame = new Game();
+//            newGame.setGameMode(Mode.NORMAL);
+//            newGame.setGameName("createdGame");
+//        }
+//        @Test
+//        public void createGameNormalModeSuccessTest(){
+//            // need for having at least one user
+//            Assert.assertNull(gameRepository.findByGameName("createdGame"));
+//            playerOne = userService.createUser(playerOne);
+//            Game createdGame = gameAdminService.createGame(playerOne.getId(), playerOne, newGame);
+//            Assert.assertEquals(createdGame.getCurrentPlayerIndex(), playerOne.getId());
+//            Assert.assertEquals(Mode.NORMAL,createdGame.getGameMode());
+//            Assert.assertEquals(GodCard.NORMAL, createdGame.getTurnTypes().get(0));
+//            Assert.assertEquals(playerOne, createdGame.getPlayers().get(0));
+//            Assert.assertEquals("createdGame",createdGame.getGameName());
+//            Assert.assertEquals(GameStatus.PENDING, createdGame.getGameStatus());
+//            Assert.assertNotNull(createdGame.getGameId());
+//            Assert.assertEquals(25, createdGame.getBoard().size());
+//            Assert.assertEquals(1, createdGame.getBoard().get(1).getCoordinate().getY());
+//            Assert.assertEquals(0, createdGame.getBoard().get(1).getCoordinate().getX());
+//            Assert.assertNull(createdGame.getCurrentTurn());
+//            Assert.assertNull(createdGame.getWinner());
+//            // Assert.assertEquals(createdGame,playerOne.getCurrentGame());
+//            Assert.assertEquals(createdGame,userRepository.findByToken(playerOne.getToken()).getCurrentGame());
+//            userRepository.delete(playerOne);
+//            gameRepository.delete(createdGame);
+//        }
+//        @Test
+//        public void joinGameSuccessTest(){
+//            playerOne = userService.createUser(playerOne);
+//            playerTwo = userService.createUser(playerTwo);
+//            Game createdGame = gameAdminService.createGame(playerOne.getId(), playerOne, newGame);
+//            Game joinedGame = gameAdminService.joinGame(playerTwo.getId(), createdGame.getGameId(), playerTwo);
+//            Assert.assertEquals(playerTwo,joinedGame.getPlayers().get(1));
+//            Assert.assertEquals(GameStatus.PRERUNNING,joinedGame.getGameStatus());
+//            Assert.assertEquals(joinedGame, userRepository.findByToken(playerTwo.getToken()).getCurrentGame());
+//            // test here for playerTwo.getCurrentGame();
+//            userRepository.delete(playerOne);
+//            userRepository.delete(playerTwo);
+//            gameRepository.delete(createdGame);
+//        }
+//        @Test
+//        public void placeWorkersInitiallyTest(){
+//            playerOne = userService.createUser(playerOne);
+//            playerTwo = userService.createUser(playerTwo);
+//            Game createdGame = gameAdminService.createGame(playerOne.getId(), playerOne, newGame);
+//            Game joinedGame = gameAdminService.joinGame(playerTwo.getId(), createdGame.getGameId(), playerTwo);
+//            Worker[] workers = gameAdminService.placeWorkersInitially(playerOne,joinedGame.getGameId(),0,1,4,3);
+//            Assert.assertEquals(0,workers[0].getCurrentSpace().getCoordinate().getX());
+//            Assert.assertEquals(1,workers[0].getCurrentSpace().getCoordinate().getY());
+//            Assert.assertEquals(4,workers[1].getCurrentSpace().getCoordinate().getX());
+//            Assert.assertEquals(3,workers[1].getCurrentSpace().getCoordinate().getY());
+//            Assert.assertEquals(joinedGame.getGameId(),workers[0].getGameId());
+//            Assert.assertEquals(joinedGame.getPlayers().get(0).getId(),workers[0].getUserId());
+//            Game game = gameRepository.findByGameId(joinedGame.getGameId());
+//            Assert.assertEquals(workers[1].getWorkerId(),game.getBoard().get(23).getWorkerId());
+//            Assert.assertEquals(true,game.getBoard().get(5*4+3).getIsOccupied());
+//            Assert.assertEquals(workers[1].getCurrentSpace().getWorkerId(), workers[1].getWorkerId());
+//            Assert.assertEquals(true,game.getBoard().get(workers[1].getCurrentSpace().getCoordinate().getX()*5+
+//                    workers[1].getCurrentSpace().getCoordinate().getY()).getIsOccupied());
+//            workerRepository.delete(workers[0]);
+//            workerRepository.delete(workers[1]);
+//            userRepository.delete(playerOne);
+//            userRepository.delete(playerTwo);
+//            gameRepository.delete(joinedGame);
+//        }
+//        @Test
+//        public void setWorkersAttributesTest(){
+//            playerOne = userService.createUser(playerOne);
+//            playerTwo = userService.createUser(playerTwo);
+//            Game createdGame = gameAdminService.createGame(playerOne.getId(), playerOne, newGame);
+//            Game joinedGame = gameAdminService.joinGame(playerTwo.getId(), createdGame.getGameId(), playerTwo);
+//            Worker worker = new Worker();
+//            worker = gameAdminService.setWorkerAttributes(worker,playerOne,joinedGame.getGameId(),0,1);
+//            Assert.assertEquals(joinedGame.getGameId(),worker.getGameId());
+//            Assert.assertEquals(playerOne.getId(), worker.getUserId());
+//            //Assert.assertEquals(joinedGame.getBoard().get(0*5+1),worker.getCurrentSpace());
+//            workerRepository.delete(worker);
+//            gameRepository.delete(joinedGame);
+//            userRepository.delete(playerOne);
+//            userRepository.delete(playerTwo);
+//        }
+//        @Test
+//        public void createBoardTest(){
+//            List<Space> board = gameAdminService.createBoard();
+//            Assert.assertEquals(25, board.size());
+//            Assert.assertEquals(4, board.get(24).getCoordinate().getY());
+//            Assert.assertEquals(4, board.get(24).getCoordinate().getX());
+//        }
+//        @Test
+//        public void createSpaceTest(){
+//            Space space = gameAdminService.createSpace(0,0);
+//            Assert.assertEquals(0, space.getCoordinate().getX());
+//            Assert.assertEquals(0, space.getCoordinate().getY());
+//            Assert.assertNull(space.getWorkerId());
+//            Assert.assertNull(space.getToplevelblock());
+//            Assert.assertNotNull(space.getSpaceId());
+//            Assert.assertFalse(space.getIsOccupied());
+//        }
+//        @Test
+//        public void createInitialTurnTest(){
+//            playerOne = userService.createUser(playerOne);
+//            playerTwo = userService.createUser(playerTwo);
+//            Game createdGame = gameAdminService.createGame(playerOne.getId(), playerOne, newGame);
+//            Game joinedGame = gameAdminService.joinGame(playerTwo.getId(), createdGame.getGameId(), playerTwo);
+//            gameAdminService.createInitialTurn(joinedGame,playerOne.getId());
+//            Game gameWithFirstTurn = gameRepository.findByGameId(joinedGame.getGameId());
+//            Assert.assertEquals(playerOne.getId(),gameWithFirstTurn.getCurrentTurn().getUserId());
+//            Assert.assertNotNull(gameWithFirstTurn.getCurrentTurn());
+//            Assert.assertEquals(joinedGame.getGameId(), gameWithFirstTurn.getCurrentTurn().getGameId());
+//            gameRepository.delete(joinedGame);
+//            userRepository.delete(playerOne);
+//            userRepository.delete(playerTwo);
+        }
+
