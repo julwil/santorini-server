@@ -96,6 +96,7 @@ public class RuleService {
         // Strip out the positions that are floating and have no building below
         stripFloatingPositions(possiblePositions);
 
+
         return possiblePositions;
     }
 

@@ -27,6 +27,7 @@ public class UserService {
     private final AuthenticationService authentication;
     private final Utilities utils;
 
+
     @Autowired
     public UserService(UserRepository userRepository, AuthenticationService authentication, Utilities utils) {
         this.userRepository = userRepository;
@@ -47,7 +48,33 @@ public class UserService {
 
         return "/users/" + newUser.getId().toString();
     }
+    public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
+    {
+        String loginUsername = userToAuthenticate.getUsername();
+        String loginPassword = userToAuthenticate.getPassword();
+        Boolean userExists = userRepository.existsByUsername(loginUsername);
 
+        if (!userExists) {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        User dbUser = userRepository.findByUsername(loginUsername);
+        String dbPassword = dbUser.getPassword();
+
+        if (!loginPassword.equals(dbPassword)) {
+            throw new FailedAuthenticationException();
+        }
+
+        if (isOffline(dbUser)) {
+            dbUser.setStatus(UserStatus.ONLINE);
+        }
+
+        dbUser.setToken(createUserToken(dbUser));
+
+        userRepository.save(dbUser);
+        System.out.print("DB-user" + dbUser.getStatus());
+        return dbUser.getToken();
+    }
     // Update a user
     public User putUpdateUser(String token, long userToUpdateId, User userToUpdate) throws
             ResourceActionNotAllowedException,
@@ -78,32 +105,7 @@ public class UserService {
         return dbUser;
     }
 
-    public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
-    {
-        String loginUsername = userToAuthenticate.getUsername();
-        String loginPassword = userToAuthenticate.getPassword();
-        Boolean userExists = userRepository.existsByUsername(loginUsername);
 
-        if (!userExists) {
-            throw new ResourceNotFoundException("User does not exist");
-        }
-
-        User dbUser = userRepository.findByUsername(loginUsername);
-        String dbPassword = dbUser.getPassword();
-
-        if (!loginPassword.equals(dbPassword)) {
-            throw new FailedAuthenticationException();
-        }
-
-        if (isOffline(dbUser)) {
-            dbUser.setStatus(UserStatus.ONLINE);
-        }
-
-        dbUser.setToken(createUserToken(dbUser));
-        userRepository.save(dbUser);
-
-        return dbUser.getToken();
-    }
 
     public Iterable<User> getAllUsers(String token) throws FailedAuthenticationException
     {
