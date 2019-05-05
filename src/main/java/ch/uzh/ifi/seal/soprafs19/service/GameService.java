@@ -97,10 +97,10 @@ public class GameService {
         }
     }
 
-    public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    public void postCancelGameRequestByUser(Game game, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
         try {
-            Game game = gameRepository.findById(id);
+
 
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
@@ -108,14 +108,11 @@ public class GameService {
             game.setStatus(GameStatus.CANCLED);
             gameRepository.save(game);
 
-            User user1 = game.getUser1();
-            User user2 = game.getUser2();
+            game.getUser1().setStatus(UserStatus.ONLINE);
+            game.getUser2().setStatus(UserStatus.ONLINE);
 
-            user1.setStatus(UserStatus.ONLINE);
-            user2.setStatus(UserStatus.ONLINE);
-
-            userRepository.save(user1);
-            userRepository.save(user2);
+            userRepository.save(game.getUser1());
+            userRepository.save(game.getUser2());
         }
         catch (NullPointerException e) {
             throw new ResourceNotFoundException("No game with matching id found");

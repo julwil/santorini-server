@@ -40,8 +40,8 @@ public class UserServiceTest{
     @Test
     public void createUserTest() throws JSONException, UsernameAlreadyExistsException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNamek");
+        testUser.setUsername("testUsernamek");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
@@ -58,8 +58,8 @@ public class UserServiceTest{
     @Test
     public void loginSuccessfulTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNamel");
+        testUser.setUsername("testUsernamel");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
@@ -75,8 +75,8 @@ public class UserServiceTest{
     @Test
     public void logoutTest() throws ResourceNotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException, ResourceActionNotAllowedException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNameu");
+        testUser.setUsername("testUsernameu");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
@@ -98,8 +98,8 @@ public class UserServiceTest{
     @Test
     public void loginFailedWrongPasswordTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNamei");
+        testUser.setUsername("testUsernamei");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
@@ -119,8 +119,8 @@ public class UserServiceTest{
     @Test
     public void loginFailedNonExistentUserNameTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNameo");
+        testUser.setUsername("testUsernameo");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
@@ -140,8 +140,8 @@ public class UserServiceTest{
     @Test
     public void updateUserTest() throws UsernameAlreadyExistsException, ResourceActionNotAllowedException, FailedAuthenticationException, ResourceNotFoundException {
         User testUser = new User();
-        testUser.setName("testName");
-        testUser.setUsername("testUsername");
+        testUser.setName("testNamep");
+        testUser.setUsername("testUsernamep");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
         String token = userService.postLogin(testUser);
