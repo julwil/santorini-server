@@ -73,6 +73,7 @@ public class GameService {
         try {
             Game game = gameRepository.findById(id);
 
+
             if (!game.getUser2().equals(acceptingUser)) {
                 throw new ResourceActionNotAllowedException("Missing permission to accept the game");
             }
