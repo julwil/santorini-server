@@ -47,33 +47,35 @@ public class UserService {
         userRepository.save(newUser);
 
         return "/users/" + newUser.getId().toString();
+
     }
     public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
     {
         String loginUsername = userToAuthenticate.getUsername();
         String loginPassword = userToAuthenticate.getPassword();
-        Boolean userExists = userRepository.existsByUsername(loginUsername);
+        Boolean userExists = userRepository.existsByUsername(userToAuthenticate.getUsername());
+
 
         if (!userExists) {
             throw new ResourceNotFoundException("User does not exist");
         }
 
-        User dbUser = userRepository.findByUsername(loginUsername);
-        String dbPassword = dbUser.getPassword();
+        User tempUser = userRepository.findByUsername(loginUsername);
+        String password = tempUser.getPassword();
 
-        if (!loginPassword.equals(dbPassword)) {
+        if (!loginPassword.equals(password)) {
             throw new FailedAuthenticationException();
         }
 
-        if (isOffline(dbUser)) {
-            dbUser.setStatus(UserStatus.ONLINE);
+        if (isOffline(tempUser)) {
+            tempUser.setStatus(UserStatus.ONLINE);
         }
 
-        dbUser.setToken(createUserToken(dbUser));
+        tempUser.setToken(createUserToken(userToAuthenticate));
 
-        userRepository.save(dbUser);
-        System.out.print("DB-user" + dbUser.getStatus());
-        return dbUser.getToken();
+        userRepository.save(tempUser);
+
+        return tempUser.getToken();
     }
     // Update a user
     public User putUpdateUser(String token, long userToUpdateId, User userToUpdate) throws

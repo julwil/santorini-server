@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.text.SimpleDateFormat;
+
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -58,37 +60,40 @@ public class UserControllerTest {
 
         this.mvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"Test User\",\"username\": \"testUser\", \"password\": \"testPassword\"}"))
+                .content("{\"name\": \"Test Userw\",\"username\": \"testUserw\", \"password\": \"testPassword\"}"))
                 .andExpect(status().is(201))
                 .andExpect(jsonPath("$.path", notNullValue()));
 
-        userRepository.delete(userRepository.findByUsername("testUser"));
+        userRepository.delete(userRepository.findByUsername("testUserw"));
 
     }
 
     @Test
     public void loginUser() throws Exception {
         User testUser = new User();
-        testUser.setUsername("testUser");
-        testUser.setName("Test User");
+        testUser.setUsername("testUsere");
+        testUser.setName("Test Usere");
         testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
         String path = userService.postCreateUser(testUser);
+
 
         this.mvc.perform(post("/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\": \"testUser\", \"password\": \"testPassword\"}"))
+                .content("{\"username\": \"testUsere\", \"password\": \"testPassword\"}"))
+
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.token", notNullValue()));
 
-        userRepository.delete(userRepository.findByUsername("testUser"));
+        userRepository.delete(userRepository.findByUsername("testUsere"));
 
     }
 
     @Test
     public void logoutUser() throws Exception{
         User testUser = new User();
-        testUser.setUsername("testUser");
-        testUser.setName("Test User");
+        testUser.setUsername("testUsert");
+        testUser.setName("Test Usert");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
         String token = userService.postLogin(testUser);
@@ -98,14 +103,14 @@ public class UserControllerTest {
                 .header("authorization", token))
                 .andExpect(status().is(204));
 
-        userRepository.delete(userRepository.findByUsername("testUser"));
+        userRepository.delete(userRepository.findByUsername("testUsert"));
     }
 
     @Test
     public void updateUser() throws Exception {
         User testUser = new User();
-        testUser.setUsername("testUser");
-        testUser.setName("Test User");
+        testUser.setUsername("testUserz");
+        testUser.setName("Test Userz");
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
         String token = userService.postLogin(testUser);

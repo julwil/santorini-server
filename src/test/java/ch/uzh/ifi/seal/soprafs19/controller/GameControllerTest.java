@@ -274,7 +274,7 @@ public class GameControllerTest {
             testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
             userService.postCreateUser(testUser);
             userService.postLogin(testUser);
-            testUser.setStatus(ONLINE);
+
 
 
             testUser2 = new User();
@@ -285,8 +285,8 @@ public class GameControllerTest {
             userService.postCreateUser(testUser2);
 
 
-//                userService.postLogin(testUser2);
-                testUser2.setStatus(ONLINE);
+                userService.postLogin(testUser2);
+
 
 
             Game game = new Game();
@@ -312,37 +312,24 @@ public class GameControllerTest {
         testUser.setName("Test User2.1");
         testUser.setPassword("testPassword");
         testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        Assert.assertEquals(NullPointerException,testUser.getStatus());
         userService.postCreateUser(testUser);
         userService.postLogin(testUser);
-        testUser.setStatus(ONLINE);
-
-
         testUser2 = new User();
         testUser2.setUsername("testUser2.2");
         testUser2.setName("Test User2.2");
         testUser2.setPassword("testPassword");
         testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
         userService.postCreateUser(testUser2);
-
-
-//                userService.postLogin(testUser2);
-        testUser2.setStatus(ONLINE);
-
-
+        userService.postLogin(testUser2);
         Game game = new Game();
         game.setUser1(testUser);
         game.setUser2(testUser2);
         game.setCurrentTurn(testUser2);
         game.setGodPower(true);
-        gameService.postCreateGame(game); //tampoco
-
-        gameService.postCancelGameRequestByUser(game.getId(),testUser2);
-        gameService.postCancelGameRequestByUser(game.getId(),testUser);
-        testUser.setStatus(ONLINE);
-        testUser2.setStatus(ONLINE);
-        game.setStatus(GameStatus.CANCLED);
-
-
+        gameService.postCreateGame(game);
+        gameService.postCancelGameRequestByUser(game,testUser2);
+        gameService.postCancelGameRequestByUser(game,testUser);
         Assert.assertEquals(GameStatus.CANCLED, game.getStatus());
         Assert.assertEquals(UserStatus.ONLINE, testUser2.getStatus());
         Assert.assertEquals(UserStatus.ONLINE, testUser.getStatus());
@@ -368,10 +355,9 @@ public class GameControllerTest {
         testUser2.setPassword("testPassword");
         testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
         userService.postCreateUser(testUser2);
-        testUser.setStatus(ONLINE);
-        testUser2.setStatus(ONLINE);
-//        userService.postLogin(testUser);
-//        userService.postLogin(testUser2);
+
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
 
         Game game = new Game();
         game.setUser1(testUser);
@@ -414,8 +400,7 @@ public class GameControllerTest {
         userService.postLogin(testUser);
         userService.postLogin(testUser2);
         Game game = new Game();
-        testUser.setStatus(ONLINE);
-        testUser2.setStatus(ONLINE);
+
 
         game.setUser1(testUser);
         game.setUser2(testUser2);
@@ -445,6 +430,7 @@ public class GameControllerTest {
         figure2.setGame(game);
         figureService.postGameBoardFigure(game, figure2);
         figureService.getGameBoardFigures(game).forEach(figure1 -> ++size);
+
         Assert.assertEquals(2, size);
         Assert.assertEquals(testUser, game.getCurrentTurn());
 

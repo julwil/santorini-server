@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,12 @@ public class GameController {
 
     private final GameService service;
     private final UserRepository userRepository;
+    private final GameRepository gameRepository;
 
-    GameController(GameService service, UserRepository userRepository) {
+    GameController(GameService service, UserRepository userRepository, GameRepository gameRepository) {
         this.service = service;
         this.userRepository = userRepository;
+        this.gameRepository = gameRepository;
     }
 
     // Create new Game
@@ -103,8 +106,9 @@ public class GameController {
             @PathVariable("id") long gameId,
             HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
-        User user = this.userRepository.findByToken(token);
-        service.postCancelGameRequestByUser(gameId, user);
+        User user1 = this.userRepository.findByToken(token);
+        Game game = user1.getGame();
+        service.postCancelGameRequestByUser(game, user1);
         response.setStatus(204);
     }
 
