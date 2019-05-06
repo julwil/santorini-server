@@ -66,6 +66,9 @@ public class UserControllerTest {
 
         userRepository.delete(userRepository.findByUsername("testUserw"));
 
+
+
+
     }
 
     @Test
@@ -87,6 +90,7 @@ public class UserControllerTest {
 
         userRepository.delete(userRepository.findByUsername("testUsere"));
 
+
     }
 
     @Test
@@ -104,6 +108,7 @@ public class UserControllerTest {
                 .andExpect(status().is(204));
 
         userRepository.delete(userRepository.findByUsername("testUsert"));
+
     }
 
     @Test
@@ -122,6 +127,8 @@ public class UserControllerTest {
                 .content("{\"name\": \"Test User Updated\",\"username\": \"testUserUpdated\", \"password\": \"testPasswordUpdated\"}"))
                 .andExpect(status().is(204)); //andDo(print()).
         userRepository.delete(userRepository.findByUsername("testUserUpdated"));
+
+
 
     }
 

@@ -75,13 +75,13 @@ public class GameControllerTest {
     ServerHttpResponse serverHttpResponse;
     AuthenticationService authenticationService;
 
-//    GameRepository gameRepository;
+    //    GameRepository gameRepository;
     @Autowired
     Utilities utils;
     @Autowired
     AuthenticationService authentication;
 
-//    BuildingRepository buildingRepository;
+    //    BuildingRepository buildingRepository;
     @Autowired
     UserService userService = new UserService(userRepository, authentication, utils);
     @Autowired
@@ -203,8 +203,33 @@ public class GameControllerTest {
 
     @Test
     public void getTurns() throws Exception {
-        this.mvc.perform(get("/games/1/turns")
-                .header("Authorization", "token"))
+        testUser = new User();
+        testUser.setUsername("testUser13");
+        testUser.setName("Test User13");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser133");
+        testUser2.setName("Test User133");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
+
+        Game game = new Game();
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        gameService.postCreateGame(game);
+        String token = testUser.getToken();
+
+        this.mvc.perform(get("/games/"+game.getId()+"/turns")
+                .header("Authorization", token)
+                .header("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(status().is(200))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.turns").isNotEmpty())
@@ -217,23 +242,78 @@ public class GameControllerTest {
                 .andExpect(jsonPath("$.turns[0].performedBy.figures", notNullValue()))
                 .andExpect(jsonPath("$.turns[0].finished").isBoolean())
                 .andExpect(jsonPath("$.turns[0].events", notNullValue()));
+
+
     }
 
     @Test
-    public void postTurn() throws Exception {
-        this.mvc.perform(post("/games/1/turns")
+    public void postTurn() throws Exception { //----------------------??
+        testUser = new User();
+        testUser.setUsername("testUser111");
+        testUser.setName("Test User111");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser122");
+        testUser2.setName("Test User122");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
+
+        Game game = new Game();
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        gameService.postCreateGame(game);
+        String token = testUser.getToken();
+
+        this.mvc.perform(post("/games/"+game.getId()+"/turns")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"performedBy\": 1,\"finished\": true, \"events\": [\"event1\",\"event2\"]}")
-                .header("Authorization", "token"))
+                .header("Authorization", token))
                 .andExpect(status().is(201))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.path").isString());
+
+
     }
 
     @Test
     public void getPlayers() throws Exception {
-        this.mvc.perform(get("/games/1/players")
-                .header("Authorization", "token"))
+        testUser = new User();
+        testUser.setUsername("testUser11");
+        testUser.setName("Test User11");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser12");
+        testUser2.setName("Test User12");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
+
+        Game game = new Game();
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        gameService.postCreateGame(game);
+        String token = testUser.getToken();
+
+        this.mvc.perform(get("/games/"+game.getId()+"/players")
+
+                .header("Authorization", token)
+                .header("Content-Type","application/json;charset=UTF-8"))
+
                 .andExpect(status().is(200))
                 .andExpect(header().string("Content-Type","application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.players").isNotEmpty())
@@ -241,6 +321,8 @@ public class GameControllerTest {
                 .andExpect(jsonPath("$.players[0].id").isNumber())
                 .andExpect(jsonPath("$.players[0].name").isString())
                 .andExpect(jsonPath("$.players[0].figures", notNullValue()));
+
+
     }
 
 //    @Test
@@ -264,42 +346,34 @@ public class GameControllerTest {
 //
 //    }
 
-        @Test
-        public void initializeGame() throws Exception {
+    @Test
+    public void initializeGame() throws Exception {
 
-            testUser = new User();
-            testUser.setUsername("testUser1.1");
-            testUser.setName("Test User1.1");
-            testUser.setPassword("testPassword");
-            testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-            userService.postCreateUser(testUser);
-            userService.postLogin(testUser);
+        testUser = new User();
+        testUser.setUsername("testUser1.1");
+        testUser.setName("Test User1.1");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        userService.postLogin(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser1.2");
+        testUser2.setName("Test User1.2");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser2);
 
+        Game game = new Game();
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        gameService.postCreateGame(game);
 
-
-            testUser2 = new User();
-            testUser2.setUsername("testUser1.2");
-            testUser2.setName("Test User1.2");
-            testUser2.setPassword("testPassword");
-            testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-            userService.postCreateUser(testUser2);
-
-
-                userService.postLogin(testUser2);
-
-
-
-            Game game = new Game();
-            game.setUser1(testUser);
-            game.setUser2(testUser2);
-            game.setCurrentTurn(testUser2);
-            game.setGodPower(true);
-            gameService.postCreateGame(game);
-
-
-            Assert.assertEquals(game.getStatus(), GameStatus.INITIALIZED);
-            Assert.assertEquals(UserStatus.CHALLENGED, testUser2.getStatus());
-            Assert.assertEquals(UserStatus.CHALLENGED, testUser.getStatus());
+        Assert.assertEquals(game.getStatus(), GameStatus.INITIALIZED);
+        Assert.assertEquals(UserStatus.CHALLENGED, testUser2.getStatus());
+        Assert.assertEquals(UserStatus.CHALLENGED, testUser.getStatus());
 
 
     }
@@ -312,7 +386,6 @@ public class GameControllerTest {
         testUser.setName("Test User2.1");
         testUser.setPassword("testPassword");
         testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-        Assert.assertEquals(NullPointerException,testUser.getStatus());
         userService.postCreateUser(testUser);
         userService.postLogin(testUser);
         testUser2 = new User();
@@ -322,14 +395,15 @@ public class GameControllerTest {
         testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
         userService.postCreateUser(testUser2);
         userService.postLogin(testUser2);
+
         Game game = new Game();
         game.setUser1(testUser);
         game.setUser2(testUser2);
         game.setCurrentTurn(testUser2);
         game.setGodPower(true);
         gameService.postCreateGame(game);
+
         gameService.postCancelGameRequestByUser(game,testUser2);
-        gameService.postCancelGameRequestByUser(game,testUser);
         Assert.assertEquals(GameStatus.CANCLED, game.getStatus());
         Assert.assertEquals(UserStatus.ONLINE, testUser2.getStatus());
         Assert.assertEquals(UserStatus.ONLINE, testUser.getStatus());
@@ -340,7 +414,7 @@ public class GameControllerTest {
 
 
     @Test
-    public void acceptGameRequestAndUser2FirstPutsFiguresOnBoard() throws Exception {
+    public void acceptGameRequestAndUser2FirstPutsFiguresOnBoard() throws Exception  {
 
         testUser = new User();
         testUser.setUsername("testUser3.1");
@@ -359,12 +433,15 @@ public class GameControllerTest {
         userService.postLogin(testUser);
         userService.postLogin(testUser2);
 
+        System.out.print(" st1 "+ testUser2.getStatus());
+
         Game game = new Game();
         game.setUser1(testUser);
         game.setUser2(testUser2);
         game.setCurrentTurn(testUser2);
         game.setGodPower(true);
-        gameService.postCreateGame(game);
+
+        gameService.postCreateGame(game); //tampoco weil testuser are offline
 
         long gameId= game.getId();
         Game testgame = gameService.postAcceptGameRequestByUser(gameId, testUser2);
@@ -375,23 +452,24 @@ public class GameControllerTest {
         Assert.assertEquals(CHALLENGED, testUser.getStatus());
         Assert.assertEquals(testUser2, game.getCurrentTurn());
 
+
     }
 
     //when game starts, the first player will set 2 workers (figures), and only after player succesfully set
-            //2 figures, the turn will change
+    //2 figures, the turn will change
     @Test
     public void afterPutting2FiguresChangeTurn() throws Exception {
 
         testUser = new User();
-        testUser.setUsername("testUser4.1");
-        testUser.setName("Test User4.1");
+        testUser.setUsername("testUser41");
+        testUser.setName("Test User41");
         testUser.setPassword("testPassword");
         testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-        userService.postCreateUser(testUser);
 
+        userService.postCreateUser(testUser);
         testUser2 = new User();
-        testUser2.setUsername("testUser4.2");
-        testUser2.setName("Test User4.2");
+        testUser2.setUsername("testUser42");
+        testUser2.setName("Test User42");
         testUser2.setPassword("testPassword");
         testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
 
@@ -430,100 +508,148 @@ public class GameControllerTest {
         figure2.setGame(game);
         figureService.postGameBoardFigure(game, figure2);
         figureService.getGameBoardFigures(game).forEach(figure1 -> ++size);
-
         Assert.assertEquals(2, size);
         Assert.assertEquals(testUser, game.getCurrentTurn());
 
 
+
+    }
+    @Test
+    public void moveWorkerfterPlacingOnly1WorkerFails() throws Exception {
+
+        testUser = new User();
+        testUser.setUsername("testUser4.1");
+        testUser.setName("Test User4.1");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser4.2");
+        testUser2.setName("Test User4.2");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
+        Game game = new Game();
+
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        String str1 = gameService.postCreateGame(game);
+
+        long gameId = game.getId();
+        Game g = gameService.postAcceptGameRequestByUser(gameId, testUser2);
+
+        Figure figure = new Figure();
+        Figure figure2 = new Figure();
+        Position position1 = new Position(2, 2, 0);
+        Position position2 = new Position(3, 3, 0);
+
+        Assert.assertEquals(testUser2, game.getCurrentTurn());
+
+        figure.setPosition(position1);
+        figure.setOwnerId(testUser2.getId());
+        figure.setGame(game);
+        figureService.postGameBoardFigure(game, figure);
+        Position targetPosition = new Position(2,1,0);
+        try {
+            figureService.putGameBoardFigure(game, figure, targetPosition);
+        }
+        catch (GameRuleException e){
+            Assert.assertEquals("Game rule violation", e.getMessage());
+
+
+        }
+
+
     }
 
 
-
-//        When game starts, the first player to set workers will first move a worker and after that build.
+    //        When game starts, the first player to set workers will first move a worker and after that build.
 //         and not the other way around. Always first move, than build (classic game-NoGodcardsInvolved)
-        @Test
-        public void afterBothPlayersSetWorkersFirstPlayerWillStartByMovingOneWorker() throws Exception {
+    @Test
+    public void afterBothPlayersSetWorkersFirstPlayerWillStartByMovingOneWorker() throws Exception {
 
-            testUser = new User();
-            testUser.setUsername("testUser5.1");
-            testUser.setName("Test User5.1");
-            testUser.setPassword("testPassword");
-            testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-            userService.postCreateUser(testUser);
-            testUser2 = new User();
-            testUser2.setUsername("testUser5.2");
-            testUser2.setName("Test User5.2");
-            testUser2.setPassword("testPassword");
-            testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-            userService.postCreateUser(testUser2);
-            userService.postLogin(testUser);
-            userService.postLogin(testUser2);
-            Game game = new Game();
-            testUser.setStatus(ONLINE);
-            testUser2.setStatus(ONLINE);
-            game.setUser1(testUser);
-            game.setUser2(testUser2);
-            game.setCurrentTurn(testUser2);
-            game.setGodPower(true);
-            String str1 = gameService.postCreateGame(game);
-            long gameId= game.getId();
-            Game g = gameService.postAcceptGameRequestByUser(gameId, testUser2);
-            Figure figure = new Figure();
-            Figure figure2 = new Figure();
-            Figure figure3 = new Figure();
-            Figure figure4 = new Figure();
+        testUser = new User();
+        testUser.setUsername("testUser5.1");
+        testUser.setName("Test User5.1");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser5.2");
+        testUser2.setName("Test User5.2");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser);
+        userService.postLogin(testUser2);
+        Game game = new Game();
 
-            Position position1 = new Position(2,2,0); //testUser2
-            Position position2 = new Position(3,3,0); // testUser2
-            Position position3 = new Position(1,1,0); // testUser
-            Position position4 = new Position(3,2,0); // testUser
-            Position positionb1 = new Position(2,0,0);
-            Position positionb2 = new Position(2,1,0);
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        String str1 = gameService.postCreateGame(game);
+        long gameId= game.getId();
+        Game g = gameService.postAcceptGameRequestByUser(gameId, testUser2);
+        Figure figure = new Figure();
+        Figure figure2 = new Figure();
+        Figure figure3 = new Figure();
+        Figure figure4 = new Figure();
 
-            figure.setPosition(position1);
-            figure.setOwnerId(testUser2.getId());
-            figure.setGame(game);
-            figureService.postGameBoardFigure(game, figure);
+        Position position1 = new Position(2,2,0); //testUser2
+        Position position2 = new Position(3,3,0); // testUser2
+        Position position3 = new Position(1,1,0); // testUser
+        Position position4 = new Position(3,2,0); // testUser
+        Position positionb1 = new Position(2,0,0);
+        Position positionb2 = new Position(2,1,0);
 
-            figure2.setPosition(position2);
-            figure2.setOwnerId(testUser2.getId());
-            figure2.setGame(game);
-            figureService.postGameBoardFigure(game, figure2);
+        figure.setPosition(position1);
+        figure.setOwnerId(testUser2.getId());
+        figure.setGame(game);
+        figureService.postGameBoardFigure(game, figure);
+
+        figure2.setPosition(position2);
+        figure2.setOwnerId(testUser2.getId());
+        figure2.setGame(game);
+        figureService.postGameBoardFigure(game, figure2);
 
 
-            figure3.setPosition(position3);
-            figure3.setOwnerId(testUser.getId());
-            figure3.setGame(game);
-            figureService.postGameBoardFigure(game, figure3);
-            figure4.setPosition(position4);
-            figure4.setOwnerId(testUser.getId());
-            figure4.setGame(game);
-            figureService.postGameBoardFigure(game, figure4);
+        figure3.setPosition(position3);
+        figure3.setOwnerId(testUser.getId());
+        figure3.setGame(game);
+        figureService.postGameBoardFigure(game, figure3);
+        figure4.setPosition(position4);
+        figure4.setOwnerId(testUser.getId());
+        figure4.setGame(game);
+        figureService.postGameBoardFigure(game, figure4);
 
-            Assert.assertEquals(testUser2, game.getCurrentTurn());
-            figureService.putGameBoardFigure(game,figure, positionb2);
+        Assert.assertEquals(testUser2, game.getCurrentTurn());
+        figureService.putGameBoardFigure(game,figure, positionb2);
 
-            Building building = new Building();
-            building.setPosition(positionb1);
-            building.setOwnerId(testUser2.getId());
-            building.setGame(game);
+        Building building = new Building();
+        building.setPosition(positionb1);
+        building.setOwnerId(testUser2.getId());
+        building.setGame(game);
 
-            buildingService.postGameBoardBuilding(game, building);
-            Assert.assertEquals(buildingService.getGameBoardBuildings(game).iterator().next(), building);
-            Assert.assertEquals(testUser, game.getCurrentTurn());
+        buildingService.postGameBoardBuilding(game, building);
+        Assert.assertEquals(buildingService.getGameBoardBuildings(game).iterator().next(), building);
+        Assert.assertEquals(testUser, game.getCurrentTurn());
+
+
+
+    }
+
+
+    //(expected = GameRuleException.class)
+
+
+
 
 
 }
-
-
-     //(expected = GameRuleException.class)
-
-
-
-
-
-    }
-
-
 
 

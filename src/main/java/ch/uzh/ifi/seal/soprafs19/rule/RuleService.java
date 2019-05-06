@@ -186,7 +186,7 @@ public class RuleService {
             Position lowerPosition = new Position(
                     adjacentPosition.getX(),
                     adjacentPosition.getY(),
-                 adjacentPosition.getZ() -1
+                    adjacentPosition.getZ() -1
             );
 
             // If there is no board item below the current position,
