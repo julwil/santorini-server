@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameDeserializer;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameSerializer;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -43,6 +44,9 @@ public class Game implements Serializable {
 	// Player 2 is the challenged one
     @OneToOne
 	private User user2;
+
+	@Transient
+	private Turn turn;
 
 //	@OneToOne
 //	private User winner;
@@ -95,6 +99,10 @@ public class Game implements Serializable {
 //	public User getWinner() {return winner;	}
 //
 //	public void setWinner(User winner) {this.winner = winner;}
+
+	public Turn getTurn() {	return turn;}
+
+	public void setTurn(Turn turn) {this.turn = turn;}
 
     @JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}

@@ -62,7 +62,7 @@ public class GameController {
                 "]}";
     }
 
-    // Create new Turn in Game
+    // Create new Move in Game
     @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
     public String postCreateTurn (

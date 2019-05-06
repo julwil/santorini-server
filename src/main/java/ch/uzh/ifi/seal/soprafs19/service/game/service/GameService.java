@@ -4,10 +4,11 @@ import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
-import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.*;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.DefaultTurn;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
+import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final FigureRepository figureRepository;
+    private final MoveRepository moveRepository;
+    private final BuildingRepository buildingRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -29,11 +32,15 @@ public class GameService {
     public GameService(
             GameRepository gameRepository,
             FigureRepository figureRepository,
+            MoveRepository moveRepository,
+            BuildingRepository buildingRepository,
             UserRepository userRepository,
             UserService userService)
     {
         this.gameRepository = gameRepository;
         this.figureRepository = figureRepository;
+        this.moveRepository = moveRepository;
+        this.buildingRepository = buildingRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
@@ -120,6 +127,12 @@ public class GameService {
         catch (NullPointerException e) {
             throw new ResourceNotFoundException("No game with matching id found");
         }
+    }
+
+    // Returns a turn object depending on the god-powers
+    public Turn getTurn(Game game) {
+        GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
+        return new DefaultTurn(board, moveRepository, buildingRepository, figureRepository);
     }
 
     public void swapTurns(Game game) {
