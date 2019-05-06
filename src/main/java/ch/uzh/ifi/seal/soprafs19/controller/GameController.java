@@ -59,9 +59,9 @@ public class GameController {
             @PathVariable long id)
     {
         return "{'turns':[" +
-                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
-                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
-                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
+                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayerrr','figures':['figure1','figure2']},'finished':true,'events':[]}," +
+                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayerrr2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
+                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayerrrr','figures':['figure1','figure2']},'finished':false,'events':[]}" +
                 "]}";
     }
 
@@ -106,9 +106,9 @@ public class GameController {
             @PathVariable("id") long gameId,
             HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
-        User user1 = this.userRepository.findByToken(token);
-        Game game = user1.getGame();
-        service.postCancelGameRequestByUser(game, user1);
+        Game game = gameRepository.findById(gameId);
+        User user = this.userRepository.findByToken(token);
+        service.postCancelGameRequestByUser(game, user);
         response.setStatus(204);
     }
 

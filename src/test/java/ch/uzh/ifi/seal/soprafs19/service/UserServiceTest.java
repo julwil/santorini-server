@@ -18,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Test class for the UserResource REST resource.
  * test commit
@@ -45,6 +47,18 @@ public class UserServiceTest{
         testUser.setPassword("testPassword");
         String path = userService.postCreateUser(testUser);
 
+        try{
+
+            User testuser22 = new User();
+            testuser22.setName("d");
+            testuser22.setUsername("testUsernamek");
+            testUser.setPassword("testPassword");
+
+            String path2 = userService.postCreateUser(testuser22);
+        }
+        catch (UsernameAlreadyExistsException e){
+            Assert.assertEquals("Username already taken.", e.getMessage());
+        }
 
         Assert.assertNull(testUser.getToken());
         Assert.assertEquals(UserStatus.OFFLINE, testUser.getStatus());
@@ -71,6 +85,7 @@ public class UserServiceTest{
         Assert.assertEquals(UserStatus.ONLINE, userRepository.findByToken(token).getStatus());
         userRepository.delete(testUser);
     }
+
 
     @Test
     public void logoutTest() throws ResourceNotFoundException, UsernameAlreadyExistsException, FailedAuthenticationException, ResourceActionNotAllowedException {
@@ -150,5 +165,7 @@ public class UserServiceTest{
         userService.putUpdateUser(token, testUser.getId(), testUser);
 
         Assert.assertEquals(testUser, userRepository.findByUsername("myNewUsername"));
+
+
     }
 }

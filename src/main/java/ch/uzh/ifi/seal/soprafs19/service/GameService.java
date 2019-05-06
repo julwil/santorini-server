@@ -45,6 +45,7 @@ public class GameService {
 
         // Check if a users are offline
         if (!(userService.isOnline(user1) && userService.isOnline(user2))) {
+            System.out.print(" s2 "+user1.getStatus()+user2.getStatus());
             return "Both users have to be online and not involved in a game";
         }
 
@@ -64,6 +65,8 @@ public class GameService {
         user2.setGame(newGame);
         user2.setStatus(UserStatus.CHALLENGED);
         userRepository.save(user2);
+
+
 
         return "games/" + newGame.getId().toString();
     }
@@ -99,7 +102,6 @@ public class GameService {
 
     public void postCancelGameRequestByUser(Game game, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
-        try {
 
 
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
@@ -108,16 +110,20 @@ public class GameService {
             game.setStatus(GameStatus.CANCLED);
             gameRepository.save(game);
 
-            game.getUser1().setStatus(UserStatus.ONLINE);
-            game.getUser2().setStatus(UserStatus.ONLINE);
+            User user1 = game.getUser1();
+            User user2 = game.getUser2();
 
-            userRepository.save(game.getUser1());
-            userRepository.save(game.getUser2());
+            user1.setStatus(UserStatus.ONLINE);
+            user2.setStatus(UserStatus.ONLINE);
+            cancelingUser.setStatus(UserStatus.ONLINE);
+
+            userRepository.save(cancelingUser);
+            userRepository.save(user1);
+            userRepository.save(user2);
+
         }
-        catch (NullPointerException e) {
-            throw new ResourceNotFoundException("No game with matching id found");
-        }
-    }
+
+
 
     public void swapTurns(Game game) {
         if (game.getCurrentTurn().equals(game.getUser1())) {
