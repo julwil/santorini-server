@@ -267,25 +267,28 @@ public class GameServiceDemo {
         building16.setOwnerId(testUser.getId());
         building16.setGame(newGame);
         buildingService.postGameBoardBuilding(newGame, building16);
-        figureService.putGameBoardFigure(newGame, figure11, p222);
 
-        Building building17 = new Building();
-        building17.setPosition(p212);
-        building17.setOwnerId(testUser2.getId());
-        building17.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building17);
+//        figureService.putGameBoardFigure(newGame, figure11, p222);
+//
+//        Building building17 = new Building();
+//        building17.setPosition(p212);
+//        building17.setOwnerId(testUser2.getId());
+//        building17.setGame(newGame);
+//        buildingService.postGameBoardBuilding(newGame, building17);
+//
+//        figureService.putGameBoardFigure(newGame, figure22, p330);
+//
+//        Building building18 = new Building();
+//        building18.setPosition(p241);
+//        building18.setOwnerId(testUser.getId());
+//        building18.setGame(newGame);
+//        buildingService.postGameBoardBuilding(newGame, building18);
+//
+//        figureService.putGameBoardFigure(newGame, figure11, p213);
 
-        figureService.putGameBoardFigure(newGame, figure22, p330);
-
-        Building building18 = new Building();
-        building18.setPosition(p241);
-        building18.setOwnerId(testUser.getId());
-        building18.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building18);
-
-        return figureService.putGameBoardFigure(newGame, figure11, p213);
 
 
+        return "games/demo/XWins" + newGame.getId().toString();
 
     }
 
@@ -487,29 +490,29 @@ public class GameServiceDemo {
 
 
 
-        figureService.putGameBoardFigure(newGame, figure21, p222);
+//        figureService.putGameBoardFigure(newGame, figure21, p222);
+//
+//        Building building14 = new Building();
+//        building14.setPosition(p232);
+//        building14.setOwnerId(testUser.getId());
+//        building14.setGame(newGame);
+//        buildingService.postGameBoardBuilding(newGame, building14);
+//
+//
+//
+//
+//        figureService.putGameBoardFigure(newGame, figure11, p201);
+//
+//        Building building15 = new Building();
+//        building15.setPosition(p100);
+//        building15.setOwnerId(testUser2.getId());
+//        building15.setGame(newGame);
+//        buildingService.postGameBoardBuilding(newGame, building15);
+//
+//        figureService.putGameBoardFigure(newGame, figure21, p233);
 
-        Building building14 = new Building();
-        building14.setPosition(p232);
-        building14.setOwnerId(testUser.getId());
-        building14.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building14);
 
-
-
-
-        figureService.putGameBoardFigure(newGame, figure11, p201);
-
-        Building building15 = new Building();
-        building15.setPosition(p100);
-        building15.setOwnerId(testUser2.getId());
-        building15.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building15);
-
-        return figureService.putGameBoardFigure(newGame, figure21, p233);
-
-
-
+        return "games/demo/XLoses" + newGame.getId().toString();
     }
 
 
