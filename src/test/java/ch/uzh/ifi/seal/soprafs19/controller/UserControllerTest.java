@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +127,9 @@ public class UserControllerTest {
                 .header("authorization", token)
                 .content("{\"name\": \"Test User Updated\",\"username\": \"testUserUpdated\", \"password\": \"testPasswordUpdated\"}"))
                 .andExpect(status().is(204)); //andDo(print()).
+
+        Assert.assertEquals("testUserUpdated", userRepository.findById(id).getUsername());
+
         userRepository.delete(userRepository.findByUsername("testUserUpdated"));
 
 

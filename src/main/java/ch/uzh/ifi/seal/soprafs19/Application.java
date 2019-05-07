@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
@@ -39,7 +40,7 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, FigureRepository figureRepository, AuthenticationService authentication, Utilities utils) {
+    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, FigureRepository figureRepository, AuthenticationService authentication, FigureService figureService, Utilities utils) {
         return (args) -> {
             UserService userService = new UserService(userRepository, authentication, utils);
             // save a couple of Users

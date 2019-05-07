@@ -2,12 +2,11 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
@@ -20,11 +19,12 @@ public class GameController {
     private final GameService service;
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
-
-    GameController(GameService service, UserRepository userRepository, GameRepository gameRepository) {
+    private final GameServiceDemo gameServiceDemo;
+    GameController(GameService service, UserRepository userRepository, GameRepository gameRepository, GameServiceDemo gameServiceDemo) {
         this.service = service;
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
+        this.gameServiceDemo = gameServiceDemo;
     }
 
     // Create new Game
@@ -35,11 +35,42 @@ public class GameController {
             HttpServletResponse response)
     {
         HashMap<String, String> pathToGame = new HashMap<>();
+
         pathToGame.put("path", this.service.postCreateGame(newGame));
 
         response.setStatus(201);
         return pathToGame;
     }
+
+    // Create new fast forward demo x wins
+    @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> postCreateGameDemoXWins (
+            @Valid @RequestBody Game newGame,
+            HttpServletResponse response) throws FailedAuthenticationException, GameRuleException, ResourceNotFoundException, UsernameAlreadyExistsException, ResourceActionNotAllowedException {
+        HashMap<String, String> pathToGame = new HashMap<>();
+
+        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXWins(newGame));
+
+        response.setStatus(201);
+        return pathToGame;
+    }
+
+    // Create new fast forward demo
+    @PostMapping(value = "/games/demoXLoses",produces = "application/json;charset=UTF-8")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> postCreateGameDemoXLoses (
+            @Valid @RequestBody Game newGame,
+            HttpServletResponse response) throws Exception {
+        HashMap<String, String> pathToGame = new HashMap<>();
+
+        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXLoses(newGame));
+
+        response.setStatus(201);
+        return pathToGame;
+    }
+
+
 
     @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)

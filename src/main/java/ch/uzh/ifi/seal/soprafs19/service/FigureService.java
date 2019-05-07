@@ -78,6 +78,7 @@ public class FigureService {
 
         if (target.isCeil()) {
             gameService.setWinner(figure.getGame(), figure.getGame().getCurrentTurn());
+            return "Game/Finished/XWins"  + game.getId().toString();
         }
 
         return "figures/"  + figure.getId();
