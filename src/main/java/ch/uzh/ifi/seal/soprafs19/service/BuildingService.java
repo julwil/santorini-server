@@ -53,9 +53,10 @@ public class BuildingService {
         buildingRepository.save(building);
         gameService.swapTurns(game);
 
-        if(ruleService.isLoose()) {
+        if(ruleService.isLoose()) { //no positions to move to
             User winner = game.getUser1().equals(game.getCurrentTurn()) ? game.getUser1() : game.getUser2();
             gameService.setWinner(game, winner);
+            return "Game/XLoses" + game.getId().toString();
         }
 
         return "buildings/" + building.getId().toString();
