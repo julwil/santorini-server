@@ -40,17 +40,18 @@ public class BuildingService {
      */
     public String postBuilding(Game game, Building newBuilding) throws GameRuleException
     {
-        Turn turn = gameService.getTurn(game);
-        boolean validTurn = turn.isBuildingAllowed(newBuilding);
+        game = gameService.loadGame(game.getId());
         Figure figure = figureService.loadFigure(game.getLastActiveFigureId());
-        boolean validPosition = figure.getPossibleBuilds().contains(newBuilding.getPosition());
 
-        if (!validTurn || !validPosition) {
+        if (!game.isBuildAllowedByUserId(figure.getOwnerId())) {
+            throw new GameRuleException();
+        }
+
+        if (!figure.getPossibleBuilds().contains(newBuilding.getPosition())) {
             throw new GameRuleException();
         }
 
         figure.build(newBuilding);
-        buildingRepository.save(newBuilding);
 
         return "buildings/" + newBuilding.getId().toString();
     }

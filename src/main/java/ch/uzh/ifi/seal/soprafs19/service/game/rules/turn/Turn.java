@@ -5,30 +5,51 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class Turn {
 
-    private final MoveRepository moveRepository;
-    private final BuildingRepository buildingRepository;
-    private final FigureRepository figureRepository;
-    private final GameBoard board;
+    protected final GameBoard board;
+    protected final MoveRepository moveRepository;
+    protected final BuildingRepository buildingRepository;
+    protected final FigureRepository figureRepository;
+    protected final GameRepository gameRepository;
+    protected final Game game;
 
     @Autowired
-    public Turn(GameBoard board, MoveRepository moveRepository, BuildingRepository buildingRepository, FigureRepository figureRepository) {
+    public Turn(GameBoard board, MoveRepository moveRepository, BuildingRepository buildingRepository, FigureRepository figureRepository, GameRepository gameRepository) {
+        this.board = board;
         this.moveRepository = moveRepository;
         this.buildingRepository = buildingRepository;
         this.figureRepository = figureRepository;
-        this.board = board;
+        this.gameRepository = gameRepository;
+        this.game = board.getGame();
+    }
+    public abstract boolean isBuildAllowedByUserId(long userId);
+    public abstract boolean isMoveAllowedByUserId(long userId);
+    public boolean isPlaceFigureAllowedByUserId(long userId)
+    {
+        return isCurrentTurn(userId)
+               && figureRepository.findAllByGameAndOwnerId(game, userId).size() < 2;
     }
 
-    public abstract boolean isBuildingAllowed(Building newBuilding);
+    public void swap()
+    {
+        if (game.getCurrentTurn().equals(game.getUser1())) {
+            game.setCurrentTurn(game.getUser2());
+        }
+        else {
+            game.setCurrentTurn(game.getUser1());
+        }
 
-    public boolean isPlaceFigureAllowed(Figure figure) {
-        return board.figureCountPerOwner(figure.getOwnerId()) < 2;
+        gameRepository.save(game);
     }
 
-    public abstract boolean isMoveAllowed(Figure figure);
+    public boolean isCurrentTurn(long userId)
+    {
+        return game.getCurrentTurn().getId() == userId;
+    }
 }

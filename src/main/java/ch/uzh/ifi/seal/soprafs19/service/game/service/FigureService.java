@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.DefaultBuilds;
@@ -26,14 +28,16 @@ public class FigureService {
     private final FigureRepository figureRepository;
     private final BuildingRepository buildingRepository;
     private final MoveRepository moveRepository;
+    private final GameRepository gameRepository;
     private final GameService gameService;
 
     @Autowired
-    public FigureService(FigureRepository figureRepository, BuildingRepository buildingRepository, MoveRepository moveRepository, GameService gameService)
+    public FigureService(FigureRepository figureRepository, BuildingRepository buildingRepository, MoveRepository moveRepository, GameRepository gameRepository, GameService gameService)
     {
         this.figureRepository = figureRepository;
         this.buildingRepository = buildingRepository;
         this.moveRepository = moveRepository;
+        this.gameRepository = gameRepository;
         this.gameService = gameService;
     }
 
@@ -50,18 +54,29 @@ public class FigureService {
      */
     public String postFigure(Game game, Figure figure) throws GameRuleException
     {
-        Turn turn = gameService.getTurn(game);
+        game = gameService.loadGame(game.getId());
         GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        Position targetPosition = figure.getPosition();
+        Action moves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
+        figure.setMoves(moves);
         long ownerId = figure.getOwnerId();
 
-        if (!turn.isPlaceFigureAllowed(figure) ||
-            !targetPosition.hasValidAxis() ||
-            board.getBoardMap().containsKey(targetPosition)) {
+        if (!game.isPlaceFigureAllowedByUserId(ownerId)) {
             throw new GameRuleException();
         }
 
-        figureRepository.save(figure);
+        Position targetPosition = figure.getPosition();
+
+        if (!targetPosition.hasValidAxis() ||
+            !figure.getPossibleMoves().contains(targetPosition)) {
+            throw new GameRuleException();
+        }
+
+        figure.moveTo(targetPosition);
+
+        if (!game.isPlaceFigureAllowedByUserId(ownerId)) {
+            game.swapTurns();
+        }
+
         return "figures/" + figure.getId();
     }
 
@@ -71,15 +86,13 @@ public class FigureService {
     public String putFigure(long figureId, Position destination) throws GameRuleException
     {
         Figure figure = loadFigure(figureId);
-        Turn turn = gameService.getTurn(figure.getGame());
+        Game game = gameService.loadGame(figure.getGame().getId());
 
-        if (!turn.isMoveAllowed(figure) || !figure.getPossibleMoves().contains(destination)) {
+        if (!game.isMoveAllowedByUserId(figure.getOwnerId()) || !figure.getPossibleMoves().contains(destination)) {
             throw new GameRuleException();
         }
 
         figure.moveTo(destination);
-        gameService.setLastActiveFigureInGame(figure);
-        figureRepository.save(figure);
 
         return "figures/"  + figure.getId();
     }
@@ -91,6 +104,11 @@ public class FigureService {
     {
         Figure figure = loadFigure(figureId);
 
+        if (figure.getPossibleMoves().size() == 0) {
+            User looser = figure.getGame().getUser1().equals(figure.getGame().getCurrentTurn()) ? figure.getGame().getUser1() : figure.getGame().getUser2();
+            gameService.setWinner(figure.getGame(), looser.getId());
+        }
+
         return figure.getPossibleMoves();
     }
 
@@ -101,7 +119,7 @@ public class FigureService {
     {
         Figure figure = new Figure();
         GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        InitialMoves initMoves = new InitialMoves(figure, board);
+        InitialMoves initMoves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
         figure.setMoves(initMoves);
 
         return figure.getPossibleMoves();
@@ -112,8 +130,8 @@ public class FigureService {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new DefaultMoves(dbFigure, board);
-        Action builds = new DefaultBuilds(dbFigure, board);
+        Action moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
+        Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
 
         dbFigure.setMoves(moves);
         dbFigure.setBuilds(builds);

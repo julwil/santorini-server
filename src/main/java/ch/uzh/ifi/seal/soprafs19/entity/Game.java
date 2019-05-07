@@ -45,6 +45,8 @@ public class Game implements Serializable {
     @OneToOne
 	private User user2;
 
+    private long winnerId;
+
 	@Transient
 	private Turn turn;
 
@@ -98,7 +100,7 @@ public class Game implements Serializable {
 
 //	public User getWinner() {return winner;	}
 //
-//	public void setWinner(User winner) {this.winner = winner;}
+//	public void setWinnerId(User winner) {this.winner = winner;}
 
 	public Turn getTurn() {	return turn;}
 
@@ -107,9 +109,34 @@ public class Game implements Serializable {
     @JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}
 
+	@JsonIgnore
 	public void setLastActiveFigureId(long lastActiveFigureId) {this.lastActiveFigureId = lastActiveFigureId; }
 
-	@Override
+	@JsonIgnore
+    public boolean isMoveAllowedByUserId(long userId)
+    {
+        return turn.isMoveAllowedByUserId(userId);
+    }
+
+	@JsonIgnore
+	public boolean isPlaceFigureAllowedByUserId(long userId)
+	{
+		return turn.isPlaceFigureAllowedByUserId(userId);
+	}
+
+    @JsonIgnore
+    public boolean isBuildAllowedByUserId(long userId)
+    {
+        return turn.isBuildAllowedByUserId(userId);
+    }
+
+	@JsonIgnore
+	public void swapTurns()
+	{
+		turn.swap();
+	}
+
+    @Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
 		if (!(o instanceof Game)) {
@@ -117,5 +144,14 @@ public class Game implements Serializable {
 		}
 		Game user = (Game) o;
 		return this.getId().equals(user.getId());
+	}
+
+	public void setWinnerId(long ownerId)
+	{
+	}
+
+	public long getWinnerId()
+	{
+		return winnerId;
 	}
 }

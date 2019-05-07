@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -14,5 +15,5 @@ public interface FigureRepository extends CrudRepository<Figure, Long> {
 	boolean existsById(long id);
 	Iterable<Figure> findAllByGame(Game game);
 
-    Iterable<Figure> findAllByGameAndOwnerId(Game game, long ownerId);
+    Collection<Figure> findAllByGameAndOwnerId(Game game, long ownerId);
 }

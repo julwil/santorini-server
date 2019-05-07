@@ -130,20 +130,13 @@ public class GameService {
     }
 
     // Returns a turn object depending on the god-powers
-    public Turn getTurn(Game game) {
+    public Game loadGame(long id) {
+        Game game = gameRepository.findById(id);
         GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        return new DefaultTurn(board, moveRepository, buildingRepository, figureRepository);
-    }
+        Turn turn = new DefaultTurn(board, moveRepository, buildingRepository, figureRepository, gameRepository); // Depending on the chosen god-powers, we need to assign a different turn object
+        game.setTurn(turn);
 
-    public void swapTurns(Game game) {
-        if (game.getCurrentTurn().equals(game.getUser1())) {
-            game.setCurrentTurn(game.getUser2());
-        }
-        else {
-            game.setCurrentTurn(game.getUser1());
-        }
-
-        gameRepository.save(game);
+        return game;
     }
 
     public Iterable<Game> getAllGames(String token)
@@ -161,8 +154,9 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setLastActiveFigureInGame(Figure figure) {
-        figure.getGame().setLastActiveFigureId(figure.getId());
-        gameRepository.save(figure.getGame());
+    public void setWinner(Game game, long ownerId) {
+        game.setWinnerId(ownerId);
+        game.setStatus(GameStatus.FINISHED);
+        gameRepository.save(game);
     }
 }

@@ -1,7 +1,14 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions;
 
 import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
+import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
@@ -12,15 +19,28 @@ import java.util.List;
 public abstract class Action {
 
     private Figure figure;
+    private Building building;
     private GameBoard board;
+    protected Game game;
     private Position originPosition;
     private Position targetPosition;
+    protected final BuildingRepository buildingRepository;
+    protected final FigureRepository figureRepository;
+    protected final MoveRepository moveRepository;
+    protected final GameRepository gameRepository;
+    protected final GameService gameService;
 
-    public Action(Figure figure, GameBoard board)
+    public Action(Figure figure, GameBoard board, BuildingRepository buildingRepository, FigureRepository figureRepository, MoveRepository moveRepository, GameRepository gameRepository, GameService gameService)
     {
         this.figure = figure;
         this.board = board;
+        this.game = board.getGame();
         this.originPosition = figure.getPosition();
+        this.buildingRepository = buildingRepository;
+        this.figureRepository = figureRepository;
+        this.moveRepository = moveRepository;
+        this.gameRepository = gameRepository;
+        this.gameService = gameService;
     }
 
     public abstract List<Position> calculatePossiblePositions();
@@ -129,5 +149,18 @@ public abstract class Action {
 
     public void setTargetPosition(Position targetPosition) {
         this.targetPosition = targetPosition;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void setBuilding(Building building)
+    {
+        this.building = building;
     }
 }
