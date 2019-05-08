@@ -16,6 +16,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,7 +104,7 @@ public class FigureController {
         authenticationService.userTokenIsCurrentTurn(token,gameId);
 
         Figure figure = figureRepository.findById(figureId);
-        return figure != null ? service.getPossibleMoves(figureId) : null;
+        return figure != null ? service.getPossibleMoves(figureId) : new ArrayList<Position>();
     }
 
     @GetMapping(value = "/games/{gameId}/figures/possiblePosts")

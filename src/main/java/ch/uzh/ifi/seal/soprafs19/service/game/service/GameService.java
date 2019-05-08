@@ -1,13 +1,16 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
+
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
-import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.repository.*;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.DefaultTurn;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
+import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,8 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final FigureRepository figureRepository;
+    private final MoveRepository moveRepository;
+    private final BuildingRepository buildingRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -29,11 +34,15 @@ public class GameService {
     public GameService(
             GameRepository gameRepository,
             FigureRepository figureRepository,
+            MoveRepository moveRepository,
+            BuildingRepository buildingRepository,
             UserRepository userRepository,
             UserService userService)
     {
         this.gameRepository = gameRepository;
         this.figureRepository = figureRepository;
+        this.moveRepository = moveRepository;
+        this.buildingRepository = buildingRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
@@ -122,15 +131,14 @@ public class GameService {
         }
     }
 
-    public void swapTurns(Game game) {
-        if (game.getCurrentTurn().equals(game.getUser1())) {
-            game.setCurrentTurn(game.getUser2());
-        }
-        else {
-            game.setCurrentTurn(game.getUser1());
-        }
+    // Returns a turn object depending on the god-powers
+    public Game loadGame(long id) {
+        Game game = gameRepository.findById(id);
+        GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
+        Turn turn = new DefaultTurn(board, moveRepository, buildingRepository, figureRepository, gameRepository); // Depending on the chosen god-powers, we need to assign a different turn object
+        game.setTurn(turn);
 
-        gameRepository.save(game);
+        return game;
     }
 
     public Iterable<Game> getAllGames(String token)
@@ -148,8 +156,14 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setLastActiveFigureInGame(Figure figure) {
-        figure.getGame().setLastActiveFigureId(figure.getId());
-        gameRepository.save(figure.getGame());
+    public void setWinner(Game game, long ownerId) {
+        game.setWinnerId(ownerId);
+        game.setStatus(GameStatus.FINISHED);
+        gameRepository.save(game);
+    }
+
+    public void swapTurn(Game game)
+    {
+
     }
 }
