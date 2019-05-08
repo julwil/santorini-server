@@ -161,9 +161,4 @@ public class GameService {
         game.setStatus(GameStatus.FINISHED);
         gameRepository.save(game);
     }
-
-    public void swapTurn(Game game)
-    {
-
-    }
 }
