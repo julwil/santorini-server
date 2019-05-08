@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
+
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.*;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.DefaultTurn;
@@ -158,5 +160,10 @@ public class GameService {
         game.setWinnerId(ownerId);
         game.setStatus(GameStatus.FINISHED);
         gameRepository.save(game);
+    }
+
+    public void swapTurn(Game game)
+    {
+
     }
 }

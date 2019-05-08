@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -11,7 +10,6 @@ import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.DefaultBuilds;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.DefaultMoves;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.InitialMoves;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
@@ -19,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -56,7 +56,7 @@ public class FigureService {
     {
         game = gameService.loadGame(game.getId());
         GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        Action moves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
+        Action moves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
         figure.setMoves(moves);
         long ownerId = figure.getOwnerId();
 
@@ -72,10 +72,6 @@ public class FigureService {
         }
 
         figure.moveTo(targetPosition);
-
-        if (!game.isPlaceFigureAllowedByUserId(ownerId)) {
-            game.swapTurns();
-        }
 
         return "figures/" + figure.getId();
     }
@@ -103,10 +99,10 @@ public class FigureService {
     public Iterable<Position> getPossibleMoves(long figureId)
     {
         Figure figure = loadFigure(figureId);
+        Game game = gameService.loadGame(figure.getGame().getId());
 
-        if (figure.getPossibleMoves().size() == 0) {
-            User looser = figure.getGame().getUser1().equals(figure.getGame().getCurrentTurn()) ? figure.getGame().getUser1() : figure.getGame().getUser2();
-            gameService.setWinner(figure.getGame(), looser.getId());
+        if (!game.isMoveAllowedByUserId(figure.getOwnerId())) {
+            return new ArrayList<Position>();
         }
 
         return figure.getPossibleMoves();
@@ -117,10 +113,14 @@ public class FigureService {
      */
     public Iterable<Position> getPossibleInitialMoves(Game game)
     {
-        Figure figure = new Figure();
-        GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        InitialMoves initMoves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
-        figure.setMoves(initMoves);
+        game = gameService.loadGame(game.getId());
+
+        // If the user is not allowed to place figures, return empty list.
+        if (!game.isPlaceFigureAllowedByUserId(game.getCurrentTurn().getId())) {
+            return new ArrayList<Position>();
+        }
+
+        Figure figure = loadInitialFigure(game);
 
         return figure.getPossibleMoves();
     }
@@ -130,12 +130,22 @@ public class FigureService {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
-        Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService);
+        Action moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
 
         dbFigure.setMoves(moves);
         dbFigure.setBuilds(builds);
 
         return dbFigure;
+    }
+
+    private Figure loadInitialFigure(Game game)
+    {
+        Figure figure = new Figure();
+        GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
+        InitialMoves initMoves = new InitialMoves(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        figure.setMoves(initMoves);
+
+        return figure;
     }
 }

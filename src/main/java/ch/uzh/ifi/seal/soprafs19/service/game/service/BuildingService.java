@@ -1,14 +1,16 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
+
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 
 
 @Service
@@ -41,11 +43,12 @@ public class BuildingService {
     public String postBuilding(Game game, Building newBuilding) throws GameRuleException
     {
         game = gameService.loadGame(game.getId());
-        Figure figure = figureService.loadFigure(game.getLastActiveFigureId());
 
-        if (!game.isBuildAllowedByUserId(figure.getOwnerId())) {
+        if (!game.isBuildAllowedByUserId(newBuilding.getOwnerId())) {
             throw new GameRuleException();
         }
+
+        Figure figure = figureService.loadFigure(game.getLastActiveFigureId());
 
         if (!figure.getPossibleBuilds().contains(newBuilding.getPosition())) {
             throw new GameRuleException();
@@ -60,6 +63,12 @@ public class BuildingService {
      * returns a list of possible positions where a building can be placed
      */
     public Iterable<Position> getPossibleBuilds(Game game) {
+        game = gameService.loadGame(game.getId());
+
+        if (!game.isBuildAllowedByUserId(game.getCurrentTurn().getId())) {
+            return new ArrayList<Position>();
+        }
+
         Figure lastActiveFigure = figureService.loadFigure(game.getLastActiveFigureId());
 
         return lastActiveFigure.getPossibleBuilds();
