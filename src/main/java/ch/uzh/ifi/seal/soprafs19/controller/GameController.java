@@ -80,6 +80,7 @@ public class GameController {
     }
 
 
+
     @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     public Game getGameById (

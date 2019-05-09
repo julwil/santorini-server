@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 
+import javax.validation.Valid;
+
 @Service
 @Transactional
 public class GameServiceDemo {
@@ -63,6 +65,7 @@ public class GameServiceDemo {
     public String postCreateGameDemoXWins(Game newGame) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, UsernameAlreadyExistsException {
         // Get the users by extracting the user id's from the game
 
+
         User testUser = newGame.getUser1();
         User testUser2 = newGame.getUser2();
 
@@ -75,16 +78,16 @@ public class GameServiceDemo {
         if (testUser.equals(testUser2)) {
             return "You can't play against yourself";
         }
-        newGame.setStatus(GameStatus.STARTED);
+        newGame.setStatus(GameStatus.INITIALIZED);
         newGame.setCurrentTurn(testUser2);
         gameRepository.save(newGame);
 
         testUser.setGame(newGame);
-        testUser.setStatus(UserStatus.PLAYING);
+        testUser.setStatus(UserStatus.CHALLENGED);
         userRepository.save(testUser);
 
         testUser2.setGame(newGame);
-        testUser2.setStatus(UserStatus.PLAYING);
+        testUser2.setStatus(UserStatus.CHALLENGED);
         userRepository.save(testUser2);
 
 
