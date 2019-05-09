@@ -10,14 +10,17 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ch.uzh.ifi.seal.soprafs19.service.BuildingService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 
 @Service
 @Transactional
@@ -42,7 +45,7 @@ public class GameServiceDemo {
             FigureService figureService,
             GameService gameService,
             BuildingService buildingService
-            )
+    )
     {
         this.gameRepository = gameRepository;
         this.figureRepository = figureRepository;
@@ -130,161 +133,161 @@ public class GameServiceDemo {
         figure11.setPosition(p220);
         figure11.setOwnerId(testUser2.getId());
         figure11.setGame(newGame);
-        String s1= figureService.postGameBoardFigure(newGame, figure11);
+        String s1= figureService.postFigure(newGame, figure11);
 
         figure12.setPosition(p330);
         figure12.setOwnerId(testUser2.getId());
         figure12.setGame(newGame);
-        figureService.postGameBoardFigure(newGame, figure12);
+        figureService.postFigure(newGame, figure12);
 
         figure21.setPosition(p110);
         figure21.setOwnerId(testUser.getId());
         figure21.setGame(newGame);
-        figureService.postGameBoardFigure(newGame, figure21);
+        figureService.postFigure(newGame, figure21);
 
         figure22.setPosition(p320);
         figure22.setOwnerId(testUser.getId());
         figure22.setGame(newGame);
-        figureService.postGameBoardFigure(newGame,figure22);
+        figureService.postFigure(newGame,figure22);
 
-        figureService.putGameBoardFigure(newGame,figure11,p210 );
+        figureService.putFigure(figure11.getId(),p210 );
 
         Building building = new Building();
         building.setPosition(p220);
         building.setOwnerId(testUser2.getId());
         building.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building);
+        buildingService.postBuilding(newGame, building);
 
-        figureService.putGameBoardFigure(newGame, figure21, p221);
+        figureService.putFigure(figure21.getId(), p221);
 
         Building building2 = new Building();
         building2.setPosition(p230);
         building2.setOwnerId(testUser.getId());
         building2.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building2);
+        buildingService.postBuilding(newGame, building2);
 
-        figureService.putGameBoardFigure(newGame, figure12, p231);
+        figureService.putFigure(figure12.getId(), p231);
 
         Building building3 = new Building();
         building3.setPosition(p120);
         building3.setOwnerId(testUser2.getId());
         building3.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building3);
+        buildingService.postBuilding(newGame, building3);
 
-        figureService.putGameBoardFigure(newGame, figure22, p310);
+        figureService.putFigure(figure22.getId(), p310);
 
 
         Building building4 = new Building();
         building4.setPosition(p320);
         building4.setOwnerId(testUser.getId());
         building4.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building4);
+        buildingService.postBuilding(newGame, building4); //move
 
-        figureService.putGameBoardFigure(newGame, figure11, p321);
+        figureService.putFigure(figure11.getId(), p321);
 
         Building building5 = new Building();
         building5.setPosition(p210);
         building5.setOwnerId(testUser2.getId());
         building5.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building5);
+        buildingService.postBuilding(newGame, building5);
 
-        figureService.putGameBoardFigure(newGame, figure22, p211);
+        figureService.putFigure(figure22.getId(), p211);
 
         Building building6 = new Building();
         building6.setPosition(p121);
         building6.setOwnerId(testUser.getId());
         building6.setGame(newGame);
 
-        buildingService.postGameBoardBuilding(newGame, building6);
-        figureService.putGameBoardFigure(newGame, figure12, p122);
+        buildingService.postBuilding(newGame, building6);
+        figureService.putFigure(figure12.getId(), p122);
 
         Building building7 = new Building();
         building7.setPosition(p231);
         building7.setOwnerId(testUser2.getId());
         building7.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building7);
-        figureService.putGameBoardFigure(newGame, figure21, p232);
+        buildingService.postBuilding(newGame, building7);
+        figureService.putFigure(figure21.getId(), p232);
 
         Building building8 = new Building();
         building8.setPosition(p221);
         building8.setOwnerId(testUser.getId());
         building8.setGame(newGame);
 
-        buildingService.postGameBoardBuilding(newGame, building8);
-        figureService.putGameBoardFigure(newGame, figure11, p222);
+        buildingService.postBuilding(newGame, building8);
+        figureService.putFigure(figure11.getId(), p222);
 
         Building building9 = new Building();
         building9.setPosition(p321);
         building9.setOwnerId(testUser2.getId());
         building9.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building9);
-        figureService.putGameBoardFigure(newGame, figure22, p322);
+        buildingService.postBuilding(newGame, building9);
+        figureService.putFigure(figure22.getId(), p322);
 
         Building building10 = new Building();
         building10.setPosition(p420);
         building10.setOwnerId(testUser.getId());
         building10.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building10);
-        figureService.putGameBoardFigure(newGame, figure12, p110);
+        buildingService.postBuilding(newGame, building10);
+        figureService.putFigure(figure12.getId(), p110);
 
         Building building11 = new Building();
         building11.setPosition(p020);
         building11.setOwnerId(testUser2.getId());
         building11.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building11);
-        figureService.putGameBoardFigure(newGame, figure22, p430);
+        buildingService.postBuilding(newGame, building11);
+        figureService.putFigure(figure22.getId(), p430);
 
         Building building12 = new Building();
         building12.setPosition(p421);
         building12.setOwnerId(testUser.getId());
         building12.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building12);
-        figureService.putGameBoardFigure(newGame, figure11, p322);
+        buildingService.postBuilding(newGame, building12);
+        figureService.putFigure(figure11.getId(), p322);
 
         Building building13 = new Building();
         building13.setPosition(p211);
         building13.setOwnerId(testUser2.getId());
         building13.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building13);
-        figureService.putGameBoardFigure(newGame, figure21, p222);
+        buildingService.postBuilding(newGame, building13);
+        figureService.putFigure(figure21.getId(), p222);
 
         Building building14 = new Building();
         building14.setPosition(p122);
         building14.setOwnerId(testUser.getId());
         building14.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building14);
-        figureService.putGameBoardFigure(newGame, figure12, p021);
+        buildingService.postBuilding(newGame, building14);
+        figureService.putFigure(figure12.getId(), p021);
 
         Building building15 = new Building();
         building15.setPosition(p123);
         building15.setOwnerId(testUser2.getId());
         building15.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building15);
-        figureService.putGameBoardFigure(newGame, figure21, p232);
+        buildingService.postBuilding(newGame, building15);
+        figureService.putFigure(figure21.getId(), p232);
 
         Building building16 = new Building();
         building16.setPosition(p240);
         building16.setOwnerId(testUser.getId());
         building16.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building16);
+        buildingService.postBuilding(newGame, building16);
 
-//        figureService.putGameBoardFigure(newGame, figure11, p222);
+//        figureService.putFigure(figure11.getId(), p222);
 //
 //        Building building17 = new Building();
 //        building17.setPosition(p212);
 //        building17.setOwnerId(testUser2.getId());
 //        building17.setGame(newGame);
-//        buildingService.postGameBoardBuilding(newGame, building17);
+//        buildingService.postBuilding(newGame, building17);
 //
-//        figureService.putGameBoardFigure(newGame, figure22, p330);
+//        figureService.putFigure(figure22.getId(), p330);
 //
 //        Building building18 = new Building();
 //        building18.setPosition(p241);
 //        building18.setOwnerId(testUser.getId());
 //        building18.setGame(newGame);
-//        buildingService.postGameBoardBuilding(newGame, building18);
+//        buildingService.postBuilding(newGame, building18);
 //
-//        figureService.putGameBoardFigure(newGame, figure11, p213);
+//        figureService.putFigure(figure11.getId(), p213);
 
 
 
@@ -365,125 +368,127 @@ public class GameServiceDemo {
         figure11.setPosition(p220);
         figure11.setOwnerId(testUser2.getId());
         figure11.setGame(newGame);
-        String s1= figureService.postGameBoardFigure(newGame, figure11);
+        String s1= figureService.postFigure(newGame, figure11);
 
         figure12.setPosition(p330);
         figure12.setOwnerId(testUser2.getId());
         figure12.setGame(newGame);
-        figureService.postGameBoardFigure(newGame, figure12);
+        figureService.postFigure(newGame, figure12);
 
         figure21.setPosition(p110);
         figure21.setOwnerId(testUser.getId());
         figure21.setGame(newGame);
-        figureService.postGameBoardFigure(newGame, figure21);
+        figureService.postFigure(newGame, figure21);
 
         figure22.setPosition(p320);
         figure22.setOwnerId(testUser.getId());
         figure22.setGame(newGame);
-        figureService.postGameBoardFigure(newGame,figure22);
+        figureService.postFigure(newGame,figure22);
 
-        figureService.putGameBoardFigure(newGame,figure11,p210 );
+        figureService.putFigure(figure11.getId(),p210 );
 
         Building building = new Building();
         building.setPosition(p220);
         building.setOwnerId(testUser2.getId());
         building.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building);
+        buildingService.postBuilding(newGame, building);
 
-        figureService.putGameBoardFigure(newGame, figure21, p221);
+        figureService.putFigure(figure21.getId(), p221);
 
         Building building2 = new Building();
         building2.setPosition(p230);
         building2.setOwnerId(testUser.getId());
         building2.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building2);
+        buildingService.postBuilding(newGame, building2);
 
-        figureService.putGameBoardFigure(newGame, figure12, p231);
+        figureService.putFigure(figure12.getId(), p231);
 
         Building building3 = new Building();
         building3.setPosition(p120);
         building3.setOwnerId(testUser2.getId());
         building3.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building3);
+        buildingService.postBuilding(newGame, building3);
 
-        figureService.putGameBoardFigure(newGame, figure22, p310);
+        figureService.putFigure(figure22.getId(), p310);
 
 
         Building building4 = new Building();
         building4.setPosition(p320);
         building4.setOwnerId(testUser.getId());
         building4.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building4);
+        buildingService.postBuilding(newGame, building4); //move
 
-        figureService.putGameBoardFigure(newGame, figure11, p321);
+        figureService.putFigure(figure11.getId(), p321);
 
         Building building5 = new Building();
         building5.setPosition(p210);
         building5.setOwnerId(testUser2.getId());
         building5.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building5);
+        buildingService.postBuilding(newGame, building5);
 
-        figureService.putGameBoardFigure(newGame, figure22, p211);
+        figureService.putFigure(figure22.getId(), p211);
 
         Building building6 = new Building();
         building6.setPosition(p121);
         building6.setOwnerId(testUser.getId());
         building6.setGame(newGame);
 
-        buildingService.postGameBoardBuilding(newGame, building6);
-        figureService.putGameBoardFigure(newGame, figure12, p122);
+        buildingService.postBuilding(newGame, building6);
+        figureService.putFigure(figure12.getId(), p122);
 
         Building building7 = new Building();
         building7.setPosition(p231);
         building7.setOwnerId(testUser2.getId());
         building7.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building7);
-        figureService.putGameBoardFigure(newGame, figure21, p232);
+        buildingService.postBuilding(newGame, building7);
+        figureService.putFigure(figure21.getId(), p232);
 
         Building building8 = new Building();
         building8.setPosition(p221);
         building8.setOwnerId(testUser.getId());
         building8.setGame(newGame);
 
-        buildingService.postGameBoardBuilding(newGame, building8);
-        figureService.putGameBoardFigure(newGame, figure11, p222);
+        buildingService.postBuilding(newGame, building8);
+        figureService.putFigure(figure11.getId(), p222);
 
         Building building9 = new Building();
         building9.setPosition(p321);
         building9.setOwnerId(testUser2.getId());
         building9.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building9);
-        figureService.putGameBoardFigure(newGame, figure22, p322);
+        buildingService.postBuilding(newGame, building9);
+        figureService.putFigure(figure22.getId(), p322);
 
         Building building10 = new Building();
         building10.setPosition(p420);
         building10.setOwnerId(testUser.getId());
         building10.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building10);
-        figureService.putGameBoardFigure(newGame, figure12, p110);
+        buildingService.postBuilding(newGame, building10);
+        figureService.putFigure(figure12.getId(), p110);
 
         Building building11 = new Building();
         building11.setPosition(p020);
         building11.setOwnerId(testUser2.getId());
         building11.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building11);
+        buildingService.postBuilding(newGame, building11);
 
-        figureService.putGameBoardFigure(newGame, figure22, p430);
+        figureService.putFigure(figure22.getId(), p430);
 
         Building building12 = new Building();
         building12.setPosition(p421);
         building12.setOwnerId(testUser.getId());
         building12.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building12);
+        buildingService.postBuilding(newGame, building12);
+        figureService.putFigure(figure11.getId(), p322);
 
 
-        figureService.putGameBoardFigure(newGame, figure11, p211);
+
+        figureService.putFigure(figure11.getId(), p211);
 
         Building building13 = new Building();
         building13.setPosition(p200);
         building13.setOwnerId(testUser2.getId());
         building13.setGame(newGame);
-        buildingService.postGameBoardBuilding(newGame, building13);
+        buildingService.postBuilding(newGame, building13);
 
 
 
@@ -496,20 +501,20 @@ public class GameServiceDemo {
 //        building14.setPosition(p232);
 //        building14.setOwnerId(testUser.getId());
 //        building14.setGame(newGame);
-//        buildingService.postGameBoardBuilding(newGame, building14);
+//        buildingService.postBuilding(newGame, building14);
 //
 //
 //
 //
-//        figureService.putGameBoardFigure(newGame, figure11, p201);
+//        figureService.putFigure(figure11.getId(), p201);
 //
 //        Building building15 = new Building();
 //        building15.setPosition(p100);
 //        building15.setOwnerId(testUser2.getId());
 //        building15.setGame(newGame);
-//        buildingService.postGameBoardBuilding(newGame, building15);
+//        buildingService.postBuilding(newGame, building15);
 //
-//        figureService.putGameBoardFigure(newGame, figure21, p233);
+//        figureService.putFigure(figure21.getId(), p233);
 
 
         return "games/demo/XLoses" + newGame.getId().toString();
