@@ -5,8 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-
 @Repository
 public interface FigureRepository extends CrudRepository<Figure, Long> {
 	Figure findById(long id);

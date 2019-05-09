@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.Move;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exceptions.*;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
@@ -18,13 +20,10 @@ public class GameController {
 
     private final GameService service;
     private final UserRepository userRepository;
-    private final GameRepository gameRepository;
-    private final GameServiceDemo gameServiceDemo;
-    GameController(GameService service, UserRepository userRepository, GameRepository gameRepository, GameServiceDemo gameServiceDemo) {
+
+    GameController(GameService service, UserRepository userRepository) {
         this.service = service;
         this.userRepository = userRepository;
-        this.gameRepository = gameRepository;
-        this.gameServiceDemo = gameServiceDemo;
     }
 
     // Create new Game
@@ -35,42 +34,11 @@ public class GameController {
             HttpServletResponse response)
     {
         HashMap<String, String> pathToGame = new HashMap<>();
-
         pathToGame.put("path", this.service.postCreateGame(newGame));
 
         response.setStatus(201);
         return pathToGame;
     }
-
-    // Create new fast forward demo x wins
-    @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> postCreateGameDemoXWins (
-            @Valid @RequestBody Game newGame,
-            HttpServletResponse response) throws FailedAuthenticationException, GameRuleException, ResourceNotFoundException, UsernameAlreadyExistsException, ResourceActionNotAllowedException {
-        HashMap<String, String> pathToGame = new HashMap<>();
-
-        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXWins(newGame));
-
-        response.setStatus(201);
-        return pathToGame;
-    }
-
-    // Create new fast forward demo
-    @PostMapping(value = "/games/demoXLoses",produces = "application/json;charset=UTF-8")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> postCreateGameDemoXLoses (
-            @Valid @RequestBody Game newGame,
-            HttpServletResponse response) throws Exception {
-        HashMap<String, String> pathToGame = new HashMap<>();
-
-        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXLoses(newGame));
-
-        response.setStatus(201);
-        return pathToGame;
-    }
-
-
 
     @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
@@ -90,13 +58,13 @@ public class GameController {
             @PathVariable long id)
     {
         return "{'turns':[" +
-                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayerrr','figures':['figure1','figure2']},'finished':true,'events':[]}," +
-                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayerrr2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
-                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayerrrr','figures':['figure1','figure2']},'finished':false,'events':[]}" +
+                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
+                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
+                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
                 "]}";
     }
 
-    // Create new Turn in Game
+    // Create new Move in Game
     @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
     public String postCreateTurn (
@@ -137,9 +105,8 @@ public class GameController {
             @PathVariable("id") long gameId,
             HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
-        Game game = gameRepository.findById(gameId);
         User user = this.userRepository.findByToken(token);
-        service.postCancelGameRequestByUser(game, user);
+        service.postCancelGameRequestByUser(gameId, user);
         response.setStatus(204);
     }
 

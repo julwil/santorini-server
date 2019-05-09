@@ -82,4 +82,10 @@ public class Position {
 
         return Integer.parseInt(hash);
     }
+
+    public boolean hasValidAxis() {
+        return Axis.XYAXIS.contains(this.getX()) &&
+                Axis.XYAXIS.contains(this.getY()) &&
+                Axis.ZAXIS.contains(this.getZ());
+    }
 }

@@ -1,12 +1,16 @@
-package ch.uzh.ifi.seal.soprafs19.service;
+package ch.uzh.ifi.seal.soprafs19.service.game.service;
+
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.exceptions.*;
-import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.utilities.Position;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
+import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.repository.*;
+import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.DefaultTurn;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
+import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,23 +25,26 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final FigureRepository figureRepository;
+    private final MoveRepository moveRepository;
+    private final BuildingRepository buildingRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-
 
     @Autowired
     public GameService(
             GameRepository gameRepository,
             FigureRepository figureRepository,
+            MoveRepository moveRepository,
+            BuildingRepository buildingRepository,
             UserRepository userRepository,
-            UserService userService
-            )
+            UserService userService)
     {
         this.gameRepository = gameRepository;
         this.figureRepository = figureRepository;
+        this.moveRepository = moveRepository;
+        this.buildingRepository = buildingRepository;
         this.userService = userService;
         this.userRepository = userRepository;
-
     }
 
     public String postCreateGame(Game newGame)
@@ -48,7 +55,6 @@ public class GameService {
 
         // Check if a users are offline
         if (!(userService.isOnline(user1) && userService.isOnline(user2))) {
-            System.out.print(" s2 "+user1.getStatus()+user2.getStatus());
             return "Both users have to be online and not involved in a game";
         }
 
@@ -69,18 +75,13 @@ public class GameService {
         user2.setStatus(UserStatus.CHALLENGED);
         userRepository.save(user2);
 
-
-
         return "games/" + newGame.getId().toString();
     }
-
-
 
     public Game postAcceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException
     {
         try {
             Game game = gameRepository.findById(id);
-
 
             if (!game.getUser2().equals(acceptingUser)) {
                 throw new ResourceActionNotAllowedException("Missing permission to accept the game");
@@ -105,9 +106,10 @@ public class GameService {
         }
     }
 
-    public void postCancelGameRequestByUser(Game game, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
-
+        try {
+            Game game = gameRepository.findById(id);
 
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
@@ -120,25 +122,23 @@ public class GameService {
 
             user1.setStatus(UserStatus.ONLINE);
             user2.setStatus(UserStatus.ONLINE);
-            cancelingUser.setStatus(UserStatus.ONLINE);
 
-            userRepository.save(cancelingUser);
             userRepository.save(user1);
             userRepository.save(user2);
-
         }
-
-
-
-    public void swapTurns(Game game) {
-        if (game.getCurrentTurn().equals(game.getUser1())) {
-            game.setCurrentTurn(game.getUser2());
+        catch (NullPointerException e) {
+            throw new ResourceNotFoundException("No game with matching id found");
         }
-        else {
-            game.setCurrentTurn(game.getUser1());
-        }
+    }
 
-        gameRepository.save(game);
+    // Returns a turn object depending on the god-powers
+    public Game loadGame(long id) {
+        Game game = gameRepository.findById(id);
+        GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
+        Turn turn = new DefaultTurn(board, moveRepository, buildingRepository, figureRepository, gameRepository); // Depending on the chosen god-powers, we need to assign a different turn object
+        game.setTurn(turn);
+
+        return game;
     }
 
     public Iterable<Game> getAllGames(String token)
@@ -156,13 +156,8 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setLastActiveFigureInGame(Figure figure, Game game) {
-        game.setLastActiveFigureId(figure.getId());
-        gameRepository.save(game);
-    }
-
-    public void setWinner(Game game, User currentTurn)
-    {
+    public void setWinner(Game game, long ownerId) {
+        game.setWinnerId(ownerId);
         game.setStatus(GameStatus.FINISHED);
         gameRepository.save(game);
     }

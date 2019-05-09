@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameDeserializer;
 import ch.uzh.ifi.seal.soprafs19.deserializers.GameSerializer;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -43,6 +44,11 @@ public class Game implements Serializable {
 	// Player 2 is the challenged one
     @OneToOne
 	private User user2;
+
+    private long winnerId;
+
+	@Transient
+	private Turn turn;
 
 //	@OneToOne
 //	private User winner;
@@ -94,14 +100,43 @@ public class Game implements Serializable {
 
 //	public User getWinner() {return winner;	}
 //
-//	public void setWinner(User winner) {this.winner = winner;}
+//	public void setWinnerId(User winner) {this.winner = winner;}
+
+	public Turn getTurn() {	return turn;}
+
+	public void setTurn(Turn turn) {this.turn = turn;}
 
     @JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}
 
+	@JsonIgnore
 	public void setLastActiveFigureId(long lastActiveFigureId) {this.lastActiveFigureId = lastActiveFigureId; }
 
-	@Override
+	@JsonIgnore
+    public boolean isMoveAllowedByUserId(long userId)
+    {
+        return turn.isMoveAllowedByUserId(userId);
+    }
+
+	@JsonIgnore
+	public boolean isPlaceFigureAllowedByUserId(long userId)
+	{
+		return turn.isPlaceFigureAllowedByUserId(userId);
+	}
+
+    @JsonIgnore
+    public boolean isBuildAllowedByUserId(long userId)
+    {
+        return turn.isBuildAllowedByUserId(userId);
+    }
+
+	@JsonIgnore
+	public void swapTurns()
+	{
+		turn.swap();
+	}
+
+    @Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
 		if (!(o instanceof Game)) {
@@ -111,5 +146,12 @@ public class Game implements Serializable {
 		return this.getId().equals(user.getId());
 	}
 
+	public void setWinnerId(long ownerId)
+	{
+	}
 
+	public long getWinnerId()
+	{
+		return winnerId;
+	}
 }

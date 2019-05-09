@@ -9,8 +9,9 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.BuildingService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class BuildingController {
     public Iterable<Building> getGameBoardBuildings (@PathVariable long id)
     {
         Game game = gameRepository.findById(id);
-        return service.getGameBoardBuildings(game);
+        return service.getAllBuildings(game);
     }
 
     @PostMapping(value = "/games/{id}/buildings")
@@ -65,7 +66,7 @@ public class BuildingController {
         response.setStatus(201);
 
         HashMap<String, String> pathToBuilding = new HashMap<>();
-        pathToBuilding.put("path", service.postGameBoardBuilding(game, building));
+        pathToBuilding.put("path", service.postBuilding(game, building));
 
         return pathToBuilding;
     }
@@ -80,6 +81,6 @@ public class BuildingController {
         authenticationService.userTokenIsCurrentTurn(token, id);
 
         Game game = gameRepository.findById(id);
-        return service.getGameBoardBuildingsPossibleBuilds(game);
+        return service.getPossibleBuilds(game);
     }
 }
