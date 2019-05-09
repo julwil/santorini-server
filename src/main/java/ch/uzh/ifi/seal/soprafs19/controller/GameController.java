@@ -69,7 +69,7 @@ public class GameController {
     // Create new Game
     @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> postCre (
+    public Map<String, String> postCreateGameDemoXWins (
             @Valid @RequestBody Game newGame,
             HttpServletResponse response) throws FailedAuthenticationException, GameRuleException, ResourceNotFoundException, UsernameAlreadyExistsException, ResourceActionNotAllowedException {
         HashMap<String, String> pathToGame = new HashMap<>();
