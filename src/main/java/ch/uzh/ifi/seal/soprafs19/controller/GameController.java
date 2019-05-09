@@ -1,14 +1,11 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Move;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
-import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
+import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
@@ -20,10 +17,13 @@ public class GameController {
 
     private final GameService service;
     private final UserRepository userRepository;
+    private final GameServiceDemo gameServiceDemo;
 
-    GameController(GameService service, UserRepository userRepository) {
+    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo) {
         this.service = service;
         this.userRepository = userRepository;
+
+        this.gameServiceDemo = gameServiceDemo;
     }
 
     // Create new Game
@@ -39,6 +39,46 @@ public class GameController {
         response.setStatus(201);
         return pathToGame;
     }
+
+
+    @CrossOrigin
+    @PutMapping(value= "/games/godcards")
+    Map<String, String> saveGodCards(
+    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
+    String godCard1, String godCard2){
+
+        HashMap<String, String> pathToGame = new HashMap<>();
+        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
+
+        return pathToGame;
+    }
+
+//    @CrossOrigin
+//    @PutMapping(value= "/games/godcards")
+//    Map<String, String> saveGodCards(
+//            @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
+//            String godCard1, String godCard2){
+//
+//        HashMap<String, String> pathToGame = new HashMap<>();
+//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
+//
+//        return pathToGame;
+//    }
+//
+
+    // Create new Game
+    @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> postCre (
+            @Valid @RequestBody Game newGame,
+            HttpServletResponse response) throws FailedAuthenticationException, GameRuleException, ResourceNotFoundException, UsernameAlreadyExistsException, ResourceActionNotAllowedException {
+        HashMap<String, String> pathToGame = new HashMap<>();
+        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXWins(newGame));
+
+        response.setStatus(201);
+        return pathToGame;
+    }
+
 
     @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)

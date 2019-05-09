@@ -118,4 +118,5 @@ public class FigureController {
         Game game = gameRepository.findById(gameId);
         return service.getPossibleInitialMoves(game);
     }
+
 }

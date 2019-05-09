@@ -147,6 +147,7 @@ public class Game implements Serializable {
 	}
 
 	public void setWinnerId(long ownerId)
+
 	{
 	}
 
