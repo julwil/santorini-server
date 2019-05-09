@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @DynamicUpdate @JsonDeserialize(using = GameDeserializer.class) @JsonSerialize(using = GameSerializer.class)
@@ -31,7 +32,10 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private Boolean isGodPower;
 
-    @OneToOne
+	@Column
+	private ArrayList<String> godCards;
+
+	@OneToOne
 	private User currentTurn;
 
     @Column

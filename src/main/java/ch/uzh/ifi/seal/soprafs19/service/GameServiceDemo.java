@@ -294,7 +294,7 @@ public class GameServiceDemo {
 
 
 
-        return "games/demo/XWins/" + newGame.getId().toString();
+        return newGame.getId().toString();
 
     }
 

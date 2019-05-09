@@ -5,11 +5,13 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GodcardService;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 @RestController
@@ -18,12 +20,14 @@ public class GameController {
     private final GameService service;
     private final UserRepository userRepository;
     private final GameServiceDemo gameServiceDemo;
+//    private final GodcardService godcardService;
 
     GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo) {
         this.service = service;
         this.userRepository = userRepository;
 
         this.gameServiceDemo = gameServiceDemo;
+//        this.godcardService = godCardService;
     }
 
     // Create new Game
@@ -41,11 +45,23 @@ public class GameController {
     }
 
 
+//    @CrossOrigin
+//    @PutMapping(value= "/games/godcards")
+//    Map<String, String> saveGodCards(
+//    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
+//    String godCard1, String godCard2){
+//
+//        HashMap<String, String> pathToGame = new HashMap<>();
+//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
+//
+//        return pathToGame;
+//    }
+
     @CrossOrigin
     @PutMapping(value= "/games/godcards")
     Map<String, String> saveGodCards(
-    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
-    String godCard1, String godCard2){
+            @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
+            String godCard1, String godCard2){
 
         HashMap<String, String> pathToGame = new HashMap<>();
         pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
@@ -53,18 +69,28 @@ public class GameController {
         return pathToGame;
     }
 
-//    @CrossOrigin
-//    @PutMapping(value= "/games/godcards")
-//    Map<String, String> saveGodCards(
-//            @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
-//            String godCard1, String godCard2){
+
+
+//    @GetMapping(value = "/games/invitations",produces = "application/json;charset=UTF-8")
+//    @ResponseStatus(HttpStatus.OK)
+//    public String godCards2OutOf10 (
+//            )
+//    {
+//        ArrayList<String> godCards2OutOf10= getGodCards(godCards2OutOf10);
 //
-//        HashMap<String, String> pathToGame = new HashMap<>();
-//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
 //
-//        return pathToGame;
+//
+//        return "{'turns':[" +
+//                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
+//                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
+//                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
+//                "]}";
 //    }
 //
+
+
+
+
 
     // Create new Game
     @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
@@ -73,7 +99,7 @@ public class GameController {
             @Valid @RequestBody Game newGame,
             HttpServletResponse response) throws FailedAuthenticationException, GameRuleException, ResourceNotFoundException, UsernameAlreadyExistsException, ResourceActionNotAllowedException {
         HashMap<String, String> pathToGame = new HashMap<>();
-        pathToGame.put("path", this.gameServiceDemo.postCreateGameDemoXWins(newGame));
+        pathToGame.put("id", this.gameServiceDemo.postCreateGameDemoXWins(newGame));
 
         response.setStatus(201);
         return pathToGame;
@@ -104,6 +130,12 @@ public class GameController {
                 "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
                 "]}";
     }
+
+
+
+
+
+
 
     // Create new Move in Game
     @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")

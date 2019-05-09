@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-public abstract class GodCard implements Serializable {
+public class GodCard {
 
     private static final long serialVersionUID = 1L;
 
