@@ -101,17 +101,14 @@ public class GameServiceDemo {
             newGame.setStatus(GameStatus.STARTED);
             gameRepository.save(newGame);
 
-            User user1 = newGame.getUser1();
-            User user2 = newGame.getUser2();
-
-            user1.setStatus(UserStatus.PLAYING);
-            user2.setStatus(UserStatus.PLAYING);
-
-            userRepository.save(user1);
-            userRepository.save(user2);
-
             User testUser = newGame.getUser1();
             User testUser2 = newGame.getUser2();
+
+            testUser.setStatus(UserStatus.PLAYING);
+            testUser2.setStatus(UserStatus.PLAYING);
+
+            userRepository.save(testUser);
+            userRepository.save(testUser2);
 
 
         Figure figure11 = new Figure();
@@ -152,7 +149,8 @@ public class GameServiceDemo {
         figure11.setPosition(p220);
         figure11.setOwnerId(testUser2.getId());
         figure11.setGame(newGame);
-        String s1= figureService.postFigure(newGame, figure11);
+
+        figureService.postFigure(newGame, figure11);
 
         figure12.setPosition(p330);
         figure12.setOwnerId(testUser2.getId());
@@ -308,8 +306,7 @@ public class GameServiceDemo {
 //
 //        figureService.putFigure(figure11.getId(), p213);
 
-        gameRepository.findById(gameId).setDemo(1);
-        gameRepository.save(gameRepository.findById(gameId));
+
         newGame.setDemo(1);
         gameRepository.save(newGame);
 
