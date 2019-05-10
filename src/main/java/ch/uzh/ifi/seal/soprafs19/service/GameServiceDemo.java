@@ -296,15 +296,15 @@ public class GameServiceDemo {
         building17.setGame(newGame);
         buildingService.postBuilding(newGame, building17);
 
-        figureService.putFigure(figure22.getId(), p330);
-
-        Building building18 = new Building();
-        building18.setPosition(p241);
-        building18.setOwnerId(testUser.getId());
-        building18.setGame(newGame);
-        buildingService.postBuilding(newGame, building18);
-
-        figureService.putFigure(figure11.getId(), p213);
+//        figureService.putFigure(figure22.getId(), p330);
+//
+//        Building building18 = new Building();
+//        building18.setPosition(p241);
+//        building18.setOwnerId(testUser.getId());
+//        building18.setGame(newGame);
+//        buildingService.postBuilding(newGame, building18);
+//
+//        figureService.putFigure(figure11.getId(), p213);
 
 
         newGame.setDemo(1);
