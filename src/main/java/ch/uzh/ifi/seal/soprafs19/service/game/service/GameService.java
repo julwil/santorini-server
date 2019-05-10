@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static ch.uzh.ifi.seal.soprafs19.constant.UserStatus.ONLINE;
+
 @Service
 @Transactional
 public class GameService {
@@ -121,8 +123,8 @@ public class GameService {
             User user1 = game.getUser1();
             User user2 = game.getUser2();
 
-            user1.setStatus(UserStatus.ONLINE);
-            user2.setStatus(UserStatus.ONLINE);
+            user1.setStatus(ONLINE);
+            user2.setStatus(ONLINE);
 
             userRepository.save(user1);
             userRepository.save(user2);
@@ -161,6 +163,8 @@ public class GameService {
 
         game.setStatus(GameStatus.FINISHED);
         game.setWinnerId(ownerId);
+        game.getUser1().setStatus(ONLINE);
+        game.getUser2().setStatus(ONLINE);
         gameRepository.save(game);
     }
 }
