@@ -64,39 +64,54 @@ public class GameServiceDemo {
 
     public String postCreateGameDemoXWins(Game newGame) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, UsernameAlreadyExistsException {
         // Get the users by extracting the user id's from the game
-
-
-        User testUser = newGame.getUser1();
-        User testUser2 = newGame.getUser2();
+        User user1 = newGame.getUser1();
+        User user2 = newGame.getUser2();
 
         // Check if a users are offline
-        if (!(userService.isOnline(testUser) && userService.isOnline(testUser2))) {
-            System.out.print(" s2 "+testUser.getStatus()+testUser2.getStatus());
+        if (!(userService.isOnline(user1) && userService.isOnline(user2))) {
             return "Both users have to be online and not involved in a game";
         }
+
         // Check if user1 and user2 are different
-        if (testUser.equals(testUser2)) {
+        if (user1.equals(user2)) {
             return "You can't play against yourself";
         }
+
         newGame.setStatus(GameStatus.INITIALIZED);
-        newGame.setCurrentTurn(testUser2);
+        newGame.setCurrentTurn(user2);
         gameRepository.save(newGame);
 
-        testUser.setGame(newGame);
-        testUser.setStatus(UserStatus.CHALLENGED);
-        userRepository.save(testUser);
+        user1.setGame(newGame);
+        user1.setStatus(UserStatus.CHALLENGED);
+        userRepository.save(user1);
 
-        testUser2.setGame(newGame);
-        testUser2.setStatus(UserStatus.CHALLENGED);
-        userRepository.save(testUser2);
+        user2.setGame(newGame);
+        user2.setStatus(UserStatus.CHALLENGED);
+        userRepository.save(user2);
 
 
-        newGame.setUser1(testUser);
-        newGame.setUser2(testUser2);
-        newGame.setCurrentTurn(testUser2);
-        newGame.setGodPower(false);
-        long gameId= newGame.getId();
-        Game g = gameService.postAcceptGameRequestByUser(gameId, testUser2);
+        return newGame.getId().toString();
+    }
+
+
+        public Game postAcceptDemoGameRequestByUser(long gameId, User acceptingUser) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, UsernameAlreadyExistsException {
+
+        Game newGame = gameRepository.findById(gameId);
+            newGame.setStatus(GameStatus.STARTED);
+            gameRepository.save(newGame);
+
+            User user1 = newGame.getUser1();
+            User user2 = newGame.getUser2();
+
+            user1.setStatus(UserStatus.PLAYING);
+            user2.setStatus(UserStatus.PLAYING);
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+
+            User testUser = newGame.getUser1();
+            User testUser2 = newGame.getUser2();
+
 
         Figure figure11 = new Figure();
         Figure figure12 = new Figure();
@@ -294,7 +309,7 @@ public class GameServiceDemo {
 
 
 
-        return newGame.getId().toString();
+        return newGame;
 
     }
 

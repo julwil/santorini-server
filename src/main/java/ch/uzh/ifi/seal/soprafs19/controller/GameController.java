@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GodcardService;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +21,16 @@ public class GameController {
     private final GameService service;
     private final UserRepository userRepository;
     private final GameServiceDemo gameServiceDemo;
-//    private final GodcardService godcardService;
+    private final GodcardService godCardService;
 
-    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo) {
+
+    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, GodcardService godCardService) {
         this.service = service;
         this.userRepository = userRepository;
 
         this.gameServiceDemo = gameServiceDemo;
-//        this.godcardService = godCardService;
+        this.godCardService = godCardService;
+
     }
 
     // Create new Game
@@ -43,50 +46,24 @@ public class GameController {
         response.setStatus(201);
         return pathToGame;
     }
+    @PostMapping("/games/{id}/accept")
+    public Game postAcceptGameRequestByUser (
+            @RequestHeader("authorization") String token,
+            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException
+    {
+        User user = this.userRepository.findByToken(token);
 
-
-//    @CrossOrigin
-//    @PutMapping(value= "/games/godcards")
-//    Map<String, String> saveGodCards(
-//    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
-//    String godCard1, String godCard2){
-//
-//        HashMap<String, String> pathToGame = new HashMap<>();
-//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
-//
-//        return pathToGame;
-//    }
-
-    @CrossOrigin
-    @PutMapping(value= "/games/godcards")
-    Map<String, String> saveGodCards(
-            @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
-            String godCard1, String godCard2){
-
-        HashMap<String, String> pathToGame = new HashMap<>();
-        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
-
-        return pathToGame;
+        return service.postAcceptGameRequestByUser(gameId, user);
     }
 
 
 
-//    @GetMapping(value = "/games/invitations",produces = "application/json;charset=UTF-8")
-//    @ResponseStatus(HttpStatus.OK)
-//    public String godCards2OutOf10 (
-//            )
-//    {
-//        ArrayList<String> godCards2OutOf10= getGodCards(godCards2OutOf10);
-//
-//
-//
-//        return "{'turns':[" +
-//                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
-//                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
-//                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
-//                "]}";
-//    }
-//
+
+
+
+
+
+
 
 
 
@@ -104,6 +81,68 @@ public class GameController {
         response.setStatus(201);
         return pathToGame;
     }
+
+    @PostMapping("/games/demo/{id}/accept")
+    public Game postAcceptDemoGameRequestByUser (
+            @RequestHeader("authorization") String token,
+            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException, UsernameAlreadyExistsException {
+        User user = this.userRepository.findByToken(token);
+
+        return gameServiceDemo.postAcceptDemoGameRequestByUser(gameId, user);
+    }
+
+
+
+//    @CrossOrigin
+//    @PutMapping(value= "/games/godcards")
+//    Map<String, String> saveGodCards(
+//    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
+//    String godCard1, String godCard2){
+//
+//        HashMap<String, String> pathToGame = new HashMap<>();
+//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
+//
+//        return pathToGame;
+//    }
+
+    @CrossOrigin
+    @PutMapping(value= "/games/godcards")
+    Map<String, String> saveGodCards(
+            @RequestHeader("authorization") String token,
+            @Valid @RequestBody Game newGameGodCards){
+
+        HashMap<String, String> pathToGame = new HashMap<>();
+
+        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
+
+        return pathToGame;
+    }
+
+
+
+//    @GetMapping(value = "/games/invitations",produces = "application/json;charset=UTF-8")
+//    @ResponseStatus(HttpStatus.OK)
+//
+//    public ArrayList<String> godCards2OutOf10 (
+//            @RequestHeader("authorization") String token,
+//            @RequestBody Game newGame
+//            )
+//    {
+//        ArrayList<String> godCards2OutOf10= godCardService.getGodcard1(newGame);
+//
+//
+//        return "{'turns':[" +
+//                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
+//                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
+//                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
+//                "]}";
+//    }
+
+
+
+
+
+
 
 
 
@@ -154,6 +193,7 @@ public class GameController {
         return service.getAllGames(token);
     }
 
+
     // Fetch all games of the logged in user
     @GetMapping("/games/invitations")
     public Iterable<Game> getGamesForUser2 (
@@ -163,14 +203,9 @@ public class GameController {
         return service.getGamesForUser2AndStatus(user2, GameStatus.INITIALIZED);
     }
 
-    @PostMapping("/games/{id}/accept")
-    public Game postAcceptGameRequestByUser (
-            @RequestHeader("authorization") String token,
-            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException
-    {
-        User user = this.userRepository.findByToken(token);
-        return service.postAcceptGameRequestByUser(gameId, user);
-    }
+
+
+
 
     @PostMapping("/games/{id}/reject")
     void postCancelGameRequest (

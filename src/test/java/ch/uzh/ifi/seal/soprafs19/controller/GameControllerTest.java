@@ -460,65 +460,90 @@ public class GameControllerTest {
 
     }
 
-    //when game starts, the first player will set 2 workers (figures), and only after player succesfully set
-    //2 figures, the turn will change
-//    @Test
-//    public void afterPutting2FiguresChangeTurn() throws Exception {
-//
-//        testUser = new User();
-//        testUser.setUsername("testUser41");
-//        testUser.setName("Test User41");
-//        testUser.setPassword("testPassword");
-//        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-//
-//        userService.postCreateUser(testUser);
-//        testUser2 = new User();
-//        testUser2.setUsername("testUser42");
-//        testUser2.setName("Test User42");
-//        testUser2.setPassword("testPassword");
-//        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-//
-//        userService.postCreateUser(testUser2);
-//
-//        userService.postLogin(testUser);
-//        userService.postLogin(testUser2);
-//        Game game = new Game();
-//
-//
-//        game.setUser1(testUser);
-//        game.setUser2(testUser2);
-//        game.setCurrentTurn(testUser2);
-//        game.setGodPower(true);
-//        String str1 = gameService.postCreateGame(game);
-//
-//        long gameId = game.getId();
-//        Game g = gameService.postAcceptGameRequestByUser(gameId, testUser2);
-//
-//        Figure figure = new Figure();
-//        Figure figure2 = new Figure();
-//        Position position1 = new Position(2, 2, 0);
-//        Position position2 = new Position(3, 3, 0);
-//
-//        Assert.assertEquals(testUser2, game.getCurrentTurn());
-//
-//        figure.setPosition(position1);
-//        figure.setOwnerId(testUser2.getId());
-//        figure.setGame(game);
-//        figureService.postFigure(game, figure);
-//
-//        Assert.assertEquals(testUser2, game.getCurrentTurn());
-//
-//        figure2.setPosition(position2);
-//        figure2.setOwnerId(testUser2.getId());
-//        figure2.setGame(game);
-//        figureService.postFigure(game, figure2);
-//
-//
-//        Assert.assertEquals(testUser, game.getCurrentTurn());
-//
-//
+//    when game starts, the first player will set 2 workers (figures), and only after player succesfully set
+//    2 figures, the turn will change
+    @Test
+    public void afterPutting2FiguresChangeTurn() throws Exception {
 
-    //    }
+
+        // create 2 users & automatically assign Id
+        testUser = new User();
+        testUser.setUsername("testUser41");
+        testUser.setName("Test User41");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+
+        userService.postCreateUser(testUser); // this method creates user and sets status to: OFFLINE
+        Assert.assertEquals(OFFLINE,testUser.getStatus());
+        Assert.assertEquals(testUser.getToken(), null); // offline = no token
+
+        testUser2 = new User();
+        testUser2.setUsername("testUser42");
+        testUser2.setName("Test User42");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+
+        userService.postCreateUser(testUser2);
+
+        userService.postLogin(testUser2); // this logs user in. Status will be online & Token created
+        userService.postLogin(testUser);
+
+
+        Game game = new Game();          // create game and assign id
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(false);
+
+        Assert.assertNotEquals(GameStatus.INITIALIZED, game.getStatus()); // not Initialized
+
+
+        gameService.postCreateGame(game); // game status = INITIALIZED & users CHALLENGED
+        //not the game is in the gameRepository
+
+        long gameId = game.getId();
+
+        Assert.assertEquals(GameStatus.INITIALIZED, gameRepository.findById(gameId).getStatus()); // now it is initialized
+        Assert.assertNotEquals(CHALLENGED, gameRepository.findById(gameId).getUser1());
+        Assert.assertNotEquals(CHALLENGED, gameRepository.findById(gameId).getUser2());
+
+
+
+        // after accepting -> game will be STARTED & players will be PLAYING
+        gameService.postAcceptGameRequestByUser(gameId, testUser2);
+
+        Assert.assertEquals(GameStatus.STARTED, gameRepository.findById(gameId).getStatus()); // now it is initialized
+        Assert.assertNotEquals(PLAYING, gameRepository.findById(gameId).getUser1());
+        Assert.assertNotEquals(PLAYING, gameRepository.findById(gameId).getUser2());
+
+
+
+        Figure figure = new Figure();
+        Figure figure2 = new Figure();
+        Position position1 = new Position(2, 2, 0);
+        Position position2 = new Position(3, 3, 0);
+
+        // first player in putting figures
+        Assert.assertEquals(testUser2.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
+
+        figure.setPosition(position1);
+        figure.setOwnerId(testUser2.getId());
+        figure.setGame(game);
+        figureService.postFigure(game, figure);
+
+        Assert.assertEquals(testUser2.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
+
+        figure2.setPosition(position2);
+        figure2.setOwnerId(testUser2.getId());
+        figure2.setGame(game);
+        figureService.postFigure(game, figure2);
+
+        // after the first one puts 2 figures, the turn automatically changes
+        Assert.assertEquals(testUser.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
+
+
+    }
+
     @Test
     public void moveWorkerfterPlacingOnly1WorkerFails() throws Exception {
 
@@ -895,7 +920,7 @@ public class GameControllerTest {
 
         figureService.putFigure(figure21.getId(), p232);
 
-    Building building16 = new Building();
+        Building building16 = new Building();
         building16.setPosition(p240);
         building16.setOwnerId(testUser.getId());
         building16.setGame(newGame);
@@ -925,4 +950,5 @@ public class GameControllerTest {
         Assert.assertEquals(GameStatus.FINISHED, game.getStatus());
 
 }
+
 }

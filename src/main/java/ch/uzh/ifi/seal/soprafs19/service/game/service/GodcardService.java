@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
 
 
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
@@ -23,6 +24,7 @@ public class GodcardService {
     private final ch.uzh.ifi.seal.soprafs19.repository.MoveRepository moveRepository;
     private final GameRepository gameRepository;
     private final GameService gameService;
+
     private String godcard1;
     private String godcard2;
 
@@ -31,20 +33,20 @@ public class GodcardService {
 public GodcardService(FigureRepository figureRepository,
         BuildingRepository buildingRepository, MoveRepository moveRepository,
         GameRepository gameRepository, GameService gameService) {
-    {
+
         this.figureRepository = figureRepository;
         this.buildingRepository = buildingRepository;
         this.moveRepository = moveRepository;
         this.gameRepository = gameRepository;
         this.gameService = gameService;
-    }
+
 
 }
 
 
-    public String getGodcard1(ArrayList<String> godCard1) {
-        return godCard1.get(0);
-    }
+//    public String getGodcard1(Game newGame) {
+//        return newGame.get
+//    }
 
     public String getGodcard2(ArrayList<String> godCard1) {
         return godCard1.get(1);
