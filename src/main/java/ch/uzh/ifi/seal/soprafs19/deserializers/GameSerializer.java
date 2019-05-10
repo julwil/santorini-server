@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
+
 import java.io.IOException;
 
 public class GameSerializer extends StdSerializer<Game> {
@@ -26,6 +27,8 @@ public class GameSerializer extends StdSerializer<Game> {
         jgen.writeBooleanField("isGodPower", game.getGodPower());
         jgen.writeNumberField("user1", game.getUser1().getId());
         jgen.writeNumberField("user2", game.getUser2().getId());
+        jgen.writeNumberField("winner", 0);
+        jgen.writeNumberField("demoMode", game.checkIfDemo());
         jgen.writeNumberField("currentTurn", game.getCurrentTurn().getId());
         jgen.writeStringField("createdOn", game.getCreatedOn().toString());
         jgen.writeEndObject();

@@ -46,6 +46,8 @@ public class GameController {
         response.setStatus(201);
         return pathToGame;
     }
+
+
     @PostMapping("/games/{id}/accept")
     public Game postAcceptGameRequestByUser (
             @RequestHeader("authorization") String token,
@@ -55,14 +57,6 @@ public class GameController {
 
         return service.postAcceptGameRequestByUser(gameId, user);
     }
-
-
-
-
-
-
-
-
 
 
 
@@ -82,7 +76,8 @@ public class GameController {
         return pathToGame;
     }
 
-    @PostMapping("/games/demo/{id}/accept")
+
+        @PostMapping("/games/demo/{id}/accept")
     public Game postAcceptDemoGameRequestByUser (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException, UsernameAlreadyExistsException {
@@ -174,8 +169,6 @@ public class GameController {
 
 
 
-
-
     // Create new Move in Game
     @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
@@ -184,6 +177,7 @@ public class GameController {
     {
         return "{'path':'/games/"+id+"/turns/1'}";
     }
+
 
     // Fetch all games
     @GetMapping("/games")
@@ -202,7 +196,6 @@ public class GameController {
         User user2 = this.userRepository.findByToken(token);
         return service.getGamesForUser2AndStatus(user2, GameStatus.INITIALIZED);
     }
-
 
 
 

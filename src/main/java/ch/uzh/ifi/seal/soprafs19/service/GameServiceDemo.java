@@ -90,6 +90,7 @@ public class GameServiceDemo {
         userRepository.save(user2);
 
 
+
         return newGame.getId().toString();
     }
 
@@ -307,7 +308,10 @@ public class GameServiceDemo {
 //
 //        figureService.putFigure(figure11.getId(), p213);
 
-
+        gameRepository.findById(gameId).setDemo(1);
+        gameRepository.save(gameRepository.findById(gameId));
+        newGame.setDemo(1);
+        gameRepository.save(newGame);
 
         return newGame;
 

@@ -88,6 +88,7 @@ public class GameService {
             }
 
             game.setStatus(GameStatus.STARTED);
+            game.setDemo(0);
             gameRepository.save(game);
 
             User user1 = game.getUser1();
@@ -157,8 +158,9 @@ public class GameService {
     }
 
     public void setWinner(Game game, long ownerId) {
-        game.setWinnerId(ownerId);
+
         game.setStatus(GameStatus.FINISHED);
+        game.setWinnerId(ownerId);
         gameRepository.save(game);
     }
 }
