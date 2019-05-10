@@ -941,13 +941,19 @@ public class GameControllerTest {
         building18.setGame(newGame);
         buildingService.postBuilding(newGame, building18);
 
-        figureService.putFigure(figure11.getId(), p213);
+
+
+        Assert.assertEquals(0,gameRepository.findById(gameId).getWinner());
+
+        figureService.putFigure(figure11.getId(), p213); // testUser wins
+
+        long testUser2Id= testUser2.getId();
+
+        Assert.assertEquals(testUser2Id , gameRepository.findById(gameId).getWinner());
 
 
 
-
-
-        Assert.assertEquals(GameStatus.FINISHED, game.getStatus());
+        Assert.assertEquals(GameStatus.FINISHED, gameRepository.findById(gameId).getStatus());
 
 }
 
