@@ -5,7 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.game.service.GodcardService;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import org.springframework.http.HttpStatus;
@@ -21,15 +20,14 @@ public class GameController {
     private final GameService service;
     private final UserRepository userRepository;
     private final GameServiceDemo gameServiceDemo;
-    private final GodcardService godCardService;
 
 
-    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, GodcardService godCardService) {
+
+    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo) {
         this.service = service;
         this.userRepository = userRepository;
 
         this.gameServiceDemo = gameServiceDemo;
-        this.godCardService = godCardService;
 
     }
 

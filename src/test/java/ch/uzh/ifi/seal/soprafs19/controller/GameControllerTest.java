@@ -381,40 +381,40 @@ public class GameControllerTest {
 
 
     }
-//
-//    @Test
-//    public void rejectGame() throws Exception {
-//
-//        testUser = new User();
-//        testUser.setUsername("testUser2.1");
-//        testUser.setName("Test User2.1");
-//        testUser.setPassword("testPassword");
-//        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-//        userService.postCreateUser(testUser);
-//        userService.postLogin(testUser);
-//        testUser2 = new User();
-//        testUser2.setUsername("testUser2.2");
-//        testUser2.setName("Test User2.2");
-//        testUser2.setPassword("testPassword");
-//        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-//        userService.postCreateUser(testUser2);
-//        userService.postLogin(testUser2);
-//
-//        Game game = new Game();
-//        game.setUser1(testUser);
-//        game.setUser2(testUser2);
-//        game.setCurrentTurn(testUser2);
-//        game.setGodPower(true);
-//        gameService.postCreateGame(game);
-//
-//        gameService.postCancelGameRequestByUser(game.getId(),testUser2);
-//
-////        Assert.assertEquals(GameStatus.CANCLED, game.getStatus());
-//        Assert.assertEquals(UserStatus.ONLINE, testUser2.getStatus());
-//        Assert.assertEquals(UserStatus.ONLINE, testUser.getStatus());
-//
-//
-//    }
+
+    @Test
+    public void rejectGame() throws Exception {
+
+        testUser = new User();
+        testUser.setUsername("testUser2.1");
+        testUser.setName("Test User2.1");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser);
+        userService.postLogin(testUser);
+        testUser2 = new User();
+        testUser2.setUsername("testUser2.2");
+        testUser2.setName("Test User2.2");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser2);
+
+        Game game = new Game();
+        game.setUser1(testUser);
+        game.setUser2(testUser2);
+        game.setCurrentTurn(testUser2);
+        game.setGodPower(true);
+        gameService.postCreateGame(game);
+        long gameId = game.getId();
+        gameService.postCancelGameRequestByUser(game.getId(),testUser2);
+
+        Assert.assertEquals(GameStatus.CANCLED, (gameRepository.findById(gameId).getStatus()));
+        Assert.assertEquals(UserStatus.ONLINE, gameRepository.findById(gameId).getUser2().getStatus());
+        Assert.assertEquals(UserStatus.ONLINE, gameRepository.findById(gameId).getUser1().getStatus());
+
+
+    }
 
 
 
@@ -464,55 +464,39 @@ public class GameControllerTest {
 //    2 figures, the turn will change
     @Test
     public void afterPutting2FiguresChangeTurn() throws Exception {
-
-
-        // create 2 users & automatically assign Id
-        testUser = new User();
-        testUser.setUsername("testUser41");
-        testUser.setName("Test User41");
+        testUser = new User();    // create users & automatically assign Id
+        testUser.setUsername("testUser471");
+        testUser.setName("Test User471");
         testUser.setPassword("testPassword");
         testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-
         userService.postCreateUser(testUser); // this method creates user and sets status to: OFFLINE
         Assert.assertEquals(OFFLINE,testUser.getStatus());
         Assert.assertEquals(testUser.getToken(), null); // offline = no token
-
         testUser2 = new User();
-        testUser2.setUsername("testUser42");
-        testUser2.setName("Test User42");
+        testUser2.setUsername("testUser428");
+        testUser2.setName("Test User427");
         testUser2.setPassword("testPassword");
         testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-
         userService.postCreateUser(testUser2);
-
         userService.postLogin(testUser2); // this logs user in. Status will be online & Token created
         userService.postLogin(testUser);
-
-
         Game game = new Game();          // create game and assign id
         game.setUser1(testUser);
         game.setUser2(testUser2);
         game.setCurrentTurn(testUser2);
         game.setGodPower(false);
-
         Assert.assertNotEquals(GameStatus.INITIALIZED, game.getStatus()); // not Initialized
-
-
         gameService.postCreateGame(game); // game status = INITIALIZED & users CHALLENGED
         //not the game is in the gameRepository
-
         long gameId = game.getId();
-
-        Assert.assertEquals(GameStatus.INITIALIZED, gameRepository.findById(gameId).getStatus()); // now it is initialized
+        Assert.assertEquals(GameStatus.INITIALIZED, gameRepository.findById(gameId).getStatus());
+        // now it is initialized
         Assert.assertNotEquals(CHALLENGED, gameRepository.findById(gameId).getUser1());
         Assert.assertNotEquals(CHALLENGED, gameRepository.findById(gameId).getUser2());
-
-
-
         // after accepting -> game will be STARTED & players will be PLAYING
         gameService.postAcceptGameRequestByUser(gameId, testUser2);
-
-        Assert.assertEquals(GameStatus.STARTED, gameRepository.findById(gameId).getStatus()); // now it is initialized
+        Assert.assertEquals(GameStatus.STARTED, gameRepository.findById(gameId).getStatus());
+        // now it is initialized
         Assert.assertNotEquals(PLAYING, gameRepository.findById(gameId).getUser1());
         Assert.assertNotEquals(PLAYING, gameRepository.findById(gameId).getUser2());
 
@@ -522,22 +506,17 @@ public class GameControllerTest {
         Figure figure2 = new Figure();
         Position position1 = new Position(2, 2, 0);
         Position position2 = new Position(3, 3, 0);
-
         // first player in putting figures
         Assert.assertEquals(testUser2.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
-
         figure.setPosition(position1);
         figure.setOwnerId(testUser2.getId());
         figure.setGame(game);
         figureService.postFigure(game, figure);
-
         Assert.assertEquals(testUser2.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
-
         figure2.setPosition(position2);
         figure2.setOwnerId(testUser2.getId());
         figure2.setGame(game);
         figureService.postFigure(game, figure2);
-
         // after the first one puts 2 figures, the turn automatically changes
         Assert.assertEquals(testUser.getId(), gameRepository.findById(gameId).getCurrentTurn().getId());
 
@@ -684,6 +663,75 @@ public class GameControllerTest {
 //
 //
 //    }
+
+
+    @Test
+    public void moveTest() throws Exception {
+        testUser = new User();    // create users & automatically assign Id
+        testUser.setUsername("testUser41");
+        testUser.setName("Test User41");
+        testUser.setPassword("testPassword");
+        testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser); // this method creates user and sets status to: OFFLINE
+
+        testUser2 = new User();
+        testUser2.setUsername("testUser42");
+        testUser2.setName("Test User42");
+        testUser2.setPassword("testPassword");
+        testUser2.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
+        userService.postCreateUser(testUser2);
+        userService.postLogin(testUser2); // this logs user in. Status will be online & Token created
+        userService.postLogin(testUser);
+        Game newGame = new Game();          // create game and assign id
+        newGame.setUser1(testUser);
+        newGame.setUser2(testUser2);
+        newGame.setCurrentTurn(testUser2);
+        newGame.setGodPower(false);
+
+        gameService.postCreateGame(newGame); // game status = INITIALIZED & users CHALLENGED
+        //not the game is in the gameRepository
+        long gameId = newGame.getId();
+        Assert.assertEquals(GameStatus.INITIALIZED, gameRepository.findById(gameId).getStatus());
+        // now it is initialized
+
+        // after accepting -> game will be STARTED & players will be PLAYING
+        gameService.postAcceptGameRequestByUser(gameId, testUser2);
+
+
+        Figure figure = new Figure();
+
+
+        Position position1 = new Position(2, 2, 0);
+
+        Position position2 = new Position(3, 3, 0);
+        // first player in putting figures
+
+        figure.setPosition(position1);
+        figure.setOwnerId(testUser2.getId());
+        figure.setGame(newGame);
+        figureService.postFigure(newGame, figure);
+
+        long x = figure.getPosition().getX();
+        long y = figure.getPosition().getY();
+        long z = figure.getPosition().getZ();
+
+
+        Assert.assertEquals(2, x);
+        Assert.assertEquals(2, y);
+        Assert.assertEquals(0, z);
+
+
+        figure.setPosition(position2);
+        Assert.assertNotEquals(2, figure.getPosition().getX());
+        Assert.assertNotEquals(2, figure.getPosition().getY());
+        Assert.assertEquals(0, figure.getPosition().getZ());  // still same
+
+        long idTestUser2 = testUser2.getId();
+
+        Assert.assertEquals(idTestUser2, figure.getOwnerId());
+
+
+    }
 
 
 
