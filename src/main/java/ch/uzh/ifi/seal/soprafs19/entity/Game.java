@@ -158,7 +158,12 @@ public class Game implements Serializable {
 	}
 
 	public void setWinnerId(long ownerId){
+
 				this.winner=ownerId;}
+
+	public long getWinner(){
+		return winner;
+	}
 
 
 

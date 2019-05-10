@@ -27,7 +27,7 @@ public class GameSerializer extends StdSerializer<Game> {
         jgen.writeBooleanField("isGodPower", game.getGodPower());
         jgen.writeNumberField("user1", game.getUser1().getId());
         jgen.writeNumberField("user2", game.getUser2().getId());
-        jgen.writeNumberField("winner", 0);
+        jgen.writeNumberField("winner", game.getWinner());
         jgen.writeNumberField("demoMode", game.checkIfDemo());
         jgen.writeNumberField("currentTurn", game.getCurrentTurn().getId());
         jgen.writeStringField("createdOn", game.getCreatedOn().toString());

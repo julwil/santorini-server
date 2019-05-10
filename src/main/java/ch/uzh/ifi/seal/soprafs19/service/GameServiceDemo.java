@@ -76,7 +76,7 @@ public class GameServiceDemo {
         if (user1.equals(user2)) {
             return "You can't play against yourself";
         }
-
+        newGame.setDemo(1);
         newGame.setStatus(GameStatus.INITIALIZED);
         newGame.setCurrentTurn(user2);
         gameRepository.save(newGame);
