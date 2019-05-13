@@ -9,8 +9,8 @@ import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.DefaultBuilds;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.DefaultMoves;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.InitialMoves;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.PanMoves;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
@@ -131,7 +131,7 @@ public class FigureService {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new PanMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
         Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
 
         dbFigure.setMoves(moves);
