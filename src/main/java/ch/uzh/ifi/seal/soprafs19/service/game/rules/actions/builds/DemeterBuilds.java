@@ -47,12 +47,13 @@ public class DemeterBuilds extends DefaultBuilds {
     @Override
     public void perform()
     {
-        buildingRepository.save(getBuilding());
-
         // This god power allows for a second build
         if (!firstBuildCompleted()) {
+            buildingRepository.save(getBuilding());
             return;
         }
+
+        buildingRepository.save(getBuilding());
 
         // The LAF is set to 0 --> no figure is LAF
         game.setLastActiveFigureId(0);
