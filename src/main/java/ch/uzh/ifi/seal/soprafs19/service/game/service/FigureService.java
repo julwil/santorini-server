@@ -1,4 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
+
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
