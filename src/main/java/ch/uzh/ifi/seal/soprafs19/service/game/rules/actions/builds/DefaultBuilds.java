@@ -49,7 +49,7 @@ public class DefaultBuilds extends Action {
         game.swapTurns();
     }
 
-    private void handleLoseCondition()
+    protected void handleLoseCondition()
     {
         long opponentUserId = game.getCurrentTurn().equals(game.getUser1()) ?
                 game.getUser2().getId() : game.getUser1().getId();
