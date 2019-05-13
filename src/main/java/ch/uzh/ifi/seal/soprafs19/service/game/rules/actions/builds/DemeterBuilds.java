@@ -75,22 +75,4 @@ public class DemeterBuilds extends DefaultBuilds {
 
         return lastBuilding.getOwnerId() == game.getCurrentTurn().getId();
     }
-
-
-    private void stripPositionOfFirstBuild(ArrayList<Position> adjacentPositionsOfOrigin)
-    {
-        ArrayList<Building> lastBuildings = (ArrayList<Building>) buildingRepository
-                .findTop2ByGameOrderByCreatedOnDesc(getGame());
-
-        // If it's the first build
-        if (lastBuildings.isEmpty()) {
-            return;
-        }
-        // Get the last inserted building
-        Building lastBuilding = lastBuildings.get(0);
-
-        // Remove the position of the last inserted building from the
-        adjacentPositionsOfOrigin.remove(lastBuilding.getPosition());
-    }
-
 }
