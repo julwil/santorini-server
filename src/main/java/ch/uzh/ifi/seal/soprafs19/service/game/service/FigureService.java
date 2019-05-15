@@ -131,7 +131,7 @@ public class FigureService {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action moves = new ApolloMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
         Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
 
         dbFigure.setMoves(moves);
