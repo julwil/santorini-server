@@ -27,6 +27,7 @@ public class UserService {
     private final AuthenticationService authentication;
     private final Utilities utils;
 
+
     @Autowired
     public UserService(UserRepository userRepository, AuthenticationService authentication, Utilities utils) {
         this.userRepository = userRepository;
@@ -47,7 +48,36 @@ public class UserService {
 
         return "/users/" + newUser.getId().toString();
     }
+    public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
+    {
+        String loginUsername = userToAuthenticate.getUsername();
+        String loginPassword = userToAuthenticate.getPassword();
+        Boolean userExists = userRepository.existsByUsername(loginUsername);
 
+        if (!userExists) {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        User dbUser = userRepository.findByUsername(loginUsername);
+        String dbPassword = dbUser.getPassword();
+
+        if (!loginPassword.equals(dbPassword)) {
+            throw new FailedAuthenticationException();
+        }
+
+        if (isOffline(dbUser)) {
+
+            userToAuthenticate.setStatus(UserStatus.ONLINE);
+            dbUser.setStatus(UserStatus.ONLINE);
+            userRepository.save(dbUser);
+
+        }
+
+        dbUser.setToken(createUserToken(dbUser));
+        userToAuthenticate.setToken(createUserToken(userToAuthenticate));
+        userRepository.save(dbUser);
+        return dbUser.getToken();
+    }
     // Update a user
     public User putUpdateUser(String token, long userToUpdateId, User userToUpdate) throws
             ResourceActionNotAllowedException,
@@ -78,32 +108,7 @@ public class UserService {
         return dbUser;
     }
 
-    public String postLogin(User userToAuthenticate) throws FailedAuthenticationException, ResourceNotFoundException
-    {
-        String loginUsername = userToAuthenticate.getUsername();
-        String loginPassword = userToAuthenticate.getPassword();
-        Boolean userExists = userRepository.existsByUsername(loginUsername);
 
-        if (!userExists) {
-            throw new ResourceNotFoundException("User does not exist");
-        }
-
-        User dbUser = userRepository.findByUsername(loginUsername);
-        String dbPassword = dbUser.getPassword();
-
-        if (!loginPassword.equals(dbPassword)) {
-            throw new FailedAuthenticationException();
-        }
-
-        if (isOffline(dbUser)) {
-            dbUser.setStatus(UserStatus.ONLINE);
-        }
-
-        dbUser.setToken(createUserToken(dbUser));
-        userRepository.save(dbUser);
-
-        return dbUser.getToken();
-    }
 
     public Iterable<User> getAllUsers(String token) throws FailedAuthenticationException
     {
@@ -131,19 +136,19 @@ public class UserService {
     // Create a token for the user
     private String createUserToken(User user)
     {
-       User dbUser = userRepository.findByUsername(user.getUsername());
+        User dbUser = userRepository.findByUsername(user.getUsername());
 
         // We use a timestamp and the user id to create a hash
-       long userId = dbUser.getId();
-       Date now = new Date();
+        long userId = dbUser.getId();
+        Date now = new Date();
 
-       // We create a json object containing user id and creation date of token
-       JSONObject json = new JSONObject();
-       json.put("user_id", userId);
-       json.put("token_created", now);
+        // We create a json object containing user id and creation date of token
+        JSONObject json = new JSONObject();
+        json.put("user_id", userId);
+        json.put("token_created", now);
 
-       // Convert json to String and encode it with b64
-       return Base64.getEncoder().encodeToString(json.toString().getBytes());
+        // Convert json to String and encode it with b64
+        return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
     public void getLogout(String userToLogoutToken) throws ResourceNotFoundException, ResourceActionNotAllowedException

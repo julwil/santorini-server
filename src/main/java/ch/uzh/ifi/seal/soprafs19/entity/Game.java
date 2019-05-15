@@ -31,7 +31,10 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private Boolean isGodPower;
 
-    @OneToOne
+//	@Column
+//	private ArrayList<String> godCards;
+
+	@OneToOne
 	private User currentTurn;
 
     @Column
@@ -45,10 +48,14 @@ public class Game implements Serializable {
     @OneToOne
 	private User user2;
 
-    private long winnerId;
+    @Column
+    private long winner;
 
 	@Transient
 	private Turn turn;
+
+	@Column
+	private long demo;
 
 //	@OneToOne
 //	private User winner;
@@ -89,6 +96,11 @@ public class Game implements Serializable {
 
     public void setUser1(User user1) { this.user1 = user1; }
 
+	public void setDemo(long demoLong) { this.demo=demoLong; }
+
+	public long checkIfDemo(){
+		return demo;
+	}
 
     public User getUser2() { return user2; }
 
@@ -99,8 +111,7 @@ public class Game implements Serializable {
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
 //	public User getWinner() {return winner;	}
-//
-//	public void setWinnerId(User winner) {this.winner = winner;}
+
 
 	public Turn getTurn() {	return turn;}
 
@@ -146,12 +157,20 @@ public class Game implements Serializable {
 		return this.getId().equals(user.getId());
 	}
 
-	public void setWinnerId(long ownerId)
-	{
+	public void setWinnerId(long ownerId){
+
+				this.winner=ownerId;}
+
+	public long getWinner(){
+		return winner;
 	}
 
-	public long getWinnerId()
-	{
-		return winnerId;
-	}
+
+
+//	public long getWinnerId()
+//	{
+//		return winnerId;
+//	}
+
+//	public void setWinnerId(User winner) {this.winner = winner;}
 }

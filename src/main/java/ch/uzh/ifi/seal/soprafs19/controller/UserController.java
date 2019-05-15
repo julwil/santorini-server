@@ -24,6 +24,7 @@ public class UserController {
     }
 
     // Create new user
+
     @PostMapping("/users")
     public Map<String, String> postCreateUser(
             @Valid @RequestBody User newUser,

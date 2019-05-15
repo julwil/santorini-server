@@ -9,7 +9,7 @@ public class GameRuleException extends Exception{
         super("Game rule violation");
     }
 
-    public GameRuleException(String message) {
-        super(message);
-    }
+//    public GameRuleException(String message) {
+//        super(message);
+//    }
 }
