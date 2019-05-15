@@ -86,7 +86,7 @@ public abstract class Action {
     /*
      * returns a list of invalid positions where one can not move-to or build on, given a list of positions.
      */
-    protected ArrayList<Position> calculateInvalidLowerPositions(ArrayList<Position> candidates) {
+    public ArrayList<Position> calculateInvalidLowerPositions(ArrayList<Position> candidates) {
         ArrayList<Position> invalidPositions = new ArrayList<>();
 
         // For all positions higher than level 0 z in {1,2,3} check if the field below has a building, else remove the original field
