@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves;
 
+import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -28,6 +29,12 @@ public class PrometheusMoves extends Action {
         int [] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
+        // If he built before moving, the figure is not allowed to move up anymore.
+        if (firstBuildCompleted()) {
+            neighbourhood[5] = 0;
+        }
+
+
         // Strip out positions that are occupied by other board items
         stripOccupiedPositions(adjacentPositionsOfOrigin);
 
@@ -54,5 +61,20 @@ public class PrometheusMoves extends Action {
         if (getFigure().getPosition().isCeil()) {
             gameService.setWinner(getGame(), getFigure().getOwnerId());
         }
+    }
+
+    private boolean firstBuildCompleted()
+    {
+        ArrayList<Building> lastBuildings = (ArrayList<Building>) buildingRepository
+                .findTop2ByGameOrderByCreatedOnDesc(getGame());
+
+        // If it's the first build
+        if (lastBuildings.isEmpty()) {
+            return false;
+        }
+        // Get the last inserted building
+        Building lastBuilding = lastBuildings.get(0);
+
+        return lastBuilding.getOwnerId() == game.getCurrentTurn().getId();
     }
 }
