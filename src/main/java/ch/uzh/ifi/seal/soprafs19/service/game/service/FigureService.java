@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
 
+import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
@@ -8,9 +9,9 @@ import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.DefaultBuilds;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.DefaultMoves;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.PrometheusBuilds;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.InitialMoves;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.PrometheusMoves;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -126,13 +129,43 @@ public class FigureService {
         return figure.getPossibleMoves();
     }
 
+    //TODO: As soon as we have the godpowers in the game object, we can look it up there
+    public Iterable<Position> getPossibleBuilds(Game game)
+    {
+        Set<Position> possibleBuilds = new HashSet<>();
+        long lafId = game.getLastActiveFigureId();
+
+        // If there is no LAF, we must check if prometheus power is active
+        if (lafId == 0) {
+
+            ArrayList<Figure> figuresByUser = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
+            Figure figure1 = loadFigure(figuresByUser.get(0).getId());
+            Figure figure2 = loadFigure(figuresByUser.get(1).getId());
+
+            // If we have no LAF and no Prometheus godcard is active --> building is not allowed
+            if (!(figure1.getMoveAction() instanceof PrometheusMoves)) {
+                return possibleBuilds;
+            }
+
+            possibleBuilds.addAll(figure1.getPossibleBuilds());
+            possibleBuilds.addAll(figure2.getPossibleBuilds());
+        }
+
+        else {
+            Figure lastActiveFigure = loadFigure(game.getLastActiveFigureId());
+            possibleBuilds.addAll(lastActiveFigure.getPossibleBuilds());
+        }
+
+        return possibleBuilds;
+    }
+
     public Figure loadFigure(long id)
     {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new ApolloMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
-        Action builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action moves = new PrometheusMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action builds = new PrometheusBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
 
         dbFigure.setMoves(moves);
         dbFigure.setBuilds(builds);
@@ -148,5 +181,30 @@ public class FigureService {
         figure.setMoves(initMoves);
 
         return figure;
+    }
+
+    public void build(Game game, Building newBuilding)
+    {
+        long lafId = game.getLastActiveFigureId();
+
+        // If there is no LAF, it is Prometheus
+        if (lafId == 0) {
+
+            ArrayList<Figure> figuresByUser = (ArrayList<Figure>) figureRepository.findAllByGameAndOwnerId(game, game.getCurrentTurn().getId());
+            Figure figure1 = loadFigure(figuresByUser.get(0).getId());
+            Figure figure2 = loadFigure(figuresByUser.get(1).getId());
+
+            // The first figure which can build
+            if (figure1.getPossibleBuilds().contains(newBuilding.getPosition())) {
+                figure1.build(newBuilding);
+            } else {
+                figure2.build(newBuilding);
+            }
+        }
+
+        else {
+            Figure lastActiveFigure = loadFigure(game.getLastActiveFigureId());
+            lastActiveFigure.build(newBuilding);
+        }
     }
 }

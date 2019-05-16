@@ -14,7 +14,7 @@ public class DefaultTurn extends Turn {
 
     @Override
     public boolean isBuildAllowedByUserId(long userId) {
-        return isCurrentTurn(userId) && game.getLastActiveFigureId() != 0;
+        return isCurrentTurn(userId);
     }
 
     @Override
