@@ -9,9 +9,8 @@ import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.PrometheusBuilds;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.InitialMoves;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.PrometheusMoves;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds.*;
+import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.*;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
@@ -164,8 +163,56 @@ public class FigureService {
         Figure dbFigure = figureRepository.findById(id);
         GameBoard board = new GameBoard(dbFigure.getGame(), figureRepository, buildingRepository);
 
-        Action moves = new PrometheusMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
-        Action builds = new PrometheusBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        Action moves = null;
+        Action builds = null;
+        String godPower = dbFigure.getOwnerId() == dbFigure.getGame().getUser1().getId() ?
+                          dbFigure.getGame().getGod1() : dbFigure.getGame().getGod2();
+
+        switch (godPower) {
+            case "apollo":
+                moves = new ApolloMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "artemis":
+                moves = new ArtemisMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "athena":
+                moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "atlas":
+                moves = new AtlasMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new AtlasBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "demeter":
+                moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DemeterBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "hephaestus":
+                moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new HephaestusBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "hermes":
+                moves = new HermesMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "minotaur":
+                moves = new MinotaurMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "pan":
+                moves = new PanMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            case "prometheus":
+                moves = new PrometheusMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new PrometheusBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                break;
+            default:
+                moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+        }
 
         dbFigure.setMoves(moves);
         dbFigure.setBuilds(builds);
