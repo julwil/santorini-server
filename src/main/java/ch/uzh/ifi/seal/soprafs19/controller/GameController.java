@@ -1,17 +1,17 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
+
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 @RestController
@@ -49,11 +49,16 @@ public class GameController {
     @PostMapping("/games/{id}/accept")
     public Game postAcceptGameRequestByUser (
             @RequestHeader("authorization") String token,
-            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException
+            @PathVariable("id") long gameId,
+            @RequestBody HashMap<String, Object> requestBody) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
         User user = this.userRepository.findByToken(token);
+        String selectedGodPower = "";
+        if (requestBody.containsKey("selectedGodPower")) {
+            selectedGodPower = (String) requestBody.get("selectedGodPower");
+        }
 
-        return service.postAcceptGameRequestByUser(gameId, user);
+        return service.postAcceptGameRequestByUser(gameId, user, selectedGodPower);
     }
 
 

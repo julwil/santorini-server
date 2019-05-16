@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 import static ch.uzh.ifi.seal.soprafs19.constant.UserStatus.ONLINE;
 
 @Service
@@ -80,7 +82,7 @@ public class GameService {
         return "games/" + newGame.getId().toString();
     }
 
-    public Game postAcceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException
+    public Game postAcceptGameRequestByUser(long id, User acceptingUser, String selectedGodPower) throws ResourceActionNotAllowedException, ResourceNotFoundException
     {
         try {
             Game game = gameRepository.findById(id);
@@ -91,6 +93,18 @@ public class GameService {
 
             game.setStatus(GameStatus.STARTED);
             game.setDemo(0);
+
+            // Assign the god powers if god power mode and one card is selected
+            if (game.getGodPower() && !selectedGodPower.isEmpty()) {
+
+                // Remaining god power
+                ArrayList<String> remainingGodCards = game.getGodCardsList();
+                ((ArrayList) remainingGodCards).remove(selectedGodPower);
+
+                // Set the selectedGodPower to the user2
+                game.setGod2(selectedGodPower);
+                game.setGod1(remainingGodCards.get(0));
+            }
             gameRepository.save(game);
 
             User user1 = game.getUser1();

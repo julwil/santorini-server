@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @DynamicUpdate @JsonDeserialize(using = GameDeserializer.class) @JsonSerialize(using = GameSerializer.class)
@@ -49,6 +50,12 @@ public class Game implements Serializable {
 	private User user2;
 
     @Column
+	private String god1;
+
+    @Column
+	private String god2;
+
+    @Column
     private long winner;
 
 	@Transient
@@ -56,6 +63,9 @@ public class Game implements Serializable {
 
 	@Column
 	private long demo;
+
+	@Column
+	private ArrayList<String> godCardsList;
 
 //	@OneToOne
 //	private User winner;
@@ -141,6 +151,14 @@ public class Game implements Serializable {
         return turn.isBuildAllowedByUserId(userId);
     }
 
+	public ArrayList<String> getGodCardsList() {
+		return godCardsList;
+	}
+
+	public void setGodCardsList(ArrayList<String> godCardsList) {
+		this.godCardsList = godCardsList;
+	}
+
 	@JsonIgnore
 	public void swapTurns()
 	{
@@ -165,6 +183,20 @@ public class Game implements Serializable {
 		return winner;
 	}
 
+	public void setGod2(String selectedGodPower) {
+		this.god2 = selectedGodPower;
+	}
+
+	public String getGod1(){
+		return god1;
+	}
+	public String getGod2(){
+		return god2;
+	}
+
+	public void setGod1(String remainginGodPower) {
+		this.god1 = remainginGodPower;
+	}
 
 
 //	public long getWinnerId()
