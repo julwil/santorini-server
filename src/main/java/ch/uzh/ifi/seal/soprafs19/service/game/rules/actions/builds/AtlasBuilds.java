@@ -70,17 +70,13 @@ public class AtlasBuilds extends Action {
     }
 
      @Override
-     public ArrayList<Position> calculateInvalidLowerPositions(ArrayList<Position> candidates) {
+     public ArrayList<Position> calculateInvalidLowerPositions(ArrayList<Position> candidates)
+     {
          ArrayList<Position> invalidPositions = new ArrayList<>();
 
-         // Atlas can build a dome at any level
+         // For each candidate we must check, if it is floating, if it is ontop of a figure
          for (Iterator<Position> iterator = candidates.iterator(); iterator.hasNext(); ) {
              Position candidate = iterator.next();
-
-             // We can always move to floor positions
-             if (candidate.isFloor()) {
-                 continue;
-             }
 
              Position belowCandidate = new Position(
                      candidate.getX(),
@@ -88,27 +84,52 @@ public class AtlasBuilds extends Action {
                      candidate.getZ() - 1 // Lower neighbour
              );
 
-             // If there is no board item at belowCandidate, AND the candidate is not a dome, it is considered invalid.
-             if (!getBoard().getBoardMap().containsKey(belowCandidate) && !candidate.isCeil()) {
-                 invalidPositions.add(candidate);
+             // We can always build to floor positions
+             if (candidate.isFloor()) {
                  continue;
              }
 
-             // If there is a board item at the belowCandidate position, it must be a building
-             while (belowCandidate.hasValidAxis()) {
+             // Candidates that are not ceil positions must be checked if floating
+             if (!candidate.isCeil()) {
+
+                 // If there is no board item at belowCandidate, the candidate is considered floating.
+                 if (!getBoard().getBoardMap().containsKey(belowCandidate)) {
+                     invalidPositions.add(candidate);
+                     continue;
+                 }
+
+                 // If there is a board item at the belowCandidate position, it must be a building
                  BoardItem itemBelowCandidate = getBoard().getBoardMap().get(belowCandidate);
                  if (itemBelowCandidate instanceof Figure) {
                      invalidPositions.add(candidate);
                      continue;
                  }
-
-                 belowCandidate.setZ(belowCandidate.getZ() - 1);
              }
 
-             // We also need to check whether a dome is placed on op of candidate
-             if (getBoard().getBoardMap().containsKey(new Position(candidate.getX(), candidate.getY(), 3))) {
-                 invalidPositions.add(candidate);
+             // Else, ceil positions are treated differently. For each ceil, we must only ensure:
+             // No figure is below there at ANY level.
+             else {
+                 while (belowCandidate.hasValidAxis()) {
+
+                     // If there is a board item below candidate
+                     if (getBoard().getBoardMap().containsKey(belowCandidate)) {
+                         BoardItem item = getBoard().getBoardMap().get(belowCandidate);
+
+                         // If it is of type figure, we can't build a dome at candidate
+                         if (item instanceof Figure) {
+                             invalidPositions.add(candidate);
+                             break;
+                         }
+                     }
+                     belowCandidate.setZ(belowCandidate.getZ() - 1);
+                 }
              }
+
+            // In both cases (ceil and !ceil) we must check that no dome is placed on top of candidate at ANY level
+            if (getBoard().getBoardMap().containsKey(new Position (candidate.getX(), candidate.getY(), 3))) {
+                invalidPositions.add(candidate);
+                continue;
+            }
          }
 
          return invalidPositions;
