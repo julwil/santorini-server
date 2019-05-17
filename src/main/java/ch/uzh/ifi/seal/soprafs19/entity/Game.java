@@ -65,6 +65,9 @@ public class Game implements Serializable {
 	private long demo;
 
 	@Column
+	private long athenaMoveUp;
+
+	@Column
 	private ArrayList<String> godCardsList;
 
 //	@OneToOne
@@ -127,7 +130,28 @@ public class Game implements Serializable {
 
 	public void setTurn(Turn turn) {this.turn = turn;}
 
-    @JsonIgnore
+	public void deactivateAthenaMovedUp(){
+		this.athenaMoveUp=0;
+	}
+
+	public void activateAthenaMovedUp(){
+		this.athenaMoveUp=1;
+	}
+
+	public long statusAthenaMovedUp(){
+		return athenaMoveUp;
+	}
+
+	public User checkForAthena(){
+			if (god1.equals("Athena")){
+		return user1;}
+				else{return user2;
+	}
+	}
+
+
+
+	@JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}
 
 	@JsonIgnore

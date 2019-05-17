@@ -178,7 +178,7 @@ public class FigureService {
                 builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
                 break;
             case "athena":
-                moves = new DefaultMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
+                moves = new AthenaMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
                 builds = new DefaultBuilds(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
                 break;
             case "atlas":
