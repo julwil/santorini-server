@@ -1,5 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.constant;
 
 public enum GameStatus {
-	INITIALIZED, STARTED, CANCLED, FINISHED;
+	INITIALIZED, STARTED, CANCELED, FINISHED;
 }
