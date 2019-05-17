@@ -65,6 +65,9 @@ public class Game implements Serializable {
 	private Turn turn;
 
 	@Column
+	private boolean canFinishTurn;
+
+	@Column
 	private long demo;
 
 	@Column
@@ -146,7 +149,7 @@ public class Game implements Serializable {
 	}
 
 	public User checkForAthena(){
-			if (god1.equals("Athena")){
+			if (god1.equals("athena")){
 		return user1;}
 				else{return user2;
 	}
@@ -229,6 +232,14 @@ public class Game implements Serializable {
 
 	public void setGod1(String remainginGodPower) {
 		this.god1 = remainginGodPower;
+	}
+
+	public boolean isCanFinishTurn() {
+		return canFinishTurn;
+	}
+
+	public void setCanFinishTurn(boolean canFinishTurn) {
+		this.canFinishTurn = canFinishTurn;
 	}
 
 

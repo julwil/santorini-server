@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.*;
@@ -165,7 +166,7 @@ public class GameService {
 
     public Game getGameById(long id)
     {
-        return gameRepository.findById(id);
+        return loadGame(id);
     }
 
     public Iterable<Game> getGamesForUser2AndStatus(User user2, GameStatus status)
@@ -179,6 +180,17 @@ public class GameService {
         game.setWinnerId(ownerId);
         game.getUser1().setStatus(ONLINE);
         game.getUser2().setStatus(ONLINE);
+        gameRepository.save(game);
+    }
+
+    public void postFinishTurn(Game game, User user) throws GameRuleException {
+
+        if (!game.isCanFinishTurn()) {
+            throw new GameRuleException();
+        }
+
+        game.swapTurns();
+        game.setLastActiveFigureId(0);
         gameRepository.save(game);
     }
 }
