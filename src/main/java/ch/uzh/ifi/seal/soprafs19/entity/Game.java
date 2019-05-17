@@ -58,6 +58,9 @@ public class Game implements Serializable {
     @Column
     private long winner;
 
+	@Column
+	private long loser;
+
 	@Transient
 	private Turn turn;
 
@@ -203,10 +206,16 @@ public class Game implements Serializable {
 
 				this.winner=ownerId;}
 
+	public void setLoserId(long ownerId){
+
+		this.loser=ownerId;}
+
 	public long getWinner(){
 		return winner;
 	}
-
+	public long getLoser(){
+		return loser;
+	}
 	public void setGod2(String selectedGodPower) {
 		this.god2 = selectedGodPower;
 	}

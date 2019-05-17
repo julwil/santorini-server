@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.*;
@@ -209,9 +210,28 @@ public class GameController {
             @PathVariable("id") long gameId,
             HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
+        Game game = this.service.getGameById(gameId);
+
+        if(game.getStatus()==GameStatus.STARTED){
+            User loser = this.userRepository.findByToken(token);
+            User winner = new User();
+
+            if(game.getUser1().getId()==loser.getId()){
+                winner = game.getUser2();
+            }
+            else{winner=game.getUser1();
+            }
+            game.setWinnerId(winner.getId());
+            game.setLoserId(loser.getId());
+            service.postCancelGameRequestByUser(gameId, loser);
+            response.setStatus(204);
+        }
+        else{
+
+
         User user = this.userRepository.findByToken(token);
         service.postCancelGameRequestByUser(gameId, user);
-        response.setStatus(204);
+        response.setStatus(204);}
     }
 
     // Get players of Game

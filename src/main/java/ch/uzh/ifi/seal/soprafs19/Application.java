@@ -53,7 +53,7 @@ public class Application {
 
             GameService gameService = new GameService(gameRepository, figureRepository, moveRepository, buildingRepository, userRepository, userService);
             // save a few games
-            GameStatus[] gameStatuses = {GameStatus.INITIALIZED, GameStatus.STARTED, GameStatus.CANCLED};
+            GameStatus[] gameStatuses = {GameStatus.INITIALIZED, GameStatus.STARTED, GameStatus.CANCELED};
             for (int i = 0; i < 3; i++) {
                 Game game = new Game();
                 User user1 = userRepository.findByUsername(testUsers[i]);

@@ -131,7 +131,7 @@ public class GameService {
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
             }
-            game.setStatus(GameStatus.CANCLED);
+            game.setStatus(GameStatus.CANCELED);
             gameRepository.save(game);
 
             User user1 = game.getUser1();
