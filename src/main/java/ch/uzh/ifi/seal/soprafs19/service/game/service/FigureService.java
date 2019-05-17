@@ -168,6 +168,8 @@ public class FigureService {
         String godPower = dbFigure.getOwnerId() == dbFigure.getGame().getUser1().getId() ?
                           dbFigure.getGame().getGod1() : dbFigure.getGame().getGod2();
 
+        godPower = godPower == null ? "" : godPower;
+
         switch (godPower) {
             case "apollo":
                 moves = new ApolloMoves(dbFigure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, this);
