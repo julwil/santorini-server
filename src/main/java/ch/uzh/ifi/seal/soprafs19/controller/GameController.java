@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
-import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.*;
@@ -154,8 +153,6 @@ public class GameController {
         return service.getGameById(id);
     }
 
-
-
     // Get turns of Game
     @GetMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
@@ -232,6 +229,18 @@ public class GameController {
         User user = this.userRepository.findByToken(token);
         service.postCancelGameRequestByUser(gameId, user);
         response.setStatus(204);}
+    }
+
+    @PostMapping("/games/{id}/finishTurn")
+    void postFinishTurn (
+            @RequestHeader("authorization") String token,
+            @PathVariable("id") long gameId,
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
+        Game game = this.service.getGameById(gameId);
+        User user = this.userRepository.findByToken(token);
+        this.service.postFinishTurn(game, user);
+
+        response.setStatus(204);
     }
 
     // Get players of Game
