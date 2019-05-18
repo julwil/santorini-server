@@ -4,7 +4,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,16 +12,15 @@ import java.util.ArrayList;
 public abstract class Turn {
 
     protected final GameBoard board;
-    protected final MoveRepository moveRepository;
     protected final BuildingRepository buildingRepository;
     protected final FigureRepository figureRepository;
     protected final GameRepository gameRepository;
     protected final Game game;
 
     @Autowired
-    public Turn(GameBoard board, MoveRepository moveRepository, BuildingRepository buildingRepository, FigureRepository figureRepository, GameRepository gameRepository) {
+    public Turn(GameBoard board, BuildingRepository buildingRepository, FigureRepository figureRepository, GameRepository gameRepository) {
         this.board = board;
-        this.moveRepository = moveRepository;
+
         this.buildingRepository = buildingRepository;
         this.figureRepository = figureRepository;
         this.gameRepository = gameRepository;

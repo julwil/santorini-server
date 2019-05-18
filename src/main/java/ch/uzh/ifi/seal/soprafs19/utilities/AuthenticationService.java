@@ -4,7 +4,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
-import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +63,18 @@ public class AuthenticationService {
         }
     }
 
+    public void surrender(String token, long gameId) {
 
+        Game game= gameRepository.findById(gameId);
+        User loser = userRepository.findByToken(token);
+        User winner = new User();
+
+        if (game.getUser1().getId() == loser.getId()) {
+            winner = game.getUser2();
+        } else {
+            winner = game.getUser1();
+        }
+        game.setWinnerId(winner.getId());
+        game.setLoserId(loser.getId());
+    }
 }

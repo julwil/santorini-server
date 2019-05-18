@@ -37,7 +37,7 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, FigureRepository figureRepository, MoveRepository moveRepository, BuildingRepository buildingRepository, AuthenticationService authentication, Utilities utils) {
+    public CommandLineRunner demo(UserRepository userRepository, GameRepository gameRepository, FigureRepository figureRepository,   BuildingRepository buildingRepository, AuthenticationService authentication, Utilities utils) {
         return (args) -> {
             UserService userService = new UserService(userRepository, authentication, utils);
             // save a couple of Users
@@ -51,7 +51,7 @@ public class Application {
                 userService.postCreateUser(user);
             }
 
-            GameService gameService = new GameService(gameRepository, figureRepository, moveRepository, buildingRepository, userRepository, userService);
+            GameService gameService = new GameService(gameRepository, figureRepository,  buildingRepository, userRepository, userService);
             // save a few games
             GameStatus[] gameStatuses = {GameStatus.INITIALIZED, GameStatus.STARTED, GameStatus.CANCELED};
             for (int i = 0; i < 3; i++) {

@@ -11,8 +11,6 @@ import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
-import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 
-import javax.validation.Valid;
-
 @Service
 @Transactional
 public class GameServiceDemo {
@@ -31,12 +27,12 @@ public class GameServiceDemo {
     private final Logger log = LoggerFactory.getLogger(GameServiceDemo.class);
 
     private final GameRepository gameRepository;
-    private final FigureRepository figureRepository;
     private final UserRepository userRepository;
     private final UserService userService;
     private  final  FigureService figureService;
-    private final  GameService gameService;
     private final BuildingService buildingService;
+    private final GameService gameService;
+    private final FigureRepository figureRepository;
 
     @Autowired
     public GameServiceDemo(
@@ -62,7 +58,7 @@ public class GameServiceDemo {
 
 
 
-    public String postCreateGameDemoXWins(Game newGame) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, UsernameAlreadyExistsException {
+    public String postCreateGameDemoXWins(Game newGame) {
         // Get the users by extracting the user id's from the game
         User user1 = newGame.getUser1();
         User user2 = newGame.getUser2();
@@ -95,7 +91,7 @@ public class GameServiceDemo {
     }
 
 
-        public Game postAcceptDemoGameRequestByUser(long gameId, User acceptingUser) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, UsernameAlreadyExistsException {
+        public Game postAcceptDemoGameRequestByUser(long gameId, User acceptingUser) throws GameRuleException {
 
         Game newGame = gameRepository.findById(gameId);
             newGame.setStatus(GameStatus.STARTED);
@@ -133,8 +129,6 @@ public class GameServiceDemo {
         Position p020 = new Position(0,2,0);
         Position p420 = new Position(4,2,0);
         Position p430 = new Position(4,3,0);
-        Position p213 = new Position(2,1,3);
-        Position p241 = new Position(2,4,1);
         Position p212 = new Position(2,1,2);
         Position p240 = new Position(2,4,0);
         Position p232 = new Position(2,3,2);

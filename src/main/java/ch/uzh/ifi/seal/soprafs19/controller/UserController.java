@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.UsernameAlreadyExistsException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import org.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
@@ -18,9 +19,11 @@ import java.util.Map;
 public class UserController {
 
     private final UserService service;
+    private final AuthenticationService authenticationService;
 
-    UserController(UserService service) {
+    UserController(UserService service, AuthenticationService authenticationService ) {
         this.service = service;
+        this.authenticationService = authenticationService;
     }
 
     // Create new user
@@ -44,6 +47,7 @@ public class UserController {
             @RequestBody User userToAuthenticate)
             throws ResourceNotFoundException, FailedAuthenticationException, JSONException
     {
+
         HashMap<String, String> map = new HashMap<>();
         map.put("token", this.service.postLogin(userToAuthenticate));
 
@@ -55,6 +59,7 @@ public class UserController {
     public void getLogout (
             @RequestHeader("authorization") String token,
             HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException {
+
         response.setStatus(204);
         this.service.getLogout(token);
     }
@@ -71,7 +76,7 @@ public class UserController {
     @GetMapping("/users/{userId}") //users
     public User getUserById (
             @RequestHeader("authorization") String token,
-            @PathVariable(value="userId") long userId) throws ResourceNotFoundException, FailedAuthenticationException
+            @PathVariable(value="userId") long userId) throws FailedAuthenticationException
     {
         return service.getUserById(token, userId);
     }
@@ -81,9 +86,10 @@ public class UserController {
     public User putUser (
             @RequestHeader("authorization") String token,
             @PathVariable(value="userId") long userId,
-            @RequestBody User userToUpdate, HttpServletResponse response) throws ResourceNotFoundException,
+            @RequestBody User userToUpdate, HttpServletResponse response) throws
             FailedAuthenticationException, ResourceActionNotAllowedException, UsernameAlreadyExistsException {
         response.setStatus(204);
+
         return service.putUpdateUser(token, userId, userToUpdate);
     }
 }

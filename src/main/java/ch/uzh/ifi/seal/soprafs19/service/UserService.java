@@ -175,15 +175,6 @@ public class UserService {
         return user.getStatus() == UserStatus.ONLINE;
     }
 
-    public boolean isPlaying(User user)
-    {
-        return user.getStatus() == UserStatus.PLAYING;
-    }
-
-    public boolean isChallenged(User user)
-    {
-        return user.getStatus() == UserStatus.CHALLENGED;
-    }
 
     public boolean isOffline(User user)
     {

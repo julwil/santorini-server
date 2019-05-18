@@ -3,7 +3,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 
 import java.util.ArrayList;
@@ -11,8 +10,8 @@ import java.util.ArrayList;
 public class DefaultTurn extends Turn {
 
 
-    public DefaultTurn(GameBoard board, MoveRepository moveRepository, BuildingRepository buildingRepository, FigureRepository figureRepository, GameRepository gameRepository) {
-        super(board, moveRepository, buildingRepository, figureRepository, gameRepository);
+    public DefaultTurn(GameBoard board,  BuildingRepository buildingRepository, FigureRepository figureRepository, GameRepository gameRepository) {
+        super(board, buildingRepository, figureRepository, gameRepository);
 
         // For Demter and Hephaestus we need to set the flag canFinishTurn
         ArrayList<String> godsCanFinishTurn = new ArrayList<>();

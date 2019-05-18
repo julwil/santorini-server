@@ -79,7 +79,7 @@ public class UserControllerTest {
         testUser.setName("Test Usere");
         testUser.setPassword("testPassword");
         testUser.setBirthday(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
 
         this.mvc.perform(post("/users/login")
@@ -100,7 +100,7 @@ public class UserControllerTest {
         testUser.setUsername("testUsert");
         testUser.setName("Test Usert");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
         String token = userService.postLogin(testUser);
 
 
@@ -118,7 +118,7 @@ public class UserControllerTest {
         testUser.setUsername("testUserz");
         testUser.setName("Test Userz");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
         String token = userService.postLogin(testUser);
         long id = userRepository.findByUsername(testUser.getUsername()).getId();
 
