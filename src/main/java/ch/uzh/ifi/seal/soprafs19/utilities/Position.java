@@ -3,10 +3,6 @@ package ch.uzh.ifi.seal.soprafs19.utilities;
 import ch.uzh.ifi.seal.soprafs19.constant.Axis;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
 public class Position {
 
 
@@ -14,7 +10,6 @@ public class Position {
     private int y;
     private int z;
 
-    public Position(){}
 
     public Position (int x, int y, int z)
     {
@@ -57,6 +52,51 @@ public class Position {
         return this.getZ() == 3;
     }
 
+    @JsonIgnore
+    public boolean isNorthTo(Position position)
+    {
+        int[] offSet = calculatePositionOffSet(position);
+        return offSet[0] == 0 && offSet[1] == 1;// && offSet[2] == 0;
+    }
+
+    @JsonIgnore
+    public boolean isEastTo(Position position)
+    {
+        int[] offSet = calculatePositionOffSet(position);
+        return offSet[0] == 1 && offSet[1] == 0; // && offSet[2] == 0;
+    }
+
+    @JsonIgnore
+    public boolean isSouthTo(Position position)
+    {
+        int[] offSet = calculatePositionOffSet(position);
+        return offSet[0] == 0 && offSet[1] == -1; // && offSet[2] == 0;
+    }
+
+    @JsonIgnore
+    public boolean isWestTo(Position position)
+    {
+        int[] offSet = calculatePositionOffSet(position);
+        return offSet[0] == -1 && offSet[1] == 0; // && offSet[2] == 0;
+    }
+
+
+
+    // Calculates the offSet between the position and an offset Position
+    @JsonIgnore
+    private int[] calculatePositionOffSet(Position offsetPosition)
+    {
+        // [0] = dx,
+        // [1] = dy,
+        // [2] = dz
+        int[] offSet = new int[3];
+        offSet[0] = this.x - offsetPosition.getX();
+        offSet[1] = this.y - offsetPosition.getY();
+        offSet[2] = this.z - offsetPosition.getZ();
+
+        return offSet;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -78,7 +118,7 @@ public class Position {
         int y = this.getY();
         int z = this.getZ();
 
-        String hash = Integer.toString(x) + Integer.toString(y) + Integer.toString(z);
+        String hash = Integer.toString(x) + y + z;
 
         return Integer.parseInt(hash);
     }

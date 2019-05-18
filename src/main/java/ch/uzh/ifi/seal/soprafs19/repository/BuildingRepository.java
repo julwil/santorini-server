@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BuildingRepository extends CrudRepository<Building, Long> {
-	Building findById(long id);
-	boolean existsById(long id);
 	Iterable<Building> findAllByGame(Game game);
+	Iterable<Building> findTop2ByGameOrderByCreatedOnDesc(Game game);
 }

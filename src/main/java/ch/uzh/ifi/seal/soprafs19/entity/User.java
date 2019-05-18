@@ -56,8 +56,6 @@ public class User implements Serializable {
 		return id;
 	}
 
-	public void setId(Long id) { this.id = id;	}
-
 	public String getName() {
 		return name;
 	}
@@ -91,7 +89,6 @@ public class User implements Serializable {
 		this.birthday = birthday;
 	}
 
-	public LocalDateTime getCreatedOn() {return createdOn;}
 
 	@JsonIgnore
 	public String getToken() {
@@ -110,8 +107,6 @@ public class User implements Serializable {
 		this.status = status;
 	}
 
-	@JsonIgnore
-	public Game getGame() { return game;}
 
 	public void setGame(Game game) { this.game = game;	}
 

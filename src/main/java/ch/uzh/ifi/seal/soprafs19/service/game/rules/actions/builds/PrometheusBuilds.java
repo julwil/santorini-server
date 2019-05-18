@@ -1,4 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds;
+import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -14,14 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DefaultBuilds extends Action {
+public class PrometheusBuilds extends Action {
 
-    public DefaultBuilds(
+    public PrometheusBuilds(
             Figure figure, GameBoard board, BuildingRepository buildingRepository,
             FigureRepository figureRepository,
             GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository,  gameRepository, gameService, figureService);
     }
 
     @Override
@@ -39,14 +40,36 @@ public class DefaultBuilds extends Action {
         return adjacentPositionsOfOrigin;
     }
 
+    // Prometheus can build both before and after a move.
+    // There are 3 cases:
+    // 1. He doesn't opt the god power
+    // 2. He performs the first build
+    // 3. He performs the second build
     @Override
     public void perform()
     {
-        buildingRepository.save(getBuilding());
-        // The LAF is set to 0 --> no figure is LAF
+        // Case 1
+        if (!firstBuildCompleted() && game.getLastActiveFigureId() != 0) {
+            buildingRepository.save(getBuilding());
+            handleLoseCondition();
+            game.swapTurns();
+        }
+
+        // Case 2 (no figure was moved)
+        else if (!firstBuildCompleted() && game.getLastActiveFigureId() == 0) {
+            buildingRepository.save(getBuilding());
+            handleLoseCondition();
+        }
+
+        // Case 3
+        else {
+            buildingRepository.save(getBuilding());
+            handleLoseCondition();
+            game.swapTurns();
+        }
+
+        // We reset the flag for all cases
         game.setLastActiveFigureId(0);
-        handleLoseCondition();
-        game.swapTurns();
     }
 
     protected void handleLoseCondition()
@@ -64,5 +87,20 @@ public class DefaultBuilds extends Action {
         if (possibleMovesOfOpponent.isEmpty()) {
             gameService.setWinner(game, game.getCurrentTurn().getId());
         }
+    }
+
+    private boolean firstBuildCompleted()
+    {
+        ArrayList<Building> lastBuildings = (ArrayList<Building>) buildingRepository
+                .findTop2ByGameOrderByCreatedOnDesc(getGame());
+
+        // If it's the first build
+        if (lastBuildings.isEmpty()) {
+            return false;
+        }
+        // Get the last inserted building
+        Building lastBuilding = lastBuildings.get(0);
+
+        return lastBuilding.getOwnerId() == game.getCurrentTurn().getId();
     }
 }

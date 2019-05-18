@@ -8,9 +8,12 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class GameDeserializer extends JsonDeserializer<Game> {
     private UserRepository userRepository;
@@ -38,6 +41,17 @@ public class GameDeserializer extends JsonDeserializer<Game> {
             newGame.setUser1(user1);
             newGame.setUser2(user2);
             newGame.setGodPower(isGodPower);
+
+            if (isGodPower) {
+                ArrayList<LinkedHashMap<String, Object>> godCardsList = new ObjectMapper().readValue(node.get("godCards").toString(), ArrayList.class);
+
+                ArrayList<String> godCardIdentifiers = new ArrayList<>();
+
+                for (LinkedHashMap<String, Object> godCard : godCardsList) {
+                    godCardIdentifiers.add((String) godCard.get("name"));
+                }
+                newGame.setGodCardsList(godCardIdentifiers);
+            }
 
             return newGame;
         } catch (Exception e) {

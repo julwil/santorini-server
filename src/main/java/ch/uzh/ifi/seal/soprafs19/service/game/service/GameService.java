@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.repository.*;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 import static ch.uzh.ifi.seal.soprafs19.constant.UserStatus.ONLINE;
 
 @Service
@@ -27,7 +30,6 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final FigureRepository figureRepository;
-    private final MoveRepository moveRepository;
     private final BuildingRepository buildingRepository;
     private final UserRepository userRepository;
     private final UserService userService;
@@ -36,14 +38,12 @@ public class GameService {
     public GameService(
             GameRepository gameRepository,
             FigureRepository figureRepository,
-            MoveRepository moveRepository,
             BuildingRepository buildingRepository,
             UserRepository userRepository,
             UserService userService)
     {
         this.gameRepository = gameRepository;
         this.figureRepository = figureRepository;
-        this.moveRepository = moveRepository;
         this.buildingRepository = buildingRepository;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -80,7 +80,7 @@ public class GameService {
         return "games/" + newGame.getId().toString();
     }
 
-    public Game postAcceptGameRequestByUser(long id, User acceptingUser) throws ResourceActionNotAllowedException, ResourceNotFoundException
+    public Game postAcceptGameRequestByUser(long id, User acceptingUser, String selectedGodPower) throws ResourceActionNotAllowedException, ResourceNotFoundException
     {
         try {
             Game game = gameRepository.findById(id);
@@ -91,6 +91,18 @@ public class GameService {
 
             game.setStatus(GameStatus.STARTED);
             game.setDemo(0);
+
+            // Assign the god powers if god power mode and one card is selected
+            if (game.getGodPower() && !selectedGodPower.isEmpty()) {
+
+                // Remaining god power
+                ArrayList<String> remainingGodCards = game.getGodCardsList();
+                remainingGodCards.remove(selectedGodPower);
+
+                // Set the selectedGodPower to the user2
+                game.setGod2(selectedGodPower);
+                game.setGod1(remainingGodCards.get(0));
+            }
             gameRepository.save(game);
 
             User user1 = game.getUser1();
@@ -112,12 +124,13 @@ public class GameService {
     public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
     {
         try {
+
             Game game = gameRepository.findById(id);
 
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
             }
-            game.setStatus(GameStatus.CANCLED);
+            game.setStatus(GameStatus.CANCELED);
             gameRepository.save(game);
 
             User user1 = game.getUser1();
@@ -138,7 +151,7 @@ public class GameService {
     public Game loadGame(long id) {
         Game game = gameRepository.findById(id);
         GameBoard board = new GameBoard(game, figureRepository, buildingRepository);
-        Turn turn = new DefaultTurn(board, moveRepository, buildingRepository, figureRepository, gameRepository); // Depending on the chosen god-powers, we need to assign a different turn object
+        Turn turn = new DefaultTurn(board, buildingRepository, figureRepository, gameRepository); // Depending on the chosen god-powers, we need to assign a different turn object
         game.setTurn(turn);
 
         return game;
@@ -151,7 +164,7 @@ public class GameService {
 
     public Game getGameById(long id)
     {
-        return gameRepository.findById(id);
+        return loadGame(id);
     }
 
     public Iterable<Game> getGamesForUser2AndStatus(User user2, GameStatus status)
@@ -165,6 +178,17 @@ public class GameService {
         game.setWinnerId(ownerId);
         game.getUser1().setStatus(ONLINE);
         game.getUser2().setStatus(ONLINE);
+        gameRepository.save(game);
+    }
+
+    public void postFinishTurn(Game game, User user) throws GameRuleException {
+
+        if (!game.isCanFinishTurn()) {
+            throw new GameRuleException();
+        }
+
+        game.swapTurns();
+        game.setLastActiveFigureId(0);
         gameRepository.save(game);
     }
 }

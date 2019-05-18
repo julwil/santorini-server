@@ -52,10 +52,6 @@ public class Figure extends BoardItem implements Serializable {
 	{return this.moves;}
 
 	@JsonIgnore
-	public Action getBuildAction()
-	{return this.builds;}
-
-	@JsonIgnore
 	public void setBuilds(Action builds) {
 		this.builds = builds;
 	}

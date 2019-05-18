@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Building;
-import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Service
@@ -48,13 +49,13 @@ public class BuildingService {
             throw new GameRuleException();
         }
 
-        Figure figure = figureService.loadFigure(game.getLastActiveFigureId());
+        Set<Position> possibleBuilds = (HashSet<Position>) figureService.getPossibleBuilds(game);
 
-        if (!figure.getPossibleBuilds().contains(newBuilding.getPosition())) {
+        if (!possibleBuilds.contains(newBuilding.getPosition())) {
             throw new GameRuleException();
         }
 
-        figure.build(newBuilding);
+        figureService.build(game, newBuilding);
 
         return "buildings/" + newBuilding.getId().toString();
     }
@@ -69,8 +70,6 @@ public class BuildingService {
             return new ArrayList<Position>();
         }
 
-        Figure lastActiveFigure = figureService.loadFigure(game.getLastActiveFigureId());
-
-        return lastActiveFigure.getPossibleBuilds();
+        return figureService.getPossibleBuilds(game);
     }
 }
