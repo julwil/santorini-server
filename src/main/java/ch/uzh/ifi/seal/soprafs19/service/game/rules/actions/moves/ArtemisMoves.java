@@ -4,7 +4,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
@@ -15,18 +14,17 @@ import java.util.ArrayList;
 
 public class ArtemisMoves extends DefaultMoves {
     public ArtemisMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                        FigureRepository figureRepository, MoveRepository moveRepository,
+                        FigureRepository figureRepository,
                         GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
     }
 
     public ArrayList<Position> calculatePossiblePositionsArtemis() {
 
-        Position currentPosition = getOriginPosition();
         Position originalPosition = getOriginPosition();
 
-        int[] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
+         // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePossiblePositions();
 
         ArrayList<Position> tmpAdjacent = (ArrayList<Position>) adjacentPositionsOfOrigin.clone();

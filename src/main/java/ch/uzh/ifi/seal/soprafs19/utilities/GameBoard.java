@@ -7,7 +7,6 @@ import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -36,16 +35,10 @@ public class GameBoard {
 		return boardMap;
 	}
 
-	@JsonProperty("board")
-	public ArrayList<BoardItem> getBoardValues()
 	/*
 	 	returns the boardMap as HashMap with id as key and item as value.
 	*/
-	{
-		ArrayList<BoardItem> items = new ArrayList<>();
-		items.addAll(boardMap.values());
-		return items;
-	}
+
 
 	public void setBoardMap(Map<Position, BoardItem> boardMap) {this.boardMap = boardMap;}
 
@@ -66,18 +59,5 @@ public class GameBoard {
 		});
 	}
 
-	public Map<Long, ArrayList<Figure>> getFigureMap() {
-		return figureMap;
-	}
 
-	public int figureCountPerOwner(long ownerId)
-	{
-		int count = 0;
-		for (BoardItem item : getBoardMap().values()) {
-			if (item instanceof Figure && item.getOwnerId() == ownerId) {
-				count++;
-			}
-		}
-		return count;
-	}
 }

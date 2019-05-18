@@ -2,7 +2,6 @@ package ch.uzh.ifi.seal.soprafs19.deserializers;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -18,7 +17,7 @@ public class GameSerializer extends StdSerializer<Game> {
     }
 
     @Override
-    public void serialize(Game game, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+    public void serialize(Game game, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         jgen.writeStartObject();
         jgen.writeNumberField("id", game.getId());

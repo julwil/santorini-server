@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FigureRepository extends CrudRepository<Figure, Long> {
 	Figure findById(long id);
-	boolean existsById(long id);
 	Iterable<Figure> findAllByGame(Game game);
 
     Iterable<Figure> findAllByGameAndOwnerId(Game game, long ownerId);

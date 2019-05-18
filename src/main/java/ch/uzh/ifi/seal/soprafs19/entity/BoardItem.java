@@ -49,8 +49,6 @@ public abstract class BoardItem implements Serializable {
         this.ownerId = ownerId;
     }
 
-	@JsonIgnore
-	public LocalDateTime getCreatedOn() {return createdOn;}
 
 	public Position getPosition()
     {

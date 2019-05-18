@@ -4,7 +4,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
@@ -16,10 +15,10 @@ import java.util.ArrayList;
 public class DefaultMoves extends Action {
 
     public DefaultMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                        FigureRepository figureRepository, MoveRepository moveRepository,
+                        FigureRepository figureRepository,
                         GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
     }
 
     @Override

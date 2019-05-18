@@ -10,7 +10,6 @@ public class Position {
     private int y;
     private int z;
 
-    public Position(){}
 
     public Position (int x, int y, int z)
     {
@@ -119,7 +118,7 @@ public class Position {
         int y = this.getY();
         int z = this.getZ();
 
-        String hash = Integer.toString(x) + Integer.toString(y) + Integer.toString(z);
+        String hash = Integer.toString(x) + y + z;
 
         return Integer.parseInt(hash);
     }

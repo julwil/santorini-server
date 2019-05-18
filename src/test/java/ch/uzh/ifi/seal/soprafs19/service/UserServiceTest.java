@@ -18,8 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Test class for the UserResource REST resource.
  * test commit
@@ -45,7 +43,7 @@ public class UserServiceTest{
         testUser.setName("testNamek");
         testUser.setUsername("testUsernamek");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
         try{
 
@@ -54,7 +52,7 @@ public class UserServiceTest{
             testuser22.setUsername("testUsernamek");
             testUser.setPassword("testPassword");
 
-            String path2 = userService.postCreateUser(testuser22);
+            userService.postCreateUser(testuser22);
         }
         catch (UsernameAlreadyExistsException e){
             Assert.assertEquals("Username already taken.", e.getMessage());
@@ -75,7 +73,7 @@ public class UserServiceTest{
         testUser.setName("testNamel");
         testUser.setUsername("testUsernamel");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
         String token = userService.postLogin(testUser);
 
@@ -93,7 +91,7 @@ public class UserServiceTest{
         testUser.setName("testNameu");
         testUser.setUsername("testUsernameu");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
         // Check if the token returned matches the to authenticated user
         String token = userService.postLogin(testUser);
@@ -104,19 +102,19 @@ public class UserServiceTest{
         Assert.assertEquals(UserStatus.OFFLINE, loggedOutUser.getStatus());
 
         // Check if token is invalidated
-        Assert.assertFalse(token.equals(userRepository.findById(userToLogout.getId())));
+        Assert.assertNotEquals(token, userRepository.findById(userToLogout.getId()));
 
         userRepository.delete(testUser);
     }
 
 
     @Test
-    public void loginFailedWrongPasswordTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginFailedWrongPasswordTest() throws ResourceNotFoundException, JSONException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testNamei");
         testUser.setUsername("testUsernamei");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
         String token = null;
         try {
@@ -132,12 +130,12 @@ public class UserServiceTest{
     }
 
     @Test
-    public void loginFailedNonExistentUserNameTest() throws ResourceNotFoundException, JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
+    public void loginFailedNonExistentUserNameTest() throws JSONException, FailedAuthenticationException, UsernameAlreadyExistsException {
         User testUser = new User();
         testUser.setName("testNameo");
         testUser.setUsername("testUsernameo");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
+        userService.postCreateUser(testUser);
 
         String token = null;
         try {
@@ -158,11 +156,11 @@ public class UserServiceTest{
         testUser.setName("testNamep");
         testUser.setUsername("testUsernamep");
         testUser.setPassword("testPassword");
-        String path = userService.postCreateUser(testUser);
-        String token = userService.postLogin(testUser);
+        userService.postCreateUser(testUser);
+        userService.postLogin(testUser);
 
         testUser.setUsername("myNewUsername");
-        userService.putUpdateUser(token, testUser.getId(), testUser);
+        userService.putUpdateUser(testUser.getToken(),testUser.getId(), testUser);
 
         Assert.assertEquals(testUser, userRepository.findByUsername("myNewUsername"));
 

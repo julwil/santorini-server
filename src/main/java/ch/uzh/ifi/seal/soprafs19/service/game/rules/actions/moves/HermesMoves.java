@@ -4,13 +4,11 @@ import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -18,9 +16,9 @@ public class HermesMoves extends DefaultMoves {
 
 
     public HermesMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                       FigureRepository figureRepository, MoveRepository moveRepository,
+                       FigureRepository figureRepository,
                        GameRepository gameRepository, GameService gameService, FigureService figureService) {
-        super(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository,  gameRepository, gameService, figureService);
 
     }
 
@@ -35,7 +33,7 @@ public class HermesMoves extends DefaultMoves {
 
         // positions around origin
         int i = 0;
-        while (i<3) {
+        while (i<15) {
             adjacentPositionsOfOrigin.addAll(calculatePossiblePositions2(adjacentPositionsOfOrigin));
             i++;
         }

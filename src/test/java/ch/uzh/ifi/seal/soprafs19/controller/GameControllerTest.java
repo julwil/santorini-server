@@ -4,9 +4,8 @@ import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
+
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.BuildingService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
@@ -14,37 +13,21 @@ import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.moves.DefaultMoves;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
-import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
-import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 import ch.uzh.ifi.seal.soprafs19.utilities.Utilities;
 
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
-import static ch.uzh.ifi.seal.soprafs19.constant.UserStatus.*;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
@@ -64,20 +47,15 @@ public class GameControllerTest {
     private BuildingRepository buildingRepository;
     @Autowired
     private GameRepository gameRepository;
-    @Autowired
-    private MoveRepository moveRepository;
+
 
 
 
 
     private User testUser;
     private User testUser2;
-    private Game game;
-    private  GameRuleException gameRuleException;
-    private int size = 0;
 
-    ServerHttpResponse serverHttpResponse;
-    AuthenticationService authenticationService;
+
 
     //    GameRepository gameRepository;
     @Autowired
@@ -90,10 +68,10 @@ public class GameControllerTest {
     @Autowired
     UserService userService = new UserService(userRepository, authentication, utils);
     @Autowired
-    GameService gameService = new GameService(gameRepository, figureRepository, moveRepository ,buildingRepository, userRepository, userService);
+    GameService gameService = new GameService(gameRepository, figureRepository, buildingRepository, userRepository, userService);
     private Object NullPointerException;
     @Autowired
-    FigureService figureService = new FigureService(figureRepository, buildingRepository, moveRepository, gameRepository, gameService  );
+    FigureService figureService = new FigureService(figureRepository, buildingRepository,  gameRepository, gameService  );
     @Autowired
     BuildingService buildingService = new BuildingService(buildingRepository, figureService, gameService);
 
