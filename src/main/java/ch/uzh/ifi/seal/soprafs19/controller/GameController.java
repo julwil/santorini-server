@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
@@ -23,12 +24,14 @@ public class GameController {
 
     private final GameService service;
     private final UserRepository userRepository;
+    private final GameRepository gameRepository;
     private final GameServiceDemo gameServiceDemo;
     private final AuthenticationService authenticationService;
 
-    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, AuthenticationService authenticationService) {
+    GameController(GameService service, UserRepository userRepository, GameRepository gameRepository, GameServiceDemo gameServiceDemo, AuthenticationService authenticationService) {
         this.service = service;
         this.userRepository = userRepository;
+        this.gameRepository = gameRepository;
 
         this.gameServiceDemo = gameServiceDemo;
         this.authenticationService = authenticationService;
@@ -104,7 +107,7 @@ public class GameController {
     }
 
         // Accept demo
-        @PostMapping("/games/demo/{id}/accept")
+    @PostMapping("/games/demo/{id}/accept")
     public Game postAcceptDemoGameRequestByUser (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId) throws GameRuleException, FailedAuthenticationException
@@ -119,9 +122,11 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public Game getGameById (
             @RequestHeader("authorization") String token,
-            @PathVariable(value="id") long id) throws FailedAuthenticationException
-    {
+            @PathVariable(value="id") long id) throws FailedAuthenticationException, ResourceNotFoundException {
         authenticationService.authenticateUser(token);
+        if (!gameRepository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
         return service.getGameById(id);
     }
 
