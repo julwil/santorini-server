@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
@@ -21,15 +22,16 @@ public class GameController {
     private final UserRepository userRepository;
     private final GameServiceDemo gameServiceDemo;
     private final AuthenticationService authenticationService;
+    private final GameService gameService;
 
 
 
-    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, AuthenticationService authenticationService) {
+    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, AuthenticationService authenticationService, GameService gameService) {
         this.service = service;
         this.userRepository = userRepository;
-
         this.gameServiceDemo = gameServiceDemo;
         this.authenticationService = authenticationService;
+        this.gameService = gameService;
     }
 
     // Create new Game
@@ -53,10 +55,10 @@ public class GameController {
     public Game postAcceptGameRequestByUser (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            @RequestBody HashMap<String, Object> requestBody) throws ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+            @RequestBody HashMap<String, Object> requestBody) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException {
         User user = this.userRepository.findByToken(token);
         authenticationService.isAuthenticated(token);
+        authenticationService.userTokenInGameById(token,gameId);
 
         String selectedGodPower = "";
         if (requestBody.containsKey("selectedGodPower")) {
@@ -91,7 +93,7 @@ public class GameController {
     public Game postAcceptDemoGameRequestByUser (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException, UsernameAlreadyExistsException {
-        authenticationService.isAuthenticated(token);
+
         User user = this.userRepository.findByToken(token);
 
         return gameServiceDemo.postAcceptDemoGameRequestByUser(gameId, user);
@@ -116,7 +118,8 @@ public class GameController {
     // Fetch all games
     @GetMapping("/games")
     public Iterable<Game> getAllGames (
-            @RequestHeader("authorization") String token) {   authenticationService.isAuthenticated(token);
+            @RequestHeader("authorization") String token) {
+        authenticationService.isAuthenticated(token);
         return service.getAllGames(token);
     }
 
@@ -137,8 +140,10 @@ public class GameController {
     void postCancelGameRequest (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
-    {   authenticationService.isAuthenticated(token);
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException {
+    authenticationService.isAuthenticated(token);
+        authenticationService.userTokenInGameById(token,gameId);
+
 
         Game game = this.service.getGameById(gameId);
 
@@ -156,11 +161,15 @@ public class GameController {
     void postFinishTurn (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            HttpServletResponse response) throws ResourceActionNotAllowedException, GameRuleException {
+            HttpServletResponse response) throws ResourceActionNotAllowedException, GameRuleException, ResourceNotFoundException, FailedAuthenticationException {
+
         Game game = this.service.getGameById(gameId);
         User user = this.userRepository.findByToken(token);
 
-        authenticationService.userTokenIsCurrentTurn(token, gameId);
+        authenticationService.isAuthenticated(token);
+        authenticationService.userTokenInGameById(token, gameId);
+        authenticationService.userTokenIsCurrentTurn(token,gameId);
+
         this.service.postFinishTurn(game, user);
 
         response.setStatus(204);

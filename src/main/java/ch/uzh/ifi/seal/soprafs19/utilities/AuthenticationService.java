@@ -1,4 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.utilities;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.FailedAuthenticationException;
@@ -9,6 +10,8 @@ import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static ch.uzh.ifi.seal.soprafs19.constant.UserStatus.ONLINE;
 
 
 @Service
@@ -76,5 +79,14 @@ public class AuthenticationService {
         }
         game.setWinnerId(winner.getId());
         game.setLoserId(loser.getId());
+
+        game.setStatus(GameStatus.CANCELED);
+        gameRepository.save(game);
+
+        winner.setStatus(ONLINE);
+        loser.setStatus(ONLINE);
+
+        userRepository.save(winner);
+        userRepository.save(loser);
     }
 }
