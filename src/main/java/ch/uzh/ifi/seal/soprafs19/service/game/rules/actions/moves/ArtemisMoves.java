@@ -13,25 +13,33 @@ import java.util.ArrayList;
 
 
 public class ArtemisMoves extends DefaultMoves {
+
     public ArtemisMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                        FigureRepository figureRepository,
-                        GameRepository gameRepository, GameService gameService, FigureService figureService)
+                    FigureRepository figureRepository,
+                    GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository,  gameRepository, gameService, figureService);
     }
 
-    public ArrayList<Position> calculatePossiblePositionsArtemis() {
+
+    @Override
+    public ArrayList<Position> calculatePossiblePositions() {
 
         Position originalPosition = getOriginPosition();
 
-         // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
-        ArrayList<Position> adjacentPositionsOfOrigin = calculatePossiblePositions();
+        int[] neighbourhood = {-1, 1, -1, 1, -3, 1};
 
-        ArrayList<Position> tmpAdjacent = (ArrayList<Position>) adjacentPositionsOfOrigin.clone();
+        ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
-        for (int i = 0; i < tmpAdjacent.size(); i++) {
+        stripOccupiedPositions(adjacentPositionsOfOrigin);
+        stripFloatingPositions(adjacentPositionsOfOrigin);
 
-            Position tempPosition = tmpAdjacent.get(i);
+
+        ArrayList<Position> tmpAdjacent = new ArrayList<>();
+
+        for (int i = 0; i < adjacentPositionsOfOrigin.size(); i++) {
+
+            Position tempPosition = adjacentPositionsOfOrigin.get(i);
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
@@ -48,7 +56,7 @@ public class ArtemisMoves extends DefaultMoves {
                             );
 
                             if (tmp.hasValidAxis()) {
-                                adjacentPositionsOfOrigin.add(tmp);
+                                tmpAdjacent.add(tmp);
                             }
                         }
                     }
@@ -56,19 +64,19 @@ public class ArtemisMoves extends DefaultMoves {
             }
 
 
-            // Strip out positions that are occupied by other board items
-            stripOccupiedPositions(adjacentPositionsOfOrigin);
-
-            // Strip out the positions that are floating and have no building below
-            stripFloatingPositions(adjacentPositionsOfOrigin);
-
-            adjacentPositionsOfOrigin.remove(originalPosition);
-
         }
+
+        adjacentPositionsOfOrigin.addAll(tmpAdjacent);
+
+        stripOccupiedPositions(adjacentPositionsOfOrigin);
+        // Strip out the positions that are floating and have no building below
+        stripFloatingPositions(adjacentPositionsOfOrigin);
+        adjacentPositionsOfOrigin.remove(originalPosition);
+
+
         return adjacentPositionsOfOrigin;
     }
-
-
 }
+
 
 

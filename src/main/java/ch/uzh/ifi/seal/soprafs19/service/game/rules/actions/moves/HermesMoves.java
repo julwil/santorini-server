@@ -10,6 +10,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class HermesMoves extends DefaultMoves {
@@ -29,13 +30,20 @@ public class HermesMoves extends DefaultMoves {
         int[] neighbourhoodD = {-1, 1, -1, 1, 0, 0};// LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         ArrayList<Position> adjacentPositionsOfOrigin =  new ArrayList<>();
 
+        HashMap<Integer, String> hmap= new HashMap<Integer, String>();
+
+
         adjacentPositionsOfOrigin.addAll(calculatePositionsInNeighbourhoodOfHermes(neighbourhoodD));
+
 
         // positions around origin
         int i = 0;
-        while (i<15) {
+        while (i<14) {
             adjacentPositionsOfOrigin.addAll(calculatePossiblePositions2(adjacentPositionsOfOrigin));
+
             i++;
+            removeDuplicates(adjacentPositionsOfOrigin);
+
         }
 
         adjacentPositionsOfOrigin.addAll(calculatePositionsInNeighbourhoodOfHermes(neighbourhood));
@@ -58,7 +66,10 @@ public class HermesMoves extends DefaultMoves {
         {tmp.addAll((calculatePositionsOfCandidates(candidate)));
 
         }
+        stripOccupiedPositions(tmp);
 
+        // Strip out the positions that are floating and have no building below
+        stripFloatingPositions(tmp);
 
         return tmp;
 
@@ -96,6 +107,7 @@ public class HermesMoves extends DefaultMoves {
         stripFloatingPositions(adjacentPositions);
 
 
+
         return adjacentPositions;
     }
 
@@ -125,11 +137,12 @@ public class HermesMoves extends DefaultMoves {
                     }
                 }
             }
-        }
-        stripOccupiedPositions(adjacentPositions);
+
+        }stripOccupiedPositions(adjacentPositions);
 
         // Strip out the positions that are floating and have no building below
         stripFloatingPositions(adjacentPositions);
+
 
         return adjacentPositions;
     }

@@ -14,7 +14,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
 
-public class PrometheusMoves extends Action {
+public class   PrometheusMoves extends Action {
 
     public PrometheusMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
                            FigureRepository figureRepository,
