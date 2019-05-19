@@ -4,9 +4,12 @@ import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.repository.*;
-import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import ch.uzh.ifi.seal.soprafs19.utilities.Utilities;
 import org.springframework.boot.CommandLineRunner;
@@ -63,7 +66,7 @@ public class Application {
                 game.setUser1(user1);
                 game.setUser2(user2);
                 game.setCurrentTurn(user2);
-                game.setGodPower(i%2 == 0);
+                game.setGodPower(false);
                 gameService.postCreateGame(game);
             }
         };

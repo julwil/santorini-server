@@ -7,7 +7,10 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exceptions.GameRuleException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceActionNotAllowedException;
 import ch.uzh.ifi.seal.soprafs19.exceptions.ResourceNotFoundException;
-import ch.uzh.ifi.seal.soprafs19.repository.*;
+import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.DefaultTurn;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.turn.Turn;
@@ -130,17 +133,27 @@ public class GameService {
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
             }
-            game.setStatus(GameStatus.CANCELED);
-            gameRepository.save(game);
 
-            User user1 = game.getUser1();
-            User user2 = game.getUser2();
+            // If the game has started, the canceling user looses
+            if (game.getStatus() == GameStatus.STARTED) {
 
-            user1.setStatus(ONLINE);
-            user2.setStatus(ONLINE);
+                User winner = game.getUser1().equals(cancelingUser) ? game.getUser2() : game.getUser1();
+                setWinner(game, winner.getId());
+            }
 
-            userRepository.save(user1);
-            userRepository.save(user2);
+            else {
+                game.setStatus(GameStatus.CANCELED);
+                gameRepository.save(game);
+
+                User user1 = game.getUser1();
+                User user2 = game.getUser2();
+
+                user1.setStatus(ONLINE);
+                user2.setStatus(ONLINE);
+
+                userRepository.save(user1);
+                userRepository.save(user2);
+            }
         }
         catch (NullPointerException e) {
             throw new ResourceNotFoundException("No game with matching id found");
@@ -172,13 +185,15 @@ public class GameService {
         return gameRepository.findByUser2AndStatus(user2, status);
     }
 
-    public void setWinner(Game game, long ownerId) {
+    public void setWinner(Game game, long winnerId) {
 
         game.setStatus(GameStatus.FINISHED);
-        game.setWinnerId(ownerId);
+        game.setWinnerId(winnerId);
         game.getUser1().setStatus(ONLINE);
         game.getUser2().setStatus(ONLINE);
         gameRepository.save(game);
+        userRepository.save(game.getUser1());
+        userRepository.save(game.getUser2());
     }
 
     public void postFinishTurn(Game game, User user) throws GameRuleException {

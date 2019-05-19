@@ -19,7 +19,8 @@ public class AuthenticationService {
     private final GameRepository gameRepository;
 
     @Autowired
-    public AuthenticationService(UserRepository userRepository, GameRepository gameRepository) {
+    public AuthenticationService(UserRepository userRepository, GameRepository gameRepository)
+    {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
     }
@@ -33,13 +34,15 @@ public class AuthenticationService {
         return isAuthenticated(token) && token.equals(dbUser.getToken());
     }
 
-    public void authenticateUser(String token) throws FailedAuthenticationException {
+    public void authenticateUser(String token) throws FailedAuthenticationException
+    {
         if (!userRepository.existsByToken(token)) {
             throw new FailedAuthenticationException();
         }
     }
 
-    public void userTokenInGameById(String token, long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException {
+    public void userTokenInGameById(String token, long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException
+    {
         authenticateUser(token);
 
         if (!gameRepository.existsById(gameId)) {
@@ -54,27 +57,13 @@ public class AuthenticationService {
         }
     }
 
-    public void userTokenIsCurrentTurn(String token, long gameId) throws ResourceActionNotAllowedException {
+    public void userTokenIsCurrentTurn(String token, long gameId) throws ResourceActionNotAllowedException
+    {
         Game game = gameRepository.findById(gameId);
         User user = userRepository.findByToken(token);
 
         if (!game.getCurrentTurn().equals(user)) {
             throw new ResourceActionNotAllowedException();
         }
-    }
-
-    public void surrender(String token, long gameId) {
-
-        Game game= gameRepository.findById(gameId);
-        User loser = userRepository.findByToken(token);
-        User winner = new User();
-
-        if (game.getUser1().getId() == loser.getId()) {
-            winner = game.getUser2();
-        } else {
-            winner = game.getUser1();
-        }
-        game.setWinnerId(winner.getId());
-        game.setLoserId(loser.getId());
     }
 }
