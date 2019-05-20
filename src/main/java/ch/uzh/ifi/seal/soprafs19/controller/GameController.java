@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.exceptions.*;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameServiceDemo;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.utilities.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +21,15 @@ public class GameController {
     private final GameService service;
     private final UserRepository userRepository;
     private final GameServiceDemo gameServiceDemo;
+    private final AuthenticationService authenticationService;
 
 
 
-    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo) {
+
+    GameController(GameService service, UserRepository userRepository, GameServiceDemo gameServiceDemo, AuthenticationService authenticationService) {
         this.service = service;
         this.userRepository = userRepository;
-
+        this.authenticationService = authenticationService;
         this.gameServiceDemo = gameServiceDemo;
 
     }
@@ -35,9 +38,11 @@ public class GameController {
     @PostMapping(value = "/games",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, String> postCreateGame (
+            @RequestHeader("authorization") String token,
             @Valid @RequestBody Game newGame,
-            HttpServletResponse response)
+            HttpServletResponse response) throws FailedAuthenticationException
     {
+        authenticationService.authenticateUser(token);
         HashMap<String, String> pathToGame = new HashMap<>();
         pathToGame.put("path", this.service.postCreateGame(newGame));
 
@@ -50,8 +55,11 @@ public class GameController {
     public Game postAcceptGameRequestByUser (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            @RequestBody HashMap<String, Object> requestBody) throws ResourceNotFoundException, ResourceActionNotAllowedException
+            @RequestBody HashMap<String, Object> requestBody) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException
     {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, gameId);
+
         User user = this.userRepository.findByToken(token);
         String selectedGodPower = "";
         if (requestBody.containsKey("selectedGodPower")) {
@@ -83,175 +91,74 @@ public class GameController {
         @PostMapping("/games/demo/{id}/accept")
     public Game postAcceptDemoGameRequestByUser (
             @RequestHeader("authorization") String token,
-            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException, UsernameAlreadyExistsException {
+            @PathVariable("id") long gameId) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException, UsernameAlreadyExistsException
+    {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, gameId);
+
         User user = this.userRepository.findByToken(token);
 
         return gameServiceDemo.postAcceptDemoGameRequestByUser(gameId, user);
     }
 
-
-
-//    @CrossOrigin
-//    @PutMapping(value= "/games/godcards")
-//    Map<String, String> saveGodCards(
-//    @RequestHeader("authorization") String token, @Valid @RequestBody Game newGameGodCards,
-//    String godCard1, String godCard2){
-//
-//        HashMap<String, String> pathToGame = new HashMap<>();
-//        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
-//
-//        return pathToGame;
-//    }
-
-    @CrossOrigin
-    @PutMapping(value= "/games/godcards")
-    Map<String, String> saveGodCards(
-            @RequestHeader("authorization") String token,
-            @Valid @RequestBody Game newGameGodCards){
-
-        HashMap<String, String> pathToGame = new HashMap<>();
-
-        pathToGame.put("path", this.service.postCreateGame(newGameGodCards));
-
-        return pathToGame;
-    }
-
-
-
-//    @GetMapping(value = "/games/invitations",produces = "application/json;charset=UTF-8")
-//    @ResponseStatus(HttpStatus.OK)
-//
-//    public ArrayList<String> godCards2OutOf10 (
-//            @RequestHeader("authorization") String token,
-//            @RequestBody Game newGame
-//            )
-//    {
-//        ArrayList<String> godCards2OutOf10= godCardService.getGodcard1(newGame);
-//
-//
-//        return "{'turns':[" +
-//                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
-//                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
-//                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
-//                "]}";
-//    }
-
-
-
-
-
-
-
-
-
     @GetMapping(value = "/games/{id}",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     public Game getGameById (
             @RequestHeader("authorization") String token,
-            @PathVariable(value="id") long id)
-    {
+            @PathVariable(value="id") long id) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, id);
+
         return service.getGameById(id);
     }
-
-    // Get turns of Game
-    @GetMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
-    @ResponseStatus(HttpStatus.OK)
-    public String getTurnsByGame (
-            @PathVariable long id)
-    {
-        return "{'turns':[" +
-                "{'id':1,'createTime':'2019-04-03 12:22:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':true,'events':[]}," +
-                "{'id':2,'createTime':'2019-04-03 12:23:02','performedBy':{'id':2,'name':'testPlayer2','figures':['figure3','figure4']},'finished':true,'events':[]}," +
-                "{'id':3,'createTime':'2019-04-03 12:24:02','performedBy':{'id':1,'name':'testPlayer','figures':['figure1','figure2']},'finished':false,'events':[]}" +
-                "]}";
-    }
-
-
-
-
-
-    // Create new Move in Game
-    @PostMapping(value = "/games/{id}/turns",produces = "application/json;charset=UTF-8")
-    @ResponseStatus(HttpStatus.CREATED)
-    public String postCreateTurn (
-            @PathVariable long id)
-    {
-        return "{'path':'/games/"+id+"/turns/1'}";
-    }
-
 
     // Fetch all games
     @GetMapping("/games")
     public Iterable<Game> getAllGames (
             @RequestHeader("authorization") String token) throws FailedAuthenticationException
     {
+        authenticationService.authenticateUser(token);
         return service.getAllGames(token);
     }
-
 
     // Fetch all games of the logged in user
     @GetMapping("/games/invitations")
     public Iterable<Game> getGamesForUser2 (
-            @RequestHeader("authorization") String token)
-    {
+            @RequestHeader("authorization") String token) throws FailedAuthenticationException {
+        authenticationService.authenticateUser(token);
+
         User user2 = this.userRepository.findByToken(token);
         return service.getGamesForUser2AndStatus(user2, GameStatus.INITIALIZED);
     }
-
-
-
 
     @PostMapping("/games/{id}/reject")
     void postCancelGameRequest (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, gameId);
+
         Game game = this.service.getGameById(gameId);
+        User cancelingUser = this.userRepository.findByToken(token);
 
-        if(game.getStatus()==GameStatus.STARTED){
-            User loser = this.userRepository.findByToken(token);
-            User winner = new User();
-
-            if(game.getUser1().getId()==loser.getId()){
-                winner = game.getUser2();
-            }
-            else{winner=game.getUser1();
-            }
-            game.setWinnerId(winner.getId());
-            game.setLoserId(loser.getId());
-            service.postCancelGameRequestByUser(gameId, loser);
-            response.setStatus(204);
-        }
-        else{
-
-
-        User user = this.userRepository.findByToken(token);
-        service.postCancelGameRequestByUser(gameId, user);
-        response.setStatus(204);}
+        service.postCancelGameRequestByUser(game.getId(), cancelingUser);
     }
 
     @PostMapping("/games/{id}/finishTurn")
     void postFinishTurn (
             @RequestHeader("authorization") String token,
             @PathVariable("id") long gameId,
-            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException {
+            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, GameRuleException, FailedAuthenticationException
+    {
+        authenticationService.authenticateUser(token);
+        authenticationService.userTokenInGameById(token, gameId);
+        authenticationService.userTokenIsCurrentTurn(token, gameId);
+
         Game game = this.service.getGameById(gameId);
         User user = this.userRepository.findByToken(token);
         this.service.postFinishTurn(game, user);
 
         response.setStatus(204);
-    }
-
-    // Get players of Game
-    @GetMapping(value = "/games/{id}/players",produces = "application/json;charset=UTF-8")
-    @ResponseStatus(HttpStatus.OK)
-    public String getPlayersByGame (
-            @PathVariable long id)
-    {
-        return "{'players':[" +
-                "{'id':1,'name':'testPlayer','figures':['figure1','figure2']}," +
-                "{'id':2,'name':'testPlayer2','figures':['figure3','figure4']}" +
-                "]}";
     }
 }

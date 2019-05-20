@@ -124,27 +124,35 @@ public class GameService {
         }
     }
 
-    public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException
-    {
+    public void postCancelGameRequestByUser(long id, User cancelingUser) throws ResourceNotFoundException, ResourceActionNotAllowedException {
         try {
             Game game = gameRepository.findById(id);
 
             if (!(game.getUser1().equals(cancelingUser) || game.getUser2().equals(cancelingUser))) {
                 throw new ResourceActionNotAllowedException("Missing permission to cancel the game");
             }
-            game.setStatus(GameStatus.CANCELED);
-            gameRepository.save(game);
 
-            User user1 = game.getUser1();
-            User user2 = game.getUser2();
+            // If the game is running, the canceling user is the loser
+            if (game.getStatus() == GameStatus.STARTED) {
+                User loser = game.getUser1().equals(cancelingUser) ? game.getUser2() : game.getUser1();
+                setWinner(game, loser.getId());
+            }
 
-            user1.setStatus(ONLINE);
-            user2.setStatus(ONLINE);
+            else {
+                game.setStatus(GameStatus.CANCELED);
+                gameRepository.save(game);
 
-            userRepository.save(user1);
-            userRepository.save(user2);
+                User user1 = game.getUser1();
+                User user2 = game.getUser2();
+
+                user1.setStatus(ONLINE);
+                user2.setStatus(ONLINE);
+
+                userRepository.save(user1);
+                userRepository.save(user2);
+            }
         }
-        catch (NullPointerException e) {
+        catch(NullPointerException e){
             throw new ResourceNotFoundException("No game with matching id found");
         }
     }
@@ -180,6 +188,9 @@ public class GameService {
         game.setWinnerId(ownerId);
         game.getUser1().setStatus(ONLINE);
         game.getUser2().setStatus(ONLINE);
+
+        userRepository.save(game.getUser1());
+        userRepository.save(game.getUser2());
         gameRepository.save(game);
     }
 
