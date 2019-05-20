@@ -32,34 +32,28 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private Boolean isGodPower;
 
-//	@Column
-//	private ArrayList<String> godCards;
-
 	@OneToOne
 	private User currentTurn;
 
-	@Column
+    @Column
 	private long lastActiveFigureId;
 
 	// Player 1 is the challenger
-	@OneToOne
+    @OneToOne
 	private User user1;
 
 	// Player 2 is the challenged one
-	@OneToOne
+    @OneToOne
 	private User user2;
 
-	@Column
+    @Column
 	private String god1;
 
-	@Column
+    @Column
 	private String god2;
 
-	@Column
-	private long winner;
-
-	@Column
-	private long loser;
+    @Column
+    private long winner;
 
 	@Transient
 	private Turn turn;
@@ -71,13 +65,10 @@ public class Game implements Serializable {
 	private long demo;
 
 	@Column
-	private long athenaMoveUp;
+	private boolean athenaMovedUp;
 
 	@Column
 	private ArrayList<String> godCardsList;
-
-//	@OneToOne
-//	private User winner;
 
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
@@ -95,9 +86,7 @@ public class Game implements Serializable {
 		this.id = id;
 	}
 
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
+	public LocalDateTime getCreatedOn() {return createdOn;}
 
 	public GameStatus getStatus() {
 		return status;
@@ -107,102 +96,67 @@ public class Game implements Serializable {
 		this.status = status;
 	}
 
-	public Boolean getGodPower() {
-		return isGodPower;
-	}
+	public Boolean getGodPower() { return isGodPower; }
 
 	public void setGodPower(Boolean godPower) {
 		isGodPower = godPower;
 	}
 
-	public User getUser1() {
-		return user1;
-	}
+    public User getUser1() { return user1; }
 
-	public void setUser1(User user1) {
-		this.user1 = user1;
-	}
+    public void setUser1(User user1) { this.user1 = user1; }
 
-	public void setDemo(long demoLong) {
-		this.demo = demoLong;
-	}
+	public void setDemo(long demoLong) { this.demo=demoLong; }
 
-	public long checkIfDemo() {
+	public long checkIfDemo(){
 		return demo;
 	}
 
-	public User getUser2() {
-		return user2;
-	}
+    public User getUser2() { return user2; }
 
-	public void setUser2(User user2) {
-		this.user2 = user2;
-	}
+    public void setUser2(User user2) { this.user2 = user2; }
 
-	public User getCurrentTurn() {
-		return currentTurn;
-	}
+    public User getCurrentTurn() { return currentTurn; }
 
-	public void setCurrentTurn(User currentTurn) {
-		this.currentTurn = currentTurn;
-	}
+    public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
-//	public User getWinner() {return winner;	}
+	public Turn getTurn() {	return turn;}
 
-
-	public Turn getTurn() {
-		return turn;
-	}
-
-	public void setTurn(Turn turn) {
-		this.turn = turn;
-	}
-
-	public void deactivateAthenaMovedUp() {
-		this.athenaMoveUp = 0;
-	}
-
-	public void activateAthenaMovedUp() {
-		this.athenaMoveUp = 1;
-	}
-
-	public long statusAthenaMovedUp() {
-		return athenaMoveUp;
-	}
-
-	public User checkForAthena() {
-		if (god1.equals("athena")) {
-			return user1;
-		} else {
-			return user2;
-		}
-	}
-
+	public void setTurn(Turn turn) {this.turn = turn;}
 
 	@JsonIgnore
-	public long getLastActiveFigureId() {
-		return lastActiveFigureId;
+	public boolean getAthenaMovedUp() {
+		return athenaMovedUp;
 	}
 
 	@JsonIgnore
-	public void setLastActiveFigureId(long lastActiveFigureId) {
-		this.lastActiveFigureId = lastActiveFigureId;
+	public void setAthenaMovedUp(boolean athenaMovedUp) {
+		this.athenaMovedUp = athenaMovedUp;
 	}
 
 	@JsonIgnore
-	public boolean isMoveAllowedByUserId(long userId) {
-		return turn.isMoveAllowedByUserId(userId);
-	}
+	public long getLastActiveFigureId() {return lastActiveFigureId;}
 
 	@JsonIgnore
-	public boolean isPlaceFigureAllowedByUserId(long userId) {
+	public void setLastActiveFigureId(long lastActiveFigureId) {this.lastActiveFigureId = lastActiveFigureId; }
+
+	@JsonIgnore
+    public boolean isMoveAllowedByUserId(long userId)
+    {
+        return turn.isMoveAllowedByUserId(userId);
+    }
+
+	@JsonIgnore
+	public boolean isPlaceFigureAllowedByUserId(long userId)
+	{
 		return turn.isPlaceFigureAllowedByUserId(userId);
 	}
 
-	@JsonIgnore
-	public boolean isBuildAllowedByUserId(long userId) {
-		return turn.isBuildAllowedByUserId(userId);
-	}
+    @JsonIgnore
+    public boolean isBuildAllowedByUserId(long userId)
+    {
+        return turn.isBuildAllowedByUserId(userId);
+    }
 
 	public ArrayList<String> getGodCardsList() {
 		return godCardsList;
@@ -213,11 +167,12 @@ public class Game implements Serializable {
 	}
 
 	@JsonIgnore
-	public void swapTurns() {
+	public void swapTurns()
+	{
 		turn.swap();
 	}
 
-	@Override
+    @Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
 		if (!(o instanceof Game)) {
@@ -227,17 +182,11 @@ public class Game implements Serializable {
 		return this.getId().equals(user.getId());
 	}
 
-	public void setWinnerId(long ownerId) {
+	public void setWinnerId(long ownerId){
 
-		this.winner = ownerId;
-	}
+				this.winner=ownerId;}
 
-	public void setLoserId(long ownerId) {
-
-		this.loser = ownerId;
-	}
-
-	public long getWinner() {
+	public long getWinner(){
 		return winner;
 	}
 
@@ -245,11 +194,10 @@ public class Game implements Serializable {
 		this.god2 = selectedGodPower;
 	}
 
-	public String getGod1() {
+	public String getGod1(){
 		return god1;
 	}
-
-	public String getGod2() {
+	public String getGod2(){
 		return god2;
 	}
 
@@ -264,5 +212,4 @@ public class Game implements Serializable {
 	public void setCanFinishTurn(boolean canFinishTurn) {
 		this.canFinishTurn = canFinishTurn;
 	}
-
 }

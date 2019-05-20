@@ -5,7 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-
+import ch.uzh.ifi.seal.soprafs19.repository.MoveRepository;
 import ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.Action;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.FigureService;
 import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
@@ -14,13 +14,13 @@ import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
 
-public class   PrometheusMoves extends Action {
+public class PrometheusMoves extends Action {
 
     public PrometheusMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                           FigureRepository figureRepository,
+                           FigureRepository figureRepository, MoveRepository moveRepository,
                            GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository,  gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, figureService);
     }
 
     @Override
@@ -28,11 +28,11 @@ public class   PrometheusMoves extends Action {
     {
         int [] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
 
-        if ((game.statusAthenaMovedUp() == 1)){
-
+        // If athena moved up, we restrict moving
+        if (game.getAthenaMovedUp()) {
             neighbourhood[5] = 0;
-
         }
+
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
         // If he built before moving, the figure is not allowed to move up anymore.
