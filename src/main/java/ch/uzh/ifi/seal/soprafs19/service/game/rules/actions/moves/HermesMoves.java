@@ -10,7 +10,6 @@ import ch.uzh.ifi.seal.soprafs19.service.game.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -30,6 +29,11 @@ public class HermesMoves extends DefaultMoves {
         int[] neighbourhood = {-1, 1, -1, 1, -3, 1};
         int[] neighbourhoodD = {-1, 1, -1, 1, 0, 0};// LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         ArrayList<Position> adjacentPositionsOfOrigin =  new ArrayList<>();
+
+        // If athena moved up, we restrict moving
+        if (game.getAthenaMovedUp()) {
+            neighbourhood[5] = 0;
+        }
 
         adjacentPositionsOfOrigin.addAll(calculatePositionsInNeighbourhoodOfHermes(neighbourhoodD));
 

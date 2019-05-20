@@ -219,7 +219,7 @@ public class GameController {
             else{winner=game.getUser1();
             }
             game.setWinnerId(winner.getId());
-            game.setLoserId(loser.getId());
+
             service.postCancelGameRequestByUser(gameId, loser);
             response.setStatus(204);
         }
