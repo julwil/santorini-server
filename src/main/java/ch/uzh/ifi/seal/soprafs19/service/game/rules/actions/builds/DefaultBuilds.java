@@ -36,6 +36,7 @@ public class DefaultBuilds extends Action {
         // Strip out the positions that are floating and have no building below
         stripFloatingPositions(adjacentPositionsOfOrigin);
 
+
         return adjacentPositionsOfOrigin;
     }
 

@@ -32,8 +32,7 @@ public abstract class Action {
 
     public Action(Figure figure, GameBoard board, BuildingRepository buildingRepository,
                   FigureRepository figureRepository,
-                  GameRepository gameRepository, GameService gameService, FigureService figureService)
-    {
+                  GameRepository gameRepository, GameService gameService, FigureService figureService) {
         this.figure = figure;
         this.board = board;
         this.game = board.getGame();
@@ -46,13 +45,13 @@ public abstract class Action {
     }
 
     public abstract List<Position> calculatePossiblePositions();
+
     public abstract void perform();
 
     /* @param inBounds: lowerX, upperX, lowerY, upperY, lowerZ, upperZ
      * returns a list of adjacent positions that lay in the area around origin spanned by inBounds
      */
-    protected ArrayList<Position> calculatePositionsInNeighbourhood(int [] inBounds)
-    {
+    protected ArrayList<Position> calculatePositionsInNeighbourhood(int[] inBounds) {
         ArrayList<Position> adjacentPositions = new ArrayList<>();
 
         for (int dx = inBounds[0]; dx <= inBounds[1]; ++dx) {
@@ -77,8 +76,15 @@ public abstract class Action {
             }
         }
 
+
+        stripOccupiedPositions(adjacentPositions);
+        // Strip out the positions that are floating and have no building below
+        stripFloatingPositions(adjacentPositions);
+
+
         return adjacentPositions;
     }
+
 
     /*
      * returns a list of invalid positions where one can not move-to or build on, given a list of positions.

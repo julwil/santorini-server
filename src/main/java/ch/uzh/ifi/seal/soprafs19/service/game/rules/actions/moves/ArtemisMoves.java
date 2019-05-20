@@ -20,22 +20,29 @@ public class ArtemisMoves extends DefaultMoves {
         super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
     }
 
-    public ArrayList<Position> calculatePossiblePositionsArtemis() {
+    @Override
+    public ArrayList<Position> calculatePossiblePositions() {
 
-        Position originalPosition = getOriginPosition();
+         Position originalPosition = getOriginPosition();
 
-         // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
-        ArrayList<Position> adjacentPositionsOfOrigin = calculatePossiblePositions();
+        int[] neighbourhood = {-1, 1, -1, 1, -3, 1};
 
-        ArrayList<Position> tmpAdjacent = (ArrayList<Position>) adjacentPositionsOfOrigin.clone();
+        if ((game.statusAthenaMovedUp() == 1)){
 
-        for (int i = 0; i < tmpAdjacent.size(); i++) {
+            neighbourhood[5] = 0;
+        }
 
-            Position tempPosition = tmpAdjacent.get(i);
+        ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
+        ArrayList<Position> tmpAdjacent = new ArrayList<>();
+
+
+        for (int i = 0; i < adjacentPositionsOfOrigin.size(); i++) {
+
+            Position tempPosition = adjacentPositionsOfOrigin.get(i);
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
-                    for (int dz = -3; dz <= 1; ++dz) {
+                    for (int dz = -3; dz <= neighbourhood[5]; ++dz) {
                         if (dx != 0 || dy != 0 || dz != 0) {
                             if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
                                 continue;
@@ -48,27 +55,26 @@ public class ArtemisMoves extends DefaultMoves {
                             );
 
                             if (tmp.hasValidAxis()) {
-                                adjacentPositionsOfOrigin.add(tmp);
+                                tmpAdjacent.add(tmp);
                             }
                         }
                     }
                 }
             }
-
-
-            // Strip out positions that are occupied by other board items
-            stripOccupiedPositions(adjacentPositionsOfOrigin);
-
-            // Strip out the positions that are floating and have no building below
-            stripFloatingPositions(adjacentPositionsOfOrigin);
-
-            adjacentPositionsOfOrigin.remove(originalPosition);
-
         }
+
+        adjacentPositionsOfOrigin.addAll(tmpAdjacent);
+        // Strip out positions that are occupied by other board items
+        stripOccupiedPositions(adjacentPositionsOfOrigin);
+
+        // Strip out the positions that are floating and have no building below
+        stripFloatingPositions(adjacentPositionsOfOrigin);
+
+        adjacentPositionsOfOrigin.remove(originalPosition);
+
+
         return adjacentPositionsOfOrigin;
     }
 
 
 }
-
-

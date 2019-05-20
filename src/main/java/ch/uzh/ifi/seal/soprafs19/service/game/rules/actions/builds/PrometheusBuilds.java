@@ -29,6 +29,10 @@ public class PrometheusBuilds extends Action {
     public List<Position> calculatePossiblePositions()
     {
         int [] neighbourhood = {-1, 1, -1, 1, -3, 3}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
+        if ((game.statusAthenaMovedUp() == 1)){
+
+            neighbourhood[5] = 0;
+        }
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
         // Strip out positions that are occupied by other board items

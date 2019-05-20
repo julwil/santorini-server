@@ -14,7 +14,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
 
-public class PrometheusMoves extends Action {
+public class   PrometheusMoves extends Action {
 
     public PrometheusMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
                            FigureRepository figureRepository,
@@ -27,6 +27,12 @@ public class PrometheusMoves extends Action {
     public ArrayList<Position> calculatePossiblePositions()
     {
         int [] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
+
+        if ((game.statusAthenaMovedUp() == 1)){
+
+            neighbourhood[5] = 0;
+
+        }
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
         // If he built before moving, the figure is not allowed to move up anymore.
