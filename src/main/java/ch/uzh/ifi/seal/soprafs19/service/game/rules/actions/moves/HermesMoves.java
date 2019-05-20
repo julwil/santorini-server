@@ -11,6 +11,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 public class HermesMoves extends DefaultMoves {
@@ -28,7 +29,7 @@ public class HermesMoves extends DefaultMoves {
 
         int[] neighbourhood = {-1, 1, -1, 1, -3, 1};
         int[] neighbourhoodD = {-1, 1, -1, 1, 0, 0};// LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
-        ArrayList<Position> adjacentPositionsOfOrigin =  new ArrayList<>();
+        HashSet<Position> adjacentPositionsOfOrigin =  new HashSet<>();
 
         // If athena moved up, we restrict moving
         if (game.getAthenaMovedUp()) {
@@ -39,7 +40,7 @@ public class HermesMoves extends DefaultMoves {
 
         // positions around origin
         int i = 0;
-        while (i<3) {
+        while (i < 15) {
             adjacentPositionsOfOrigin.addAll(calculatePossiblePositions2(adjacentPositionsOfOrigin));
             i++;
         }
@@ -47,35 +48,21 @@ public class HermesMoves extends DefaultMoves {
         adjacentPositionsOfOrigin.addAll(calculatePositionsInNeighbourhoodOfHermes(neighbourhood));
         adjacentPositionsOfOrigin.add(getOriginPosition());
 
-        ArrayList<Position>cleanList =new ArrayList<>();
-
-        cleanList=removeDuplicates(adjacentPositionsOfOrigin);
-
-
-        return cleanList;
+        return new ArrayList<Position>(adjacentPositionsOfOrigin);
     }
 
-
-    public ArrayList<Position> calculatePossiblePositions2(ArrayList<Position> candidates) {
-        ArrayList<Position>tmp =new ArrayList<>();
-
+    public HashSet<Position> calculatePossiblePositions2(HashSet<Position> candidates) {
+        HashSet<Position>tmp =new HashSet<>();
 
         for (Position candidate: candidates )
         {tmp.addAll((calculatePositionsOfCandidates(candidate)));
-
         }
 
-
         return tmp;
-
     }
-
-
-
 
     public ArrayList<Position> calculatePositionsOfCandidates(Position position) {
         ArrayList<Position> adjacentPositions = new ArrayList<>();
-
 
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
@@ -104,8 +91,6 @@ public class HermesMoves extends DefaultMoves {
 
         return adjacentPositions;
     }
-
-
 
     public ArrayList<Position> calculatePositionsInNeighbourhoodOfHermes(int [] inBounds)
     {
@@ -139,26 +124,4 @@ public class HermesMoves extends DefaultMoves {
 
         return adjacentPositions;
     }
-
-
-
-    public ArrayList<Position> removeDuplicates(ArrayList<Position> list)
-    {
-
-        ArrayList<Position> newList = new ArrayList<Position>();
-
-        for (Position element : list) {
-
-
-            if (!newList.contains(element)) {
-
-                newList.add(element);
-            }
-        }
-
-
-        return newList;
-    }
-
-
 }
