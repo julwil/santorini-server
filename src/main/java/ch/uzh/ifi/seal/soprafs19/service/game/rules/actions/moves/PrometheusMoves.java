@@ -27,6 +27,12 @@ public class PrometheusMoves extends Action {
     public ArrayList<Position> calculatePossiblePositions()
     {
         int [] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
+
+        // If athena moved up, we restrict moving
+        if (game.getAthenaMovedUp()) {
+            neighbourhood[5] = 0;
+        }
+
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
 
         // If he built before moving, the figure is not allowed to move up anymore.

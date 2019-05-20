@@ -31,6 +31,11 @@ public class HermesMoves extends DefaultMoves {
         int[] neighbourhoodD = {-1, 1, -1, 1, 0, 0};// LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
         HashSet<Position> adjacentPositionsOfOrigin =  new HashSet<>();
 
+        // If athena moved up, we restrict moving
+        if (game.getAthenaMovedUp()) {
+            neighbourhood[5] = 0;
+        }
+
         adjacentPositionsOfOrigin.addAll(calculatePositionsInNeighbourhoodOfHermes(neighbourhoodD));
 
         // positions around origin

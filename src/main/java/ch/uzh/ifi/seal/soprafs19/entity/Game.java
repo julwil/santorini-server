@@ -32,9 +32,6 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private Boolean isGodPower;
 
-//	@Column
-//	private ArrayList<String> godCards;
-
 	@OneToOne
 	private User currentTurn;
 
@@ -58,9 +55,6 @@ public class Game implements Serializable {
     @Column
     private long winner;
 
-	@Column
-	private long loser;
-
 	@Transient
 	private Turn turn;
 
@@ -71,13 +65,10 @@ public class Game implements Serializable {
 	private long demo;
 
 	@Column
-	private long athenaMoveUp;
+	private boolean athenaMovedUp;
 
 	@Column
 	private ArrayList<String> godCardsList;
-
-//	@OneToOne
-//	private User winner;
 
 	@Column(nullable = false, updatable = false)
 	@CreationTimestamp
@@ -129,33 +120,19 @@ public class Game implements Serializable {
 
     public void setCurrentTurn(User currentTurn) { this.currentTurn = currentTurn; }
 
-//	public User getWinner() {return winner;	}
-
-
 	public Turn getTurn() {	return turn;}
 
 	public void setTurn(Turn turn) {this.turn = turn;}
 
-	public void deactivateAthenaMovedUp(){
-		this.athenaMoveUp=0;
+	@JsonIgnore
+	public boolean getAthenaMovedUp() {
+		return athenaMovedUp;
 	}
 
-	public void activateAthenaMovedUp(){
-		this.athenaMoveUp=1;
+	@JsonIgnore
+	public void setAthenaMovedUp(boolean athenaMovedUp) {
+		this.athenaMovedUp = athenaMovedUp;
 	}
-
-	public long statusAthenaMovedUp(){
-		return athenaMoveUp;
-	}
-
-	public User checkForAthena(){
-			if (god1.equals("athena")){
-		return user1;}
-				else{return user2;
-	}
-	}
-
-
 
 	@JsonIgnore
 	public long getLastActiveFigureId() {return lastActiveFigureId;}
@@ -209,16 +186,10 @@ public class Game implements Serializable {
 
 				this.winner=ownerId;}
 
-	public void setLoserId(long ownerId){
-
-		this.loser=ownerId;}
-
 	public long getWinner(){
 		return winner;
 	}
-	public long getLoser(){
-		return loser;
-	}
+
 	public void setGod2(String selectedGodPower) {
 		this.god2 = selectedGodPower;
 	}
@@ -241,12 +212,4 @@ public class Game implements Serializable {
 	public void setCanFinishTurn(boolean canFinishTurn) {
 		this.canFinishTurn = canFinishTurn;
 	}
-
-
-//	public long getWinnerId()
-//	{
-//		return winnerId;
-//	}
-
-//	public void setWinnerId(User winner) {this.winner = winner;}
 }

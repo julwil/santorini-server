@@ -134,11 +134,11 @@ public class GameController {
     @PostMapping("/games/{id}/reject")
     void postCancelGameRequest (
             @RequestHeader("authorization") String token,
-            @PathVariable("id") long gameId,
-            HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException {
+            @PathVariable("id") long gameId, HttpServletResponse response) throws ResourceNotFoundException, ResourceActionNotAllowedException, FailedAuthenticationException 
+    {
         authenticationService.authenticateUser(token);
         authenticationService.userTokenInGameById(token, gameId);
-
+      
         Game game = this.service.getGameById(gameId);
         User cancelingUser = this.userRepository.findByToken(token);
 
