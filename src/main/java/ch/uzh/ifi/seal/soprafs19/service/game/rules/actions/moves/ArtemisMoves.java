@@ -13,29 +13,28 @@ import java.util.ArrayList;
 
 
 public class ArtemisMoves extends DefaultMoves {
-
     public ArtemisMoves(Figure figure, GameBoard board, BuildingRepository buildingRepository,
-                    FigureRepository figureRepository,
-                    GameRepository gameRepository, GameService gameService, FigureService figureService)
+                        FigureRepository figureRepository,
+                        GameRepository gameRepository, GameService gameService, FigureService figureService)
     {
-        super(figure, board, buildingRepository, figureRepository,  gameRepository, gameService, figureService);
+        super(figure, board, buildingRepository, figureRepository, gameRepository, gameService, figureService);
     }
-
 
     @Override
     public ArrayList<Position> calculatePossiblePositions() {
 
-        Position originalPosition = getOriginPosition();
+         Position originalPosition = getOriginPosition();
 
         int[] neighbourhood = {-1, 1, -1, 1, -3, 1};
 
+        if ((game.statusAthenaMovedUp() == 1)){
+
+            neighbourhood[5] = 0;
+        }
+
         ArrayList<Position> adjacentPositionsOfOrigin = calculatePositionsInNeighbourhood(neighbourhood);
-
-        stripOccupiedPositions(adjacentPositionsOfOrigin);
-        stripFloatingPositions(adjacentPositionsOfOrigin);
-
-
         ArrayList<Position> tmpAdjacent = new ArrayList<>();
+
 
         for (int i = 0; i < adjacentPositionsOfOrigin.size(); i++) {
 
@@ -43,7 +42,7 @@ public class ArtemisMoves extends DefaultMoves {
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
-                    for (int dz = -3; dz <= 1; ++dz) {
+                    for (int dz = -3; dz <= neighbourhood[5]; ++dz) {
                         if (dx != 0 || dy != 0 || dz != 0) {
                             if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
                                 continue;
@@ -62,21 +61,20 @@ public class ArtemisMoves extends DefaultMoves {
                     }
                 }
             }
-
-
         }
 
         adjacentPositionsOfOrigin.addAll(tmpAdjacent);
-
+        // Strip out positions that are occupied by other board items
         stripOccupiedPositions(adjacentPositionsOfOrigin);
+
         // Strip out the positions that are floating and have no building below
         stripFloatingPositions(adjacentPositionsOfOrigin);
+
         adjacentPositionsOfOrigin.remove(originalPosition);
 
 
         return adjacentPositionsOfOrigin;
     }
+
+
 }
-
-
-
