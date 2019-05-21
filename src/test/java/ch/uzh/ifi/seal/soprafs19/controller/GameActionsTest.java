@@ -369,6 +369,29 @@ public class GameActionsTest {
         }
     }
 
+    @Test
+    public void getPossibleBuilds() throws Exception {
+        postFigures();
+
+        // Fetch possible moves for each godcard
+        String [] godCards = {"apollo", "artemis", "athena", "atlas", "demeter", "hephaestus", "hermes", "minotaur", "pan", "prometheus"};
+        long currentGame = Long.parseLong(gameId);
+        Game game = gameRepository.findById(currentGame);
+        long figure2Id = Long.parseLong(figure2);
+
+        for (int i = 0; i < godCards.length; i++) {
+            game.setGod1(godCards[i]);
+            game.setGod2(godCards[i]);
+            game.setLastActiveFigureId(figure2Id);
+            gameRepository.save(game);
+
+            this.mvc.perform(get("/games/" + gameId + "/buildings/possibleBuilds")
+                    .header("authorization", token2)
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is(200));
+        }
+    }
+
     @After
     public void tearDown() throws ResourceNotFoundException, ResourceActionNotAllowedException {
         long game = Long.parseLong(gameId);
