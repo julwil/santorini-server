@@ -162,10 +162,9 @@ public class GameDemoSetupTests {
     public void acceptGameInvitation() throws Exception
     {
         // Accept the game invitation
-        this.mvc.perform(post("/games/" + gameId + "/accept")
+        this.mvc.perform(post("/games/demo/" + gameId + "/accept")
                 .header("authorization", token2)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"selectedGodPower\": \"demeter\"}"))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200));
     }
 
