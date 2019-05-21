@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -135,10 +136,32 @@ public class GameSetupTests {
 
 
         // Create a game
-        HashMap<String, String> body = new HashMap<>();
+        HashMap<String, Object> body = new HashMap<>();
+
+        // Athena god card
+        HashMap<String, Object> athena = new HashMap<>();
+        athena.put("name", "athena");
+        athena.put("selected", true);
+        athena.put("user", null);
+
+        // Demeter god card
+        HashMap<String, Object> demeter = new HashMap<>();
+        athena.put("name", "demeter");
+        athena.put("selected", true);
+        athena.put("user", null);
+
+        ArrayList<HashMap<String, Object>> godCards = new ArrayList<>();
+
+        godCards.add(athena);
+        godCards.add(demeter);
+
+
+
+
         body.put("user1", user1);
         body.put("user2", user2);
-        body.put("isGodPower", "false");
+        body.put("isGodPower", "true");
+        body.put("godCards", godCards);
 
         JSONObject jsonBody = new JSONObject(body);
 
@@ -162,7 +185,7 @@ public class GameSetupTests {
         this.mvc.perform(post("/games/" + gameId + "/accept")
                 .header("authorization", token2)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"selectedGodPower\": null}"))
+                .content("{\"selectedGodPower\": \"demeter\"}"))
                 .andExpect(status().is(200));
     }
 
