@@ -69,11 +69,6 @@ public class GameController {
         return service.postAcceptGameRequestByUser(gameId, user, selectedGodPower);
     }
 
-
-
-
-
-
     // Create new Game
     @PostMapping(value = "/games/demoXWins",produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.CREATED)
