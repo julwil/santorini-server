@@ -11,6 +11,7 @@ import ch.uzh.ifi.seal.soprafs19.utilities.GameBoard;
 import ch.uzh.ifi.seal.soprafs19.utilities.Position;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 public class ArtemisMoves extends DefaultMoves {
@@ -21,53 +22,22 @@ public class ArtemisMoves extends DefaultMoves {
         super(figure, board, buildingRepository, figureRepository, moveRepository, gameRepository, gameService, figureService);
     }
 
-    public ArrayList<Position> calculatePossiblePositionsArtemis() {
+    @Override
+    public ArrayList<Position> calculatePossiblePositions() {
 
-        Position currentPosition = getOriginPosition();
-        Position originalPosition = getOriginPosition();
+        HashSet<Position> adjacentPositionsOfOrigin = new HashSet<>(super.calculatePossiblePositions());
+        HashSet<Position> secondMovePositions = new HashSet<>(adjacentPositionsOfOrigin);
+        Position initPosition = getOriginPosition(); // Position where the worker initially stands
 
-        int[] neighbourhood = {-1, 1, -1, 1, -3, 1}; // LowerX, UpperX, LowerY, UpperY, LowerZ, UpperZ
-        ArrayList<Position> adjacentPositionsOfOrigin = calculatePossiblePositions();
-
-        ArrayList<Position> tmpAdjacent = (ArrayList<Position>) adjacentPositionsOfOrigin.clone();
-
-        for (int i = 0; i < tmpAdjacent.size(); i++) {
-
-            Position tempPosition = tmpAdjacent.get(i);
-
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
-                    for (int dz = -3; dz <= 1; ++dz) {
-                        if (dx != 0 || dy != 0 || dz != 0) {
-                            if (dx == 0 && dy == 0) { // moving up/down along the z-axis ONLY is not allowed
-                                continue;
-                            }
-
-                            Position tmp = new Position(
-                                    tempPosition.getX() + dx,
-                                    tempPosition.getY() + dy,
-                                    tempPosition.getZ() + dz
-                            );
-
-                            if (tmp.hasValidAxis()) {
-                                adjacentPositionsOfOrigin.add(tmp);
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            // Strip out positions that are occupied by other board items
-            stripOccupiedPositions(adjacentPositionsOfOrigin);
-
-            // Strip out the positions that are floating and have no building below
-            stripFloatingPositions(adjacentPositionsOfOrigin);
-
-            adjacentPositionsOfOrigin.remove(originalPosition);
-
+        for (Position tmp : adjacentPositionsOfOrigin) {
+            setOriginPosition(tmp);
+            secondMovePositions.addAll(super.calculatePossiblePositions()); // Calculates the positions around tmp
         }
-        return adjacentPositionsOfOrigin;
+
+        // He must not move back to it's initial space
+        adjacentPositionsOfOrigin.remove(initPosition);
+
+        return new ArrayList<Position>(secondMovePositions);
     }
 
 

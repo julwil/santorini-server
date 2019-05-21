@@ -148,6 +148,10 @@ public abstract class Action {
         return originPosition;
     }
 
+    protected void setOriginPosition(Position position) {
+        this.originPosition = position;
+    }
+
     public Position getTargetPosition() {
         return targetPosition;
     }
