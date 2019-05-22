@@ -175,7 +175,7 @@ public class GameDemoSetupTests {
         this.mvc.perform(post("/games/" + gameId + "/reject")
                 .header("authorization", token2)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(200));
+                .andExpect(status().is(204));
     }
 
     @After
