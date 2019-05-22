@@ -148,6 +148,7 @@ public class GameController {
         User cancelingUser = this.userRepository.findByToken(token);
 
         service.postCancelGameRequestByUser(game.getId(), cancelingUser);
+        response.setStatus(204);
     }
 
     @PostMapping("/games/{id}/finishTurn")
