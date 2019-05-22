@@ -53,6 +53,8 @@ public class HephaestusBuilds extends DefaultBuilds {
             // If there is no such position and a second build is not possible,
             // swap the turns
             if (adjacentPositionsOfOrigin.isEmpty()) {
+                game.setLastActiveFigureId(0);
+                super.handleLoseCondition();
                 game.swapTurns();
             }
         }
