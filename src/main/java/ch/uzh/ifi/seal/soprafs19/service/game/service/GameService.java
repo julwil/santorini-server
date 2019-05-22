@@ -204,4 +204,9 @@ public class GameService {
         game.setLastActiveFigureId(0);
         gameRepository.save(game);
     }
+
+    public Iterable<Game> getAllGamesByUserId(long userId) {
+        User user = userRepository.findById(userId);
+        return gameRepository.findAllByUser1OrUser2(user, user);
+    }
 }
