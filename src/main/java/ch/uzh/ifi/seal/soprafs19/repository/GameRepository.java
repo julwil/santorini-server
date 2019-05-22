@@ -11,5 +11,5 @@ public interface GameRepository extends CrudRepository<Game, Long> {
 	Game findById(long id);
 	boolean existsById(long id);
 	Iterable<Game> findByUser2AndStatus(User user2, GameStatus status);
-	Iterable<Game> findByUser1AndStatus(User user1, GameStatus status);
+	Iterable<Game> findAllByUser1OrUser2(User user1, User user2);
 }

@@ -107,6 +107,16 @@ public class GameController {
         return service.getGameById(id);
     }
 
+    @GetMapping(value = "/users/{userId}/games",produces = "application/json;charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    public Iterable<Game> getGameByUserId (
+            @RequestHeader("authorization") String token,
+            @PathVariable(value="userId") long userId) throws FailedAuthenticationException, ResourceNotFoundException, ResourceActionNotAllowedException {
+        authenticationService.authenticateUser(token);
+
+        return service.getAllGamesByUserId(userId);
+    }
+
     // Fetch all games
     @GetMapping("/games")
     public Iterable<Game> getAllGames (
