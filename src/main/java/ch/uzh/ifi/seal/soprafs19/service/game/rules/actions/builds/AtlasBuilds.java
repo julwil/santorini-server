@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service.game.rules.actions.builds;
 import ch.uzh.ifi.seal.soprafs19.entity.BoardItem;
+import ch.uzh.ifi.seal.soprafs19.entity.Building;
 import ch.uzh.ifi.seal.soprafs19.entity.Figure;
 import ch.uzh.ifi.seal.soprafs19.repository.BuildingRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.FigureRepository;
@@ -44,6 +45,23 @@ public class AtlasBuilds extends Action {
     @Override
     public void perform()
     {
+        // If the building is a dome, we must ensure, lower positions are occupied,
+        // such that no build or move can be performed at this position
+        if (getTargetPosition().isCeil()) {
+
+            // The buildings lower neighbour
+            Position tmp = new Position (getTargetPosition().getX(), getTargetPosition().getY(), getTargetPosition().getZ() - 1);
+
+            while (tmp.hasValidAxis() && !getBoard().getBoardMap().containsKey(tmp)) {
+
+                Building tmpBuilding = new Building();
+                tmpBuilding.setGame(getBuilding().getGame());
+                tmpBuilding.setOwnerId(getBuilding().getOwnerId());
+                tmpBuilding.setPosition(tmp);
+                buildingRepository.save(tmpBuilding);
+                tmp.setZ(tmp.getZ() - 1);
+            }
+        }
         buildingRepository.save(getBuilding());
 
         // The LAF is set to 0 --> no figure is LAF
