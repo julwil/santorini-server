@@ -35,6 +35,7 @@ public class Figure extends BoardItem implements Serializable {
 
 	@JsonIgnore
 	public void build(Building building) {
+		builds.setTargetPosition(building.getPosition());
 		builds.setBuilding(building);
 		builds.perform();
 	}
